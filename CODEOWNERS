@@ -1,0 +1,7 @@
+# Protéger les fichiers critiques – exigent review de @votre-compte
+/app/page.tsx                          @votre-compte
+/app/components/WaitlistLandingPage.tsx @votre-compte
+/app/api/send-sms/route.ts             @votre-compte
+/app/api/verify-code/route.ts          @votre-compte
+/app/api/save-lead/route.ts            @votre-compte
+/public/images/*                       @votre-compte

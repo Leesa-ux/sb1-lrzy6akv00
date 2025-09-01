@@ -1,0 +1,16 @@
+# Guardrails – Ne pas modifier sans approbation
+
+- Ne PAS modifier le code sans instruction explicite de l'auteur.
+- Toute génération IA doit respecter le design actuel et NE PAS créer de nouveaux fichiers de page/routing sans accord.
+- Les fichiers protégés listés ci-dessous sont intouchables sans PR approuvée:
+  - app/page.tsx
+  - app/components/WaitlistLandingPage.tsx
+  - pages/api/send-sms.ts
+  - pages/api/verify-code.ts
+  - pages/api/save-lead.ts
+  - public/images/*
+
+Si une modification est nécessaire :
+1) Ouvrir une PR
+2) Mentionner @owner pour approbation
+3) Inclure captures avant/après

@@ -1,0 +1,16 @@
+{
+  "policyVersion": 1,
+  "rules": [
+    {
+      "id": "no-frontend-overwrite",
+      "description": "Ne pas réécrire les pages/routage existants sans approbation.",
+      "protectedPaths": [
+        "app/page.tsx",
+        "app/components/WaitlistLandingPage.tsx",
+        "public/images/*"
+      ],
+      "action": "require-approval"
+    }
+  ],
+  "contact": "@votre-compte"
+}
