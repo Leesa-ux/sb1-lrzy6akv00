@@ -30,21 +30,25 @@ class RateLimiter {
     
     if (!entry || now > entry.resetTime) {
       // Create new entry or reset expired one
-      this.cache.set(identifier, {
+      const newEntry: RateLimitEntry = {
         attempts: 1,
         resetTime: now + this.windowMs,
         lastAttempt: now,
-      });
-      return { allowed: true };
+      };
+      this.cache.set(identifier, newEntry);
+      console.debug("[RateLimiter] New window started", { identifier, ...newEntry });
+      return { allowed: true, resetTime: newEntry.resetTime };
     }
     
     if (entry.attempts >= this.maxAttempts) {
+      console.debug("[RateLimiter] Blocked request", { identifier, attempts: entry.attempts, resetTime: entry.resetTime });
       return { allowed: false, resetTime: entry.resetTime };
     }
     
     entry.attempts++;
     entry.lastAttempt = now;
-    return { allowed: true };
+    console.debug("[RateLimiter] Allowed request", { identifier, attempts: entry.attempts, resetTime: entry.resetTime });
+    return { allowed: true, resetTime: entry.resetTime };
   }
 
   reset(identifier: string): void {
@@ -52,9 +56,10 @@ class RateLimiter {
   }
 
   private cleanup(now: number): void {
-    for (const [key, entry] of this.cache.entries()) {
+    for (const [key, entry] of Array.from(this.cache.entries())) {
       if (now > entry.resetTime) {
         this.cache.delete(key);
+        console.debug("[RateLimiter] Cleaned up expired entry", { identifier: key });
       }
     }
   }

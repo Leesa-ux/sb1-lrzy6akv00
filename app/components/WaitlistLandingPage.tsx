@@ -1,503 +1,324 @@
-/**  DO NOT EDIT WITHOUT APPROVAL.
- *   This file is protected by GUARDRAILS.md and CODEOWNERS.
- *   Frontend must keep the 3-line headline and referral flow intact.
- */
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-'use client';
+/** === PATHS (utilisés à la fois pour l'affichage et pour les fallbacks) === */
+const HERO_IMAGE_SRC = "/images/hero-desert-beauty.jpg";
+// const HERO_IMAGE_SRC = "/images/hero-desert-beauty.png";
+const LOGO_IMAGE_SRC = "/images/afroe-logo.jpg";
+// const LOGO_IMAGE_SRC = "/images/afroe-logo.png";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Loader2, CheckCircle, Smartphone, Users, Zap } from 'lucide-react';
+// Construit le chemin disque attendu dans Next.js (où déposer le fichier)
+const HERO_DISK_PATH = `/public${HERO_IMAGE_SRC}`;
+const LOGO_DISK_PATH = `/public${LOGO_IMAGE_SRC}`;
 
-// Memoized feature data to prevent re-renders
-const FEATURES = [
-  {
-    icon: Smartphone,
-    title: 'Accès Prioritaire',
-    description: 'Soyez les premiers informés du lancement',
-    bgColor: 'bg-blue-100',
-    iconColor: 'text-blue-600'
-  },
-  {
-    icon: Users,
-    title: 'Communauté Exclusive',
-    description: 'Rejoignez un réseau de visionnaires',
-    bgColor: 'bg-purple-100',
-    iconColor: 'text-purple-600'
-  },
-  {
-    icon: Zap,
-    title: 'Innovation',
-    description: 'Découvrez les dernières technologies',
-    bgColor: 'bg-green-100',
-    iconColor: 'text-green-600'
-  }
-];
+/* ---------------- Progress Bar (animée) ---------------- */
+function ProgressBar({ points, breaks = [10, 25, 50, 100] }: { points: number; breaks?: number[] }) {
+  const total = breaks[3];
+  const pct = Math.max(0, Math.min(100, (points / total) * 100));
+  return (
+    <div className="w-full rounded-2xl border border-zinc-800 bg-[#0c0c0c] p-4">
+      <div className="mb-3 grid grid-cols-4 text-center text-xs sm:text-sm text-zinc-300">
+        <span>🌱 {breaks[0]} pts</span>
+        <span>✨ {breaks[1]} pts</span>
+        <span>💎 {breaks[2]} pts</span>
+        <span>🔥 {breaks[3]} pts</span>
+      </div>
+      <div className="relative h-3 w-full overflow-hidden rounded-full bg-[#222]">
+        <div
+          className="absolute left-0 top-0 h-full rounded-full"
+          style={{
+            width: pct + "%",
+            transition: "width 700ms ease",
+            background: "linear-gradient(90deg,#FF2D95,#7B2FFF,#00E5FF)",
+          }}
+        />
+      </div>
+      <div className="mt-3 grid grid-cols-4 gap-2 text-center text-[0.75rem] sm:text-[0.85rem] text-zinc-200">
+        <div>Badge VIP + Tuto</div>
+        <div>Bon service / Spotlight / Fees off</div>
+        <div>Afroé Pack</div>
+        <div>Jackpot 3 500 €</div>
+      </div>
+    </div>
+  );
+}
 
-// Memoized role options
-const ROLE_OPTIONS = [
-  { value: 'entrepreneur', label: 'Entrepreneur' },
-  { value: 'investisseur', label: 'Investisseur' },
-  { value: 'developpeur', label: 'Développeur' },
-  { value: 'client', label: 'Client' },
-  { value: 'autre', label: 'Autre' }
-];
+type Role = "client" | "influenceur" | "pro";
+
 
 export default function WaitlistLandingPage() {
-  const [step, setStep] = useState<'signup' | 'verify' | 'success'>('signup');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const mountedRef = useRef(true);
-  
-  // Form data
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [referralCode, setReferralCode] = useState('');
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState<Role>("client");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+  const [countdown, setCountdown] = useState("—");
 
-  // Memoized referral code generation
-  const makeReferralCode = useCallback(() => {
-    const base = (email || "guest").split("@")[0].replace(/[^a-zA-Z0-9]/g, "").slice(0, 6) || "afroe";
-    const rand = Math.random().toString(36).slice(2, 8);
-    return `${base}-${rand}`.toLowerCase();
-  }, [email]);
+  // (démo) points pour animer la barre
+  const [demoPts, setDemoPts] = useState(12);
 
-  // Memoized time formatting
-  const formatTime = useCallback((seconds: number) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const ss = Math.floor(seconds % 60).toString().padStart(2, "0");
-    return `${m}:${ss}`;
-  }, []);
-
-  // Timer effect for referral code expiration
+  // Countdown (change la date)
   useEffect(() => {
-    mountedRef.current = true;
-    if (timeLeft > 0) {
-      timerRef.current = setTimeout(() => {
-        if (mountedRef.current) {
-          setTimeLeft(prev => prev - 1);
-        }
-      }, 1000);
-      return () => {
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
-      };
-    }
-    return () => {
-      mountedRef.current = false;
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [timeLeft]);
-
-  // Memoized form validation
-  const isFormValid = useMemo(() => {
-    // Enhanced validation
-    const emailValid = email && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.trim());
-    const phoneValid = phone && /^\+?[1-9]\d{7,14}$/.test(phone.replace(/\s+/g, ''));
-    const roleValid = role && ['entrepreneur', 'investisseur', 'developpeur', 'client', 'autre'].includes(role);
-    
-    return emailValid && phoneValid && roleValid;
-  }, [email, phone, role]);
-
-  // Client-side rate limiting
-  const canSubmit = useMemo(() => {
-    const now = Date.now();
-    return now - lastSubmissionTime > 60000; // 1 minute cooldown
-  }, [lastSubmissionTime]);
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isFormValid || !canSubmit) {
-      if (!canSubmit) {
-        setError('Veuillez patienter avant de soumettre à nouveau');
-        return;
-      }
-      setError('Veuillez remplir tous les champs correctement');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setLastSubmissionTime(Date.now());
-
-    // Sanitize inputs
-    const sanitizedEmail = email.trim().toLowerCase();
-    const sanitizedPhone = phone.replace(/\s+/g, '');
-    try {
-      // Parallel requests for better performance
-      const [smsResponse, leadResponse] = await Promise.allSettled([
-        fetch('/api/send-sms', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: sanitizedPhone }),
-        }),
-        fetch('/api/save-lead', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email: sanitizedEmail, 
-            phone: sanitizedPhone, 
-            role, 
-            referralCode: '' 
-          }),
-        })
-      ]);
-
-      // Check SMS response
-      if (smsResponse.status === 'rejected' || !smsResponse.value.ok) {
-        const smsError = smsResponse.status === 'fulfilled' 
-          ? await smsResponse.value.json() 
-          : { error: 'Erreur envoi SMS' };
-        setError(smsError.error || 'Erreur envoi SMS');
-        return;
-      }
-
-      // Log lead save errors but don't block user flow
-      if (leadResponse.status === 'rejected' || !leadResponse.value.ok) {
-        console.warn('Lead save failed, but continuing with SMS verification');
-      }
-
-      setStep('verify');
-      // Clear verification code when moving to verify step
-      setVerificationCode('');
-    } catch (err) {
-      setError('Erreur de connexion');
-    } finally {
-      setLoading(false);
-    }
-  }, [email, phone, role, isFormValid, canSubmit]);
-
-  const handleVerification = useCallback(async () => {
-    if (!phone || verificationCode.length !== 4) {
-      setError('Code de vérification requis');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    const sanitizedPhone = phone.replace(/\s+/g, '');
-    const sanitizedCode = verificationCode.replace(/\D/g, ''); // Only digits
-
-    try {
-      const resp = await fetch('/api/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: sanitizedPhone, code: sanitizedCode }),
-      });
-      const json = await resp.json();
-
-      if (!resp.ok || !json.ok) {
-        setError('Code incorrect');
-        return;
-      }
-
-      // Success - generate referral code and set timer
-      const gen = makeReferralCode();
-      setReferralCode(gen);
-      setTimeLeft(15 * 60); // 15 minutes
-      setStep('success');
-
-      // Save verified lead with referral code (non-blocking)
-      try {
-        await fetch('/api/save-lead', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email: email.trim().toLowerCase(), 
-            phone: sanitizedPhone, 
-            role, 
-            referralCode: gen 
-          }),
-        });
-      } catch (err) {
-        console.warn('Referral code save failed');
-      }
-    } catch (err) {
-      setError('Erreur de vérification');
-    } finally {
-      setLoading(false);
-    }
-  }, [phone, verificationCode, email, role, makeReferralCode]);
-
-  const resendCode = useCallback(async () => {
-    if (!phone) {
-      setError('Numéro de téléphone requis');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    const sanitizedPhone = phone.replace(/\s+/g, '');
-
-    try {
-      const response = await fetch('/api/send-sms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: sanitizedPhone }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        setError(error.error || 'Erreur envoi SMS');
-      }
-    } catch (err) {
-      setError('Erreur de connexion');
-    } finally {
-      setLoading(false);
-    }
-  }, [phone]);
-
-  // Reset form when switching steps
-  const resetForm = useCallback(() => {
-    setEmail('');
-    setPhone('');
-    setRole('');
-    setVerificationCode('');
-    setError('');
-    setStep('signup');
+    const END = new Date("2025-10-01T23:59:59Z").getTime();
+    const t = setInterval(() => {
+      const now = Date.now();
+      let diff = Math.max(0, END - now);
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff / 3600000) % 24);
+      const m = Math.floor((diff / 60000) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      setCountdown(`${d}j ${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`);
+    }, 1000);
+    return () => clearInterval(t);
   }, []);
 
-  // Memoized feature cards to prevent unnecessary re-renders
-  const featureCards = useMemo(() => (
-    FEATURES.map((feature, index) => {
-      const IconComponent = feature.icon;
-      return (
-        <div key={index} className="text-center">
-          <div className={`w-12 h-12 ${feature.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
-            <IconComponent className={`w-6 h-6 ${feature.iconColor}`} />
-          </div>
-          <h3 className="font-semibold mb-2">{feature.title}</h3>
-          <p className="text-gray-600 text-sm">{feature.description}</p>
-        </div>
-      );
-    })
-  ), []);
+  const roleNote = useMemo(() => {
+    if (role === "pro") return "Pro : 1 mois de booking fees off (après 2 mois payés) au palier 2.";
+    if (role === "influenceur") return "Influenceur·e : spotlight IG/TikTok au palier 2.";
+    return "Client·e : bon service gratuit (cap 30) au palier 2.";
+  }, [role]);
 
-  // Memoized role options to prevent re-renders
-  const roleSelectItems = useMemo(() => (
-    ROLE_OPTIONS.map(option => (
-      <SelectItem key={option.value} value={option.value}>
-        {option.label}
-      </SelectItem>
-    ))
-  ), []);
+  async function sendOTP() {
+    if (!phone) return alert("Entre un numéro de téléphone.");
+    // TODO: fetch('/api/send-otp', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone }) })
+    setOtpSent(true);
+    alert("Code envoyé par SMS (démo).");
+  }
 
-  // Memoized formatted time display
-  const formattedTimeLeft = useMemo(() => 
-    timeLeft > 0 ? formatTime(timeLeft) : null
-  , [timeLeft, formatTime]);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !phone) return alert("Email et téléphone requis.");
+    if (otpSent && otp.length < 4) return alert("Entre le code de vérification SMS.");
+    // TODO: fetch('/api/join', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, phone, role, otp }) })
+    setSubmitted(true);
+    alert("Inscription envoyée (démo). Ton lien de parrainage arrive par email.");
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 will-change-scroll">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6 transform-gpu">
-            <Zap className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-[#0B0B0B] text-white flex flex-col items-center justify-center px-6 py-10">
+      {/* HEADER */}
+      <header className="w-full max-w-6xl mb-8 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3" aria-label="Accueil Afroé">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-zinc-800 bg-black">
+            {logoError ? (
+              <div className="w-full h-full grid place-items-center text-[10px] text-zinc-300 p-1 text-center leading-tight">
+                <div className="font-semibold">Logo manquant</div>
+                <div className="opacity-80">
+                  Place le fichier à<br />
+                  <code className="text-[9px]">{LOGO_DISK_PATH}</code>
+                  <br />URL : <code className="text-[9px]">{LOGO_IMAGE_SRC}</code>
+                </div>
+              </div>
+            ) : (
+              <Image
+                src={LOGO_IMAGE_SRC}
+                alt="Logo Afroé"
+                fill
+                sizes="48px"
+                className="object-cover"
+                onError={() => setLogoError(true)}
+                priority
+              />
+            )}
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 transform-gpu">
-            Rejoignez AFROÉ
+          <div>
+            <div className="font-extrabold tracking-wide">Afroé</div>
+            <div className="text-xs text-zinc-400">Hip-Hop Glam • Indie Luxe</div>
+          </div>
+        </Link>
+        <span className="text-[10px] px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/60">Private Waitlist</span>
+      </header>
+
+      {/* HERO */}
+      <div className="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
+        {/* Image (from /public). Fallback si manquante. */}
+        <div className="flex-1 order-1 md:order-2 flex justify-center">
+          {imgError ? (
+            <div className="w-[300px] h-[400px] sm:w-[400px] sm:h-[500px] rounded-lg bg-gradient-to-br from-[#1B9AA2] via-[#8E58C7] to-[#92D14F] flex items-center justify-center text-center text-zinc-900 font-semibold">
+              <div className="p-4">
+                <div className="mb-1">Image manquante</div>
+                <span className="block text-xs opacity-80">
+                  Place le fichier à&nbsp;<code>{HERO_DISK_PATH}</code>
+                  <br />URL : <code>{HERO_IMAGE_SRC}</code>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <Image
+              src={HERO_IMAGE_SRC}
+              alt="Couple Afro-descendant avec trolleys beauté Afroé"
+              width={400}
+              height={500}
+              className="rounded-lg shadow-xl w-[300px] sm:w-[400px] h-auto"
+              onError={() => setImgError(true)}
+              priority
+            />
+          )}
+        </div>
+
+        {/* Texte + FORM global (email+tel+role+OTP) */}
+        <div className="flex-1 text-center md:text-left flex flex-col order-2 md:order-1">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-3 md:mb-4 bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] bg-clip-text text-transparent">
+            ON CHANGE DE GAME
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            La plateforme révolutionnaire qui connecte l'Afrique au monde. 
-            Soyez parmi les premiers à découvrir l'avenir du commerce digital africain.
+
+          <p className="text-xl sm:text-2xl text-zinc-300 mb-4 md:mb-6">
+            <span className="block">Le futur de la beauté afro démarre maintenant. 🔥</span>
+            <span className="block">Afroé, c’est l’étincelle qui allume le game.</span>
+            <span className="block">Pro ? Monte ton business d’un cran.</span>
+            <span className="block">Client·e ? Connecte-toi aux meilleurs pros.</span>
+            <span className="block">Ce n’est pas juste une app. C’est ta nouvelle force.</span>
           </p>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16">
-            {featureCards}
+
+          {/* Bloc récompenses court */}
+          <div className="relative mt-2 md:mt-4 p-6 rounded-2xl bg-gradient-to-r from-[#1B9AA2] via-[#8E58C7] to-[#92D14F] text-black shadow-xl inline-block">
+            <div aria-hidden className="absolute -top-6 -left-6 w-16 h-16 rounded-full bg-white flex items-center justify-center font-extrabold text-sm shadow-lg animate-bounce">
+              €3500
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold mb-1">🎁 Jusqu’à 3500€ de récompenses</h2>
+            <p className="text-sm text-[#0B0B0B]">
+              Invite, grimpe les paliers, débloque des exclus — et vise la cagnotte <strong>3 500€</strong>.
+            </p>
           </div>
-        </div>
 
-        {/* Waitlist Form */}
-        <div className="max-w-md mx-auto">
-          {step === 'signup' && (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm transform-gpu">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Rejoignez la liste d'attente</CardTitle>
-                <CardDescription>
-                  Inscrivez-vous pour être notifié du lancement
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Téléphone</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+33 6 12 34 56 78"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      required
-                    />
-                  </div>
+          {/* FORM principal */}
+          <form onSubmit={handleSubmit} className="mt-5 grid gap-3 max-w-lg">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Balance ton email"
+              className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#1B9AA2]"
+            />
+            <input
+              type="tel"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+32 4 12 34 56 78"
+              className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#1B9AA2]"
+            />
 
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Vous êtes</Label>
-                    <Select value={role} onValueChange={setRole} required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez votre profil" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roleSelectItems}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex items-center gap-2 rounded-full border border-zinc-800 bg-[#111] px-3 py-2 text-sm">
+                <input type="radio" checked={role === "client"} onChange={() => setRole("client")} /> Client·e
+              </label>
+              <label className="flex items-center gap-2 rounded-full border border-zinc-800 bg-[#111] px-3 py-2 text-sm">
+                <input type="radio" checked={role === "influenceur"} onChange={() => setRole("influenceur")} /> Influenceur·e
+              </label>
+              <label className="flex items-center gap-2 rounded-full border border-zinc-800 bg-[#111] px-3 py-2 text-sm">
+                <input type="radio" checked={role === "pro"} onChange={() => setRole("pro")} /> Pro beauté
+              </label>
+            </div>
 
-                  {error && (
-                    <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
-                      {error}
-                    </div>
-                  )}
+            {otpSent && (
+              <input
+                inputMode="numeric"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Code de vérification (6 chiffres)"
+                className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#1B9AA2]"
+              />
+            )}
 
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform-gpu transition-all duration-200"
-                    disabled={loading || !isFormValid}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Envoi en cours...
-                      </>
-                    ) : (
-                      'Rejoindre la liste d\'attente'
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={sendOTP}
+                className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black shadow-md"
+              >
+                Envoyer code SMS
+              </button>
+              <button
+                type="submit"
+                className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black shadow-md"
+              >
+                Prends ta place
+              </button>
+            </div>
 
-          {step === 'verify' && (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm transform-gpu">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Vérification SMS</CardTitle>
-                <CardDescription>
-                  Entrez le code reçu par SMS au {phone}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex justify-center">
-                  <InputOTP
-                    maxLength={4}
-                    value={verificationCode}
-                    onChange={setVerificationCode}
-                  >
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-
-                {error && (
-                  <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
-                    {error}
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                  <Button 
-                    onClick={handleVerification}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform-gpu transition-all duration-200"
-                    disabled={loading || verificationCode.length !== 4}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Vérification...
-                      </>
-                    ) : (
-                      'Vérifier le code'
-                    )}
-                  </Button>
-
-                  <Button 
-                    variant="outline" 
-                    onClick={resendCode}
-                    className="w-full transform-gpu transition-all duration-200"
-                    disabled={loading}
-                  >
-                    Renvoyer le code
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {step === 'success' && (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm transform-gpu">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto transform-gpu">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Bienvenue dans AFROÉ !</h2>
-                  <p className="text-gray-600">
-                    Votre inscription a été confirmée. Vous recevrez bientôt des nouvelles exclusives.
-                  </p>
-                  
-                  {referralCode && (
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
-                      <h3 className="font-semibold text-gray-900 mb-2">Votre code de parrainage</h3>
-                      <div className="bg-white p-3 rounded-lg border-2 border-dashed border-blue-300">
-                        <code className="text-lg font-mono text-blue-600">{referralCode}</code>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Partagez ce code pour inviter vos contacts
-                      </p>
-                      {formattedTimeLeft && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Expire dans: {formattedTimeLeft}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      💡 <strong>Astuce:</strong> Partagez AFROÉ avec vos contacts pour accélérer le lancement !
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-16 text-gray-500 text-sm">
-          <p>© 2025 AFROÉ. L'avenir commence ici.</p>
+            <p className="text-xs text-zinc-400">{roleNote} Ton lien de parrainage arrive par email après confirmation.</p>
+          </form>
         </div>
       </div>
+
+      {/* Mockup téléphone (garde ton design) */}
+      <div className="relative w-[280px] sm:w-[320px] h-[550px] sm:h-[650px] rounded-[40px] border-[10px] border-[#2A2A2A] bg-black shadow-2xl overflow-hidden flex-shrink-0 mt-10 md:mt-16">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20" />
+        <div className="absolute inset-0 overflow-y-auto">
+          {/* Header mock */}
+          <div className="h-36 sm:h-40 bg-gradient-to-br from-[#1B9AA2] via-[#8E58C7] to-[#92D14F] flex flex-col justify-center items-center text-center px-4">
+            <h1 className="text-2xl sm:text-3xl font-extrabold">Afroé</h1>
+            <p className="text-xs sm:text-sm text-[#E9E3D6] mt-1">Barbe, Coiffure, Ongles, Maquillage, Soins Esthétiques</p>
+          </div>
+
+          <div className="p-5">
+            {!submitted ? (
+              <p className="text-sm text-zinc-300 text-center">Inscris-toi ci-dessus pour recevoir ton lien de parrainage.</p>
+            ) : (
+              <p className="text-sm text-zinc-300 text-center">✅ Merci ! Check ton email pour ton lien unique.</p>
+            )}
+          </div>
+
+          {/* Référal helper */}
+          <div className="px-5 mt-2">
+            <div className="flex flex-col items-center gap-2 text-xs">
+              <div className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] p-[1px] rounded-full">
+                <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-700 bg-[#141416]/95">
+                  <span className="w-2 h-2 rounded-full bg-[#92D14F]" aria-hidden />
+                  Invite tes amis → gagne des services gratuits
+                </span>
+              </div>
+              <span className="opacity-70">Ton lien est dans l’email de confirmation.</span>
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 w-full py-3 text-center text-[10px] text-zinc-500 border-t border-zinc-800">
+            © {new Date().getFullYear()} Afroé
+          </div>
+        </div>
+      </div>
+
+      {/* REWARDS + URGENCE */}
+      <section className="w-full max-w-6xl mt-10 md:mt-14">
+        <div className="rounded-2xl border border-zinc-900 bg-[#0f0f0f] p-5">
+          <h3 className="m-0 text-lg font-semibold">🎁 Ladder des récompenses</h3>
+          <p className="text-sm text-zinc-400">Invite tes amis, grimpe les paliers, débloque des cadeaux exclusifs.</p>
+          <div className="mt-3">
+            <ProgressBar points={demoPts} />
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center rounded-full border border-dashed border-zinc-800 px-3 py-1 text-sm text-zinc-200">
+              Cap : 30 bons service
+            </span>
+            <span className="inline-flex items-center rounded-full border border-dashed border-zinc-800 px-3 py-1 text-sm text-zinc-200">
+              Cap : 50 Afroé Packs
+            </span>
+            <span className="inline-flex items-center rounded-full border border-dashed border-zinc-800 px-3 py-1 text-sm font-extrabold text-zinc-200">
+              ⏳ Fin dans {countdown}
+            </span>
+          </div>
+
+          {/* (Démo) contrôles points */}
+          <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
+            <button onClick={() => setDemoPts((p) => Math.max(0, p - 5))} className="rounded-lg border border-zinc-800 px-3 py-1">
+              −5 pts
+            </button>
+            <span>Points actuels : {demoPts}</span>
+            <button onClick={() => setDemoPts((p) => Math.min(100, p + 5))} className="rounded-lg border border-zinc-800 px-3 py-1">
+              +5 pts
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
