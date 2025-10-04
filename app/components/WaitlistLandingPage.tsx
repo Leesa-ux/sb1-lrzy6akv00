@@ -228,86 +228,80 @@ export default function WaitlistLandingPage() {
             </form>
           </div>
 
-          {/* Colonne droite : Phone mockup */}
+          {/* Colonne droite : Phone mockup hybride */}
           <div className="order-1 md:order-2 flex justify-center items-center">
-            <div className="relative w-[320px] h-[640px]">
-              {/* Phone frame */}
-              <div className="absolute inset-0 bg-black rounded-[3rem] shadow-2xl border-[14px] border-black">
-                {/* Notch */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-10"></div>
+            <div className="relative w-[280px] sm:w-[320px] h-[550px] sm:h-[650px] rounded-[40px] border-[10px] border-[#2A2A2A] bg-black shadow-2xl overflow-hidden flex-shrink-0 mt-10 md:mt-16">
+              {/* En-tête (notch) */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20" />
 
-                {/* Screen content */}
-                <div className="w-full h-full bg-[#0a0a0a] rounded-[2.5rem] overflow-hidden relative">
-                  {/* Status bar */}
-                  <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-8 text-white text-xs z-20">
-                    <span>9:41</span>
-                    <div className="flex gap-1 items-center">
-                      <div className="w-4 h-3 border border-white rounded-sm"></div>
-                      <div className="w-4 h-3 border border-white rounded-sm"></div>
-                      <div className="w-4 h-3 border border-white rounded-sm"></div>
-                    </div>
-                  </div>
+              {/* Contenu interne */}
+              <div className="absolute inset-0 overflow-y-auto flex flex-col">
+                {/* Logo + catégories */}
+                <div className="h-36 sm:h-40 bg-gradient-to-br from-[#1B9AA2] via-[#8E58C7] to-[#92D14F] flex flex-col justify-center items-center text-center px-4">
+                  <Image
+                    src={LOGO_IMAGE_SRC}
+                    alt="Logo Afroé"
+                    width={50}
+                    height={50}
+                    className="rounded-full mb-2"
+                    priority
+                  />
 
-                  {/* App content */}
-                  <div className="pt-16 px-6 h-full overflow-y-auto">
-                    {/* Logo */}
-                    <div className="flex justify-center mb-6">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] flex items-center justify-center">
-                        <span className="text-2xl font-bold text-black">A</span>
-                      </div>
-                    </div>
+                  {/* Liste services avec points épais */}
+                  <p className="text-xs sm:text-sm text-[#E9E3D6] flex flex-wrap justify-center gap-2">
+                    <span>Barbe</span>
+                    <span className="font-extrabold">•</span>
+                    <span>Maquillage</span>
+                    <span className="font-extrabold">•</span>
+                    <span>Ongles</span>
+                    <span className="font-extrabold">•</span>
+                    <span>Coiffure</span>
+                    <span className="font-extrabold">•</span>
+                    <span>Soins</span>
+                  </p>
+                </div>
 
-                    {/* Title */}
-                    <h3 className="text-white text-xl font-bold text-center mb-2">Rejoins Afroé</h3>
-                    <p className="text-zinc-400 text-xs text-center mb-6">
-                      Inscris-toi et débloque des récompenses exclusives
+                {/* Texte principal */}
+                <div className="p-5 text-center text-sm text-zinc-300">
+                  <p className="font-semibold text-base mb-2">
+                    Inscris-toi & invite tes amis 🎉
+                  </p>
+                  <p>
+                    💎 Gagne des services beauté gratuits et tente ta chance au Jackpot Afroé <strong>3 500 €</strong>.
+                  </p>
+
+                  {/* Bouton voir plus (mobile uniquement) */}
+                  <button
+                    className="mt-3 text-xs text-[#92D14F] underline sm:hidden"
+                    onClick={() => {
+                      const details = document.getElementById("mockup-details");
+                      if (details) details.classList.toggle("hidden");
+                    }}
+                  >
+                    Voir plus +
+                  </button>
+
+                  {/* Détails : cachés en mobile, visibles en desktop */}
+                  <div
+                    id="mockup-details"
+                    className="hidden sm:block mt-3 space-y-2 text-left text-xs sm:text-sm"
+                  >
+                    <p>👯 Chaque ami inscrit = une chance en plus.</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>🎀 Badge VIP + -10%</li>
+                      <li>✨ Services beauté gratuits</li>
+                      <li>💎 Afroé Beauty Kit (80€+)</li>
+                      <li>🏆 Accès au Jackpot Afroé 3 500 €</li>
+                    </ul>
+                    <p className="text-[#92D14F] font-semibold mt-2">
+                      Plus tu parraines, plus tu montes en récompenses ✨
                     </p>
-
-                    {/* Mini form preview */}
-                    <div className="space-y-3">
-                      <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl px-4 py-3">
-                        <span className="text-zinc-600 text-sm">Balance ton email</span>
-                      </div>
-
-                      <button className="w-full bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black">
-                        Prends ta place
-                      </button>
-
-                      <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl px-4 py-3">
-                        <span className="text-zinc-600 text-sm">+32 4 12 34 56 78</span>
-                      </div>
-
-                      <div className="flex gap-2 text-xs">
-                        <span className="px-3 py-2 rounded-full border border-[#1B9AA2] bg-[#111] text-white">Client·e</span>
-                        <span className="px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-zinc-500">Influenceur·e</span>
-                      </div>
-
-                      <button className="w-full bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black">
-                        Envoyer code SMS
-                      </button>
-
-                      {/* Rewards preview */}
-                      <div className="mt-8 pt-6 border-t border-zinc-800">
-                        <p className="text-white text-sm font-semibold mb-3">🎁 Tes récompenses</p>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-lg">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#8E58C7] to-[#1B9AA2] flex items-center justify-center text-xs">✨</div>
-                            <div>
-                              <p className="text-white text-xs font-medium">Badge Early Bird</p>
-                              <p className="text-zinc-500 text-[10px]">Palier 1 · 10 points</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-lg opacity-50">
-                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs">🎯</div>
-                            <div>
-                              <p className="text-zinc-400 text-xs">Accès VIP Beta</p>
-                              <p className="text-zinc-600 text-[10px]">Palier 2 · 25 points</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
+                </div>
+
+                {/* Footer interne du mockup */}
+                <div className="mt-auto w-full py-3 text-center text-[10px] text-zinc-500 border-t border-zinc-800">
+                  © {new Date().getFullYear()} Afroé
                 </div>
               </div>
             </div>
