@@ -247,45 +247,40 @@ export default function WaitlistLandingPage() {
               {/* === BEGIN: mockup body text (replace only this block) === */}
               <div className="p-5 text-left text-[13px] sm:text-[14px] leading-relaxed text-zinc-200 space-y-3">
                 <h4 className="font-semibold text-[15px] sm:text-[16px]">
-                  Inscris-toi & invite tes ami·e·s 🎉
+                  ✨ Rejoins Afroé & invite des ami·e·s.
                 </h4>
 
                 <p>
-                  🎀 Bonus immédiat&nbsp;: <strong>-10% sur tes services</strong>.
+                  Direct, tu choppes <strong>-10% sur tes services</strong> pour chaque personne que tu réfères.
                 </p>
 
-                <p className="mt-2 text-zinc-100">
-                  👯 <strong>Deux catégories de filleuls :</strong>
-                </p>
-                <ul className="list-none space-y-1">
+                <ul className="list-none space-y-2 mt-3">
                   <li>
-                    👤 <strong>Client normal</strong> — tu gagnes des points dès qu'il/elle télécharge l'app
-                    <span className="italic text-zinc-400"> (disponible dès le lancement Afroé)</span>.
+                    🪪 Un·e <strong>client·e</strong> télécharge l'app → points pour toi.
                   </li>
                   <li>
-                    💼 <strong>Pro beauté afro / influenceur·e</strong> — tu gagnes
-                    <strong> plus de points</strong> dès qu'il/elle souscrit et paie son abonnement
-                    <span className="italic text-zinc-400"> (possible dès lancement Afroé)</span>.
+                    💎 Un·e <strong>pro beauté / influenceur·e</strong> s'abonne → encore plus de points.
                   </li>
                 </ul>
 
-                <div className="text-zinc-300">
-                  ⚠️ Les grosses récompenses (services gratuits, Beauty Kit, Jackpot 3 500 €)
-                  sont calculées à la fin de la période selon la logique de points. Le parrain reçoit
-                  des <strong>points bonus</strong> si le filleul pro a payé au moins
-                  <strong> 2 mois d'abonnement</strong>.
-                </div>
-
-                <div className="border-t border-zinc-800 pt-3 space-y-1">
-                  <p>🎀 Badge VIP + -10%</p>
-                  <p>✨ Services beauté gratuits</p>
-                  <p>💎 Afroé Beauty Kit (80€+)</p>
-                  <p>🏆 Accès au Jackpot Afroé 3 500 €</p>
-                </div>
-
-                <p className="text-[#92D14F] font-semibold">
-                  Plus tu parraines, plus tu montes en récompenses ✨
+                <p className="mt-3 text-zinc-100">
+                  Et plus tu montes, plus tu débloques :
                 </p>
+
+                <div className="space-y-1 text-zinc-200">
+                  <p>🌟 10 pts → Tutos VIP</p>
+                  <p>🌸 25 pts → Services gratuits + accès VIP anticipé</p>
+                  <p>👜 50 pts → Afroé Beauty Kit (80€+)</p>
+                  <p>👑 100 pts → Participation au Jackpot Afroé 3 500 €</p>
+                </div>
+
+                <div className="text-zinc-300 mt-3 text-[12px] sm:text-[13px]">
+                  🔑 Si ton Pro garde 2 mois d'abo → bonus encore plus lourd pour toi.
+                </div>
+
+                <div className="text-zinc-400 mt-3 text-[11px] sm:text-[12px] italic">
+                  ℹ️ Quand l'app sera en ligne, ton score sera mis à jour : tes points seront mis à jour sur la base des vrais téléchargements et des pros payants.
+                </div>
               </div>
               {/* === END: mockup body text === */}
 
