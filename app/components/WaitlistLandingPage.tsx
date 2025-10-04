@@ -300,32 +300,30 @@ export default function WaitlistLandingPage() {
 
       {/* EDITORIAL IMAGE PLACEHOLDER */}
       <section className="mx-auto w-full max-w-7xl px-6 pb-16">
-        <div className="relative w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden bg-gradient-to-br from-[#1B9AA2]/20 via-[#8E58C7]/20 to-[#92D14F]/20 border border-zinc-800">
-          {/* Overlay pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0" style={{
-              backgroundImage: 'radial-gradient(circle at 2px 2px, rgb(255 255 255 / 0.15) 1px, transparent 0)',
-              backgroundSize: '32px 32px'
-            }}></div>
-          </div>
+        <div className="relative w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-zinc-800">
+          {/* Background Image */}
+          <Image
+            src="/images/Outils professionnels et style moderne.png"
+            alt="Outils professionnels Afroé"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 1280px"
+          />
+
+          {/* Overlay gradient for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
           {/* Content */}
-          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-            <div className="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] flex items-center justify-center">
-              <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-              Afroé Editorial
+          <div className="relative z-10 h-full flex flex-col items-center justify-end text-center px-6 pb-12">
+            <h3 className="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight">
+              OUTILS PRO, SERVICES PRO,<br />MINDSET PRO
             </h3>
 
-            <p className="text-zinc-400 text-sm md:text-base max-w-md">
+            <p className="text-zinc-200 text-sm md:text-base max-w-md mb-6">
               L'univers beauté afro comme tu ne l'as jamais vu • Découvre notre vision
             </p>
 
-            <div className="mt-6 px-6 py-2 rounded-full bg-zinc-900/80 border border-zinc-700 text-xs text-zinc-400">
+            <div className="px-6 py-2 rounded-full bg-zinc-900/80 border border-zinc-700 text-xs text-zinc-400 backdrop-blur-sm">
               Coming Soon
             </div>
           </div>
