@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   // Fix webpack cache issues
   webpack: (config, { dev, isServer }) => {
     // Disable webpack cache completely to prevent corruption

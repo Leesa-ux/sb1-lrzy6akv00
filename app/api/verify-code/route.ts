@@ -41,12 +41,12 @@ const rateLimitCache = new Map<string, { attempts: number; lastAttempt: number }
 function cleanupRateLimit() {
   const now = Date.now();
   const fiveMinutesAgo = now - 5 * 60 * 1000;
-  
-  for (const [key, data] of rateLimitCache.entries()) {
+
+  Array.from(rateLimitCache.entries()).forEach(([key, data]) => {
     if (data.lastAttempt < fiveMinutesAgo) {
       rateLimitCache.delete(key);
     }
-  }
+  });
 }
 
 function checkRateLimit(phone: string): boolean {

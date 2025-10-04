@@ -44,11 +44,11 @@ function checkRateLimit(phone: string): boolean {
   
   // Clean expired entries
   if (rateLimitMap.size > 100) {
-    for (const [k, v] of rateLimitMap.entries()) {
+    Array.from(rateLimitMap.entries()).forEach(([k, v]) => {
       if (now > v.resetTime) {
         rateLimitMap.delete(k);
       }
-    }
+    });
   }
   
   if (!limit || now > limit.resetTime) {

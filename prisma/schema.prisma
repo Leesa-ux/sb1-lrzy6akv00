@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?
+  role         String   @default("client")
+  points       Int      @default(0)
+  referralCode String   @unique
+  referredBy   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  referralEventsL1 ReferralEvent[] @relation("ActorL1")
+  referralEventsL2 ReferralEvent[] @relation("ActorL2")
+}
+
+model ReferralEvent {
+  id        String   @id @default(cuid())
+  type      String
+  actorL1Id String
+  actorL2Id String?
+  createdAt DateTime @default(now())
+
+  actorL1   User     @relation("ActorL1", fields: [actorL1Id], references: [id])
+  actorL2   User?    @relation("ActorL2", fields: [actorL2Id], references: [id])
+
+  @@index([actorL1Id])
+  @@index([actorL2Id])
+}

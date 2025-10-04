@@ -9,7 +9,7 @@ export async function GET() {
 
     // En prod → prévoir batching/file d’attente
     await Promise.allSettled(
-      users.map(u =>
+      users.map((u: { id: string }) =>
         fetch(`${process.env.APP_URL}/api/progress-email`, {
           method:"POST",
           headers:{ "Content-Type":"application/json" },

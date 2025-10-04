@@ -26,7 +26,7 @@ export async function getRedisClient() {
         token: process.env.UPSTASH_REDIS_REST_TOKEN,
         retry: {
           retries: 2,
-          retryDelayOnFailure: 1000,
+          backoff: (retryCount: number) => Math.min(1000 * Math.pow(2, retryCount), 3000),
         },
       });
       

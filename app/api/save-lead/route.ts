@@ -16,11 +16,11 @@ function checkSubmissionLimit(email: string, phone: string): { allowed: boolean;
   // Cleanup old entries periodically
   if (submissionCache.size > 200) {
     const oneHourAgo = now - 60 * 60 * 1000;
-    for (const [k, v] of submissionCache.entries()) {
+    Array.from(submissionCache.entries()).forEach(([k, v]) => {
       if (v.timestamp < oneHourAgo) {
         submissionCache.delete(k);
       }
-    }
+    });
   }
   
   if (!entry) {

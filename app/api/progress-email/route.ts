@@ -3,11 +3,16 @@ import { db } from "@/lib/db";
 import { getUserPoints, nextMilestone, palier2Copy } from "@/lib/points";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const getResend = () => process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const APP_URL = process.env.APP_URL || "https://afroe.app";
 
 export async function POST(req: Request) {
   try {
+    const resend = getResend();
+    if (!resend) {
+      return NextResponse.json({ ok: false, error: "email_not_configured" }, { status: 500 });
+    }
+
     const { userId, kind } = await req.json() as { userId: string; kind: "weekly"|"leaderboard"|"lastcall" };
     const u = await db.user.findUnique({ where: { id: userId }});
     if (!u) return NextResponse.json({ ok:false, error:"user_not_found" }, { status:404 });

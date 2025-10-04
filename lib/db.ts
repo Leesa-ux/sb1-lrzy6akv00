@@ -16,21 +16,11 @@ const createPrismaClient = () =>
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 
-const client = global.prisma ?? createPrismaClient();
+export const db = global.prisma ?? createPrismaClient();
 
 // Prevent multiple instances during hot-reloading in development
 if (process.env.NODE_ENV !== "production") {
-  global.prisma = client;
+  global.prisma = db;
 }
 
-const db = client;
 export default db;
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
-
-export const db =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ["query", "error", "warn"],
-  });
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;

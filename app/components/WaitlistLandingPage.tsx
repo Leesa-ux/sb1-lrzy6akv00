@@ -64,6 +64,7 @@ export default function WaitlistLandingPage() {
 
   // (démo) points pour animer la barre
   const [demoPts, setDemoPts] = useState(12);
+  const [showShareDemo, setShowShareDemo] = useState(false);
 
   // Countdown (change la date)
   useEffect(() => {
@@ -309,22 +310,30 @@ export default function WaitlistLandingPage() {
             </span>
           </div>
 
-          {/* Boutons de partage (si inscrit) */}
-          {submitted && referralLink && (
+          {/* Boutons de partage (si inscrit OU mode démo) */}
+          {((submitted && referralLink) || showShareDemo) && (
             <div className="mt-6 p-4 rounded-xl border border-zinc-800 bg-zinc-900/30">
               <h4 className="text-sm font-semibold mb-3">🚀 Commence à inviter maintenant</h4>
-              <ShareButtons referralLink={referralLink} />
+              <ShareButtons
+                referralLink={referralLink || "https://afroe.com/join?ref=demo123"}
+              />
             </div>
           )}
 
-          {/* (Démo) contrôles points */}
-          <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
+          {/* (Démo) contrôles */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
             <button onClick={() => setDemoPts((p) => Math.max(0, p - 5))} className="rounded-lg border border-zinc-800 px-3 py-1">
               −5 pts
             </button>
-            <span>Points actuels : {demoPts}</span>
+            <span>Points : {demoPts}</span>
             <button onClick={() => setDemoPts((p) => Math.min(100, p + 5))} className="rounded-lg border border-zinc-800 px-3 py-1">
               +5 pts
+            </button>
+            <button
+              onClick={() => setShowShareDemo(!showShareDemo)}
+              className="rounded-lg border border-purple-800 bg-purple-900/20 px-3 py-1 text-purple-300"
+            >
+              {showShareDemo ? "Masquer" : "Voir"} partage
             </button>
           </div>
         </div>
