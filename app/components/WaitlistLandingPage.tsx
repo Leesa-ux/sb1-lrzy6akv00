@@ -8,7 +8,7 @@ import ShareButtons from "@/app/components/ShareButtons";
 /** === PATHS (utilisés à la fois pour l'affichage et pour les fallbacks) === */
 const HERO_IMAGE_SRC = "/images/hero-desert-beauty.jpg";
 // const HERO_IMAGE_SRC = "/images/hero-desert-beauty.png";
-const LOGO_IMAGE_SRC = "/images/image.png";
+const LOGO_IMAGE_SRC = "/images/Afroé.jpg";
 
 // Construit le chemin disque attendu dans Next.js (où déposer le fichier)
 const HERO_DISK_PATH = `/public${HERO_IMAGE_SRC}`;
