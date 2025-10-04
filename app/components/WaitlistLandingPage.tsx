@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import RewardsTimeline from "@/app/components/RewardsTimeline";
+import ShareButtons from "@/app/components/ShareButtons";
 
 /** === PATHS (utilisés à la fois pour l'affichage et pour les fallbacks) === */
 const HERO_IMAGE_SRC = "/images/hero-desert-beauty.jpg";
@@ -59,6 +60,7 @@ export default function WaitlistLandingPage() {
   const [imgError, setImgError] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const [countdown, setCountdown] = useState("—");
+  const [referralLink, setReferralLink] = useState("");
 
   // (démo) points pour animer la barre
   const [demoPts, setDemoPts] = useState(12);
@@ -96,6 +98,9 @@ export default function WaitlistLandingPage() {
     if (!email || !phone) return alert("Email et téléphone requis.");
     if (otpSent && otp.length < 4) return alert("Entre le code de vérification SMS.");
     // TODO: fetch('/api/join', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, phone, role, otp }) })
+
+    const demoLink = `https://afroe.com/join?ref=${email.split('@')[0]}${Math.random().toString(36).substring(2, 6)}`;
+    setReferralLink(demoLink);
     setSubmitted(true);
     alert("Inscription envoyée (démo). Ton lien de parrainage arrive par email.");
   }
@@ -264,21 +269,13 @@ export default function WaitlistLandingPage() {
             {!submitted ? (
               <p className="text-sm text-zinc-300 text-center">Inscris-toi ci-dessus pour recevoir ton lien de parrainage.</p>
             ) : (
-              <p className="text-sm text-zinc-300 text-center">✅ Merci ! Check ton email pour ton lien unique.</p>
+              <>
+                <p className="text-sm text-zinc-300 text-center mb-3">✅ Merci ! Partage ton lien maintenant :</p>
+                <div className="text-xs">
+                  <ShareButtons referralLink={referralLink} />
+                </div>
+              </>
             )}
-          </div>
-
-          {/* Référal helper */}
-          <div className="px-5 mt-2">
-            <div className="flex flex-col items-center gap-2 text-xs">
-              <div className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] p-[1px] rounded-full">
-                <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-700 bg-[#141416]/95">
-                  <span className="w-2 h-2 rounded-full bg-[#92D14F]" aria-hidden />
-                  Invite tes amis → gagne des services gratuits
-                </span>
-              </div>
-              <span className="opacity-70">Ton lien est dans l’email de confirmation.</span>
-            </div>
           </div>
 
           <div className="absolute bottom-0 w-full py-3 text-center text-[10px] text-zinc-500 border-t border-zinc-800">
@@ -311,6 +308,14 @@ export default function WaitlistLandingPage() {
               ⏳ Fin dans {countdown}
             </span>
           </div>
+
+          {/* Boutons de partage (si inscrit) */}
+          {submitted && referralLink && (
+            <div className="mt-6 p-4 rounded-xl border border-zinc-800 bg-zinc-900/30">
+              <h4 className="text-sm font-semibold mb-3">🚀 Commence à inviter maintenant</h4>
+              <ShareButtons referralLink={referralLink} />
+            </div>
+          )}
 
           {/* (Démo) contrôles points */}
           <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
