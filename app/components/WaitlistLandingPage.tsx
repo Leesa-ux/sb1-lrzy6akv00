@@ -156,40 +156,46 @@ export default function WaitlistLandingPage() {
               </p>
             </div>
 
-            {/* FORM (inchangé, juste marges et largeur) */}
-            <form onSubmit={handleSubmit} className="grid gap-3 max-w-md">
+            {/* FORM - New vertical layout */}
+            <form onSubmit={handleSubmit} className="grid gap-4 max-w-md">
+              {/* Email field */}
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Ton email"
-                className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#1B9AA2]"
+                placeholder="Balance ton email"
+                className="bg-[#1a1a1a] border border-zinc-800 rounded-2xl px-5 py-4 text-sm text-zinc-300 placeholder:text-zinc-600 focus:ring-2 focus:ring-[#1B9AA2] focus:border-transparent"
               />
+
+              {/* Submit button directly under email */}
+              <button
+                type="submit"
+                className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-2xl py-4 font-bold text-base text-black hover:opacity-90 transition-opacity"
+              >
+                Prends ta place
+              </button>
+
+              {/* Phone field */}
               <input
                 type="tel"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Ton téléphone"
-                className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#1B9AA2]"
+                placeholder="+32 4 12 34 56 78"
+                className="bg-[#1a1a1a] border border-zinc-800 rounded-2xl px-5 py-4 text-sm text-zinc-300 placeholder:text-zinc-600 focus:ring-2 focus:ring-[#1B9AA2] focus:border-transparent"
               />
 
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-sm">
-                  <input type="radio" checked={role === "client"} onChange={() => setRole("client")} />
-                  Client·e
-                </label>
-                <label className="flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-sm">
-                  <input type="radio" checked={role === "influenceur"} onChange={() => setRole("influenceur")} />
-                  Influenceur·e
-                </label>
-                <label className="flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-sm">
-                  <input type="radio" checked={role === "pro"} onChange={() => setRole("pro")} />
-                  Pro beauté
-                </label>
-              </div>
+              {/* Send SMS button */}
+              <button
+                type="button"
+                onClick={sendOTP}
+                className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-2xl py-4 font-bold text-base text-black hover:opacity-90 transition-opacity"
+              >
+                Envoyer code SMS
+              </button>
 
+              {/* OTP field (shown after SMS sent) */}
               {otpSent && (
                 <input
                   inputMode="numeric"
@@ -197,27 +203,12 @@ export default function WaitlistLandingPage() {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="Code de vérification (6 chiffres)"
-                  className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#1B9AA2]"
+                  className="bg-[#1a1a1a] border border-zinc-800 rounded-2xl px-5 py-4 text-sm text-zinc-300 placeholder:text-zinc-600 focus:ring-2 focus:ring-[#1B9AA2] focus:border-transparent"
                 />
               )}
 
-              <div className="grid gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={sendOTP}
-                  className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black"
-                >
-                  Reçois ton code
-                </button>
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black"
-                >
-                  Rejoins-nous
-                </button>
-              </div>
-
-              <p className="text-xs text-zinc-400 mt-1">{roleNote}</p>
+              {/* Role note at bottom */}
+              <p className="text-xs text-zinc-500 mt-1">{roleNote}</p>
             </form>
           </div>
 
