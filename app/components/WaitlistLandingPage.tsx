@@ -230,79 +230,61 @@ export default function WaitlistLandingPage() {
 
           {/* Colonne droite : Phone mockup hybride */}
           <div className="order-1 md:order-2 flex justify-center items-center">
-            <div className="relative w-[280px] sm:w-[320px] h-[550px] sm:h-[650px] rounded-[40px] border-[10px] border-[#2A2A2A] bg-black shadow-2xl overflow-hidden flex-shrink-0 mt-10 md:mt-16">
-              {/* En-tête (notch) */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-20" />
+            <div className="relative mx-auto mt-10 w-[280px] sm:w-[320px] rounded-[2rem] bg-black text-white overflow-hidden border border-zinc-800 shadow-[0_0_30px_rgba(146,209,79,0.2)]">
+              {/* Dégradé haut */}
+              <div className="bg-gradient-to-b from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] py-4 text-center text-sm font-medium tracking-wide">
+                <span>Barbe • Maquillage • Ongles • Coiffure • Soins</span>
+              </div>
 
-              {/* Contenu interne */}
-              <div className="absolute inset-0 overflow-y-auto flex flex-col">
-                {/* Logo + catégories */}
-                <div className="h-36 sm:h-40 bg-gradient-to-br from-[#1B9AA2] via-[#8E58C7] to-[#92D14F] flex flex-col justify-center items-center text-center px-4">
-                  <Image
-                    src={LOGO_IMAGE_SRC}
-                    alt="Logo Afroé"
-                    width={50}
-                    height={50}
-                    className="rounded-full mb-2"
-                    priority
-                  />
+              {/* Contenu principal */}
+              <div className="p-5 text-center text-[0.9rem] leading-relaxed">
+                <h3 className="font-semibold text-lg mb-2">
+                  Inscris-toi & invite tes ami·e·s 🎉
+                </h3>
+                <p className="text-zinc-200 text-sm mb-3">
+                  💎 Gagne des services beauté gratuits et tente ta chance au{" "}
+                  <strong>Jackpot Afroé 3 500 €</strong>.
+                </p>
 
-                  {/* Liste services avec points épais */}
-                  <p className="text-xs sm:text-sm text-[#E9E3D6] flex flex-wrap justify-center gap-2">
-                    <span>Barbe</span>
-                    <span className="font-extrabold">•</span>
-                    <span>Maquillage</span>
-                    <span className="font-extrabold">•</span>
-                    <span>Ongles</span>
-                    <span className="font-extrabold">•</span>
-                    <span>Coiffure</span>
-                    <span className="font-extrabold">•</span>
-                    <span>Soins</span>
-                  </p>
+                <p className="text-xs text-zinc-300 mb-2">
+                  👯 <strong>Deux catégories de filleuls :</strong>
+                </p>
+
+                <ul className="list-none text-left text-xs text-zinc-300 space-y-1 mb-3">
+                  <li>
+                    👤 <strong>Client normal</strong> → points dès qu'il/elle télécharge
+                    l'appli{" "}
+                    <span className="italic text-zinc-500">(dispo dès lancement Afroé)</span>.
+                  </li>
+                  <li>
+                    💼 <strong>Pro beauté afro / influenceur·e</strong> → points plus lourds
+                    dès qu'il/elle souscrit et paie son abonnement{" "}
+                    <span className="italic text-zinc-500">(dispo dès lancement Afroé)</span>.
+                  </li>
+                </ul>
+
+                <div className="text-xs text-zinc-300 mb-3">
+                  ⚠️ Les grosses récompenses (services gratuits, Beauty Kit, Jackpot)
+                  sont calculées à la fin de la période.
+                  Le parrain reçoit des <strong>points bonus</strong> si le pro filleul
+                  a payé au moins <strong>2 mois d'abonnement</strong>.
                 </div>
 
-                {/* Texte principal */}
-                <div className="p-5 text-center text-sm text-zinc-300">
-                  <p className="font-semibold text-base mb-2">
-                    Inscris-toi & invite tes amis 🎉
-                  </p>
-                  <p>
-                    💎 Gagne des services beauté gratuits et tente ta chance au Jackpot Afroé <strong>3 500 €</strong>.
-                  </p>
-
-                  {/* Bouton voir plus (mobile uniquement) */}
-                  <button
-                    className="mt-3 text-xs text-[#92D14F] underline sm:hidden"
-                    onClick={() => {
-                      const details = document.getElementById("mockup-details");
-                      if (details) details.classList.toggle("hidden");
-                    }}
-                  >
-                    Voir plus +
-                  </button>
-
-                  {/* Détails : cachés en mobile, visibles en desktop */}
-                  <div
-                    id="mockup-details"
-                    className="hidden sm:block mt-3 space-y-2 text-left text-xs sm:text-sm"
-                  >
-                    <p>👯 Chaque ami inscrit = une chance en plus.</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>🎀 Badge VIP + -10%</li>
-                      <li>✨ Services beauté gratuits</li>
-                      <li>💎 Afroé Beauty Kit (80€+)</li>
-                      <li>🏆 Accès au Jackpot Afroé 3 500 €</li>
-                    </ul>
-                    <p className="text-[#92D14F] font-semibold mt-2">
-                      Plus tu parraines, plus tu montes en récompenses ✨
-                    </p>
-                  </div>
+                <div className="text-left text-xs text-zinc-200 border-t border-zinc-800 pt-3 mt-3">
+                  <p>🎀 Badge VIP + -10%</p>
+                  <p>✨ Services beauté gratuits</p>
+                  <p>💎 Afroé Beauty Kit (80€+)</p>
+                  <p>🏆 Accès au Jackpot Afroé 3 500 €</p>
                 </div>
 
-                {/* Footer interne du mockup */}
-                <div className="mt-auto w-full py-3 text-center text-[10px] text-zinc-500 border-t border-zinc-800">
-                  © {new Date().getFullYear()} Afroé
-                </div>
+                <p className="text-[#92D14F] font-semibold mt-4">
+                  Plus tu parraines, plus tu montes en récompenses ✨
+                </p>
+              </div>
+
+              {/* Footer mockup */}
+              <div className="py-2 text-[10px] text-zinc-500 border-t border-zinc-800">
+                © 2025 Afroé
               </div>
             </div>
           </div>
