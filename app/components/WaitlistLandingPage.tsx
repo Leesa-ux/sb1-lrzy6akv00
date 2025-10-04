@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import RewardsTimeline from "./RewardsTimeline";
 
 /** === PATHS (utilisés à la fois pour l'affichage et pour les fallbacks) === */
 const HERO_IMAGE_SRC = "/images/hero-desert-beauty.jpg";
@@ -293,6 +294,10 @@ export default function WaitlistLandingPage() {
           <p className="text-sm text-zinc-400">Invite tes amis, grimpe les paliers, débloque des cadeaux exclusifs.</p>
           <div className="mt-3">
             <ProgressBar points={demoPts} />
+          </div>
+
+          <div className="mt-6">
+            <RewardsTimeline />
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
