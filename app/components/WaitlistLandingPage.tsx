@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import RewardsTimeline from "./RewardsTimeline";
+import RewardsTimeline from "@/app/components/RewardsTimeline";
 
 /** === PATHS (utilisés à la fois pour l'affichage et pour les fallbacks) === */
 const HERO_IMAGE_SRC = "/images/hero-desert-beauty.jpg";
