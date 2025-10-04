@@ -232,55 +232,62 @@ export default function WaitlistLandingPage() {
           <div className="order-1 md:order-2 flex justify-center items-center">
             <div className="relative mx-auto mt-10 w-[280px] sm:w-[320px] rounded-[2rem] bg-black text-white overflow-hidden border border-zinc-800 shadow-[0_0_30px_rgba(146,209,79,0.2)]">
               {/* Dégradé haut */}
-              <div className="bg-gradient-to-b from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] py-4 text-center text-sm font-medium tracking-wide">
-                <span>Barbe • Maquillage • Ongles • Coiffure • Soins</span>
+              <div className="bg-gradient-to-b from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] py-4 text-center flex flex-col items-center gap-2">
+                <Image
+                  src={LOGO_IMAGE_SRC}
+                  alt="Logo Afroé"
+                  width={50}
+                  height={50}
+                  className="rounded-full"
+                  priority
+                />
+                <span className="text-sm font-medium tracking-wide">Barbe • Maquillage • Ongles • Coiffure • Soins</span>
               </div>
 
-              {/* Contenu principal */}
-              <div className="p-5 text-center text-[0.9rem] leading-relaxed">
-                <h3 className="font-semibold text-lg mb-2">
+              {/* === BEGIN: mockup body text (replace only this block) === */}
+              <div className="p-5 text-left text-[13px] sm:text-[14px] leading-relaxed text-zinc-200 space-y-3">
+                <h4 className="font-semibold text-[15px] sm:text-[16px]">
                   Inscris-toi & invite tes ami·e·s 🎉
-                </h3>
-                <p className="text-zinc-200 text-sm mb-3">
-                  💎 Gagne des services beauté gratuits et tente ta chance au{" "}
-                  <strong>Jackpot Afroé 3 500 €</strong>.
+                </h4>
+
+                <p>
+                  🎀 Bonus immédiat&nbsp;: <strong>-10% sur tes services</strong>.
                 </p>
 
-                <p className="text-xs text-zinc-300 mb-2">
+                <p className="mt-2 text-zinc-100">
                   👯 <strong>Deux catégories de filleuls :</strong>
                 </p>
-
-                <ul className="list-none text-left text-xs text-zinc-300 space-y-1 mb-3">
+                <ul className="list-none space-y-1">
                   <li>
-                    👤 <strong>Client normal</strong> → points dès qu'il/elle télécharge
-                    l'appli{" "}
-                    <span className="italic text-zinc-500">(dispo dès lancement Afroé)</span>.
+                    👤 <strong>Client normal</strong> — tu gagnes des points dès qu'il/elle télécharge l'app
+                    <span className="italic text-zinc-400"> (disponible dès le lancement Afroé)</span>.
                   </li>
                   <li>
-                    💼 <strong>Pro beauté afro / influenceur·e</strong> → points plus lourds
-                    dès qu'il/elle souscrit et paie son abonnement{" "}
-                    <span className="italic text-zinc-500">(dispo dès lancement Afroé)</span>.
+                    💼 <strong>Pro beauté afro / influenceur·e</strong> — tu gagnes
+                    <strong> plus de points</strong> dès qu'il/elle souscrit et paie son abonnement
+                    <span className="italic text-zinc-400"> (possible dès lancement Afroé)</span>.
                   </li>
                 </ul>
 
-                <div className="text-xs text-zinc-300 mb-3">
-                  ⚠️ Les grosses récompenses (services gratuits, Beauty Kit, Jackpot)
-                  sont calculées à la fin de la période.
-                  Le parrain reçoit des <strong>points bonus</strong> si le pro filleul
-                  a payé au moins <strong>2 mois d'abonnement</strong>.
+                <div className="text-zinc-300">
+                  ⚠️ Les grosses récompenses (services gratuits, Beauty Kit, Jackpot 3 500 €)
+                  sont calculées à la fin de la période selon la logique de points. Le parrain reçoit
+                  des <strong>points bonus</strong> si le filleul pro a payé au moins
+                  <strong> 2 mois d'abonnement</strong>.
                 </div>
 
-                <div className="text-left text-xs text-zinc-200 border-t border-zinc-800 pt-3 mt-3">
+                <div className="border-t border-zinc-800 pt-3 space-y-1">
                   <p>🎀 Badge VIP + -10%</p>
                   <p>✨ Services beauté gratuits</p>
                   <p>💎 Afroé Beauty Kit (80€+)</p>
                   <p>🏆 Accès au Jackpot Afroé 3 500 €</p>
                 </div>
 
-                <p className="text-[#92D14F] font-semibold mt-4">
+                <p className="text-[#92D14F] font-semibold">
                   Plus tu parraines, plus tu montes en récompenses ✨
                 </p>
               </div>
+              {/* === END: mockup body text === */}
 
               {/* Footer mockup */}
               <div className="py-2 text-[10px] text-zinc-500 border-t border-zinc-800">
