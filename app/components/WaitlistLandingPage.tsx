@@ -186,6 +186,22 @@ export default function WaitlistLandingPage() {
                 className="bg-[#1a1a1a] border border-zinc-800 rounded-2xl px-5 py-4 text-sm text-zinc-300 placeholder:text-zinc-600 focus:ring-2 focus:ring-[#1B9AA2] focus:border-transparent"
               />
 
+              {/* Radio buttons for role selection */}
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-sm cursor-pointer hover:border-[#1B9AA2] transition-colors">
+                  <input type="radio" checked={role === "client"} onChange={() => setRole("client")} />
+                  Client·e
+                </label>
+                <label className="flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-sm cursor-pointer hover:border-[#1B9AA2] transition-colors">
+                  <input type="radio" checked={role === "influenceur"} onChange={() => setRole("influenceur")} />
+                  Influenceur·e
+                </label>
+                <label className="flex items-center gap-2 px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-sm cursor-pointer hover:border-[#1B9AA2] transition-colors">
+                  <input type="radio" checked={role === "pro"} onChange={() => setRole("pro")} />
+                  Pro beauté
+                </label>
+              </div>
+
               {/* Send SMS button */}
               <button
                 type="button"
