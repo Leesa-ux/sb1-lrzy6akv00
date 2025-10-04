@@ -116,7 +116,7 @@ export default function WaitlistLandingPage() {
           </div>
           <div>
             <div className="font-extrabold tracking-wide font-sans">Afroé</div>
-            <div className="text-xs text-zinc-400 font-sans">Hip-Hop Glam • Indie Luxe</div>
+            <div className="text-xs text-zinc-400 font-sans">Ton Style • Ton Impact • Ton Future</div>
           </div>
         </Link>
         <span className="text-[10px] px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/60">
