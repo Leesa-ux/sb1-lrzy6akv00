@@ -228,23 +228,89 @@ export default function WaitlistLandingPage() {
             </form>
           </div>
 
-          {/* Colonne droite : visuel hero (alignements revus) */}
-          <div className="order-1 md:order-2 flex justify-center">
-            {imgError ? (
-              <div className="w-[300px] h-[400px] sm:w-[420px] sm:h-[520px] rounded-xl bg-gradient-to-br from-[#1B9AA2] via-[#8E58C7] to-[#92D14F] grid place-items-center text-zinc-900 font-semibold">
-                Image manquante
+          {/* Colonne droite : Phone mockup */}
+          <div className="order-1 md:order-2 flex justify-center items-center">
+            <div className="relative w-[320px] h-[640px]">
+              {/* Phone frame */}
+              <div className="absolute inset-0 bg-black rounded-[3rem] shadow-2xl border-[14px] border-black">
+                {/* Notch */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-10"></div>
+
+                {/* Screen content */}
+                <div className="w-full h-full bg-[#0a0a0a] rounded-[2.5rem] overflow-hidden relative">
+                  {/* Status bar */}
+                  <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-8 text-white text-xs z-20">
+                    <span>9:41</span>
+                    <div className="flex gap-1 items-center">
+                      <div className="w-4 h-3 border border-white rounded-sm"></div>
+                      <div className="w-4 h-3 border border-white rounded-sm"></div>
+                      <div className="w-4 h-3 border border-white rounded-sm"></div>
+                    </div>
+                  </div>
+
+                  {/* App content */}
+                  <div className="pt-16 px-6 h-full overflow-y-auto">
+                    {/* Logo */}
+                    <div className="flex justify-center mb-6">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] flex items-center justify-center">
+                        <span className="text-2xl font-bold text-black">A</span>
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-white text-xl font-bold text-center mb-2">Rejoins Afroé</h3>
+                    <p className="text-zinc-400 text-xs text-center mb-6">
+                      Inscris-toi et débloque des récompenses exclusives
+                    </p>
+
+                    {/* Mini form preview */}
+                    <div className="space-y-3">
+                      <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl px-4 py-3">
+                        <span className="text-zinc-600 text-sm">Balance ton email</span>
+                      </div>
+
+                      <button className="w-full bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black">
+                        Prends ta place
+                      </button>
+
+                      <div className="bg-[#1a1a1a] border border-zinc-800 rounded-xl px-4 py-3">
+                        <span className="text-zinc-600 text-sm">+32 4 12 34 56 78</span>
+                      </div>
+
+                      <div className="flex gap-2 text-xs">
+                        <span className="px-3 py-2 rounded-full border border-[#1B9AA2] bg-[#111] text-white">Client·e</span>
+                        <span className="px-3 py-2 rounded-full border border-zinc-800 bg-[#111] text-zinc-500">Influenceur·e</span>
+                      </div>
+
+                      <button className="w-full bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-xl py-3 font-bold text-sm text-black">
+                        Envoyer code SMS
+                      </button>
+
+                      {/* Rewards preview */}
+                      <div className="mt-8 pt-6 border-t border-zinc-800">
+                        <p className="text-white text-sm font-semibold mb-3">🎁 Tes récompenses</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-lg">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#8E58C7] to-[#1B9AA2] flex items-center justify-center text-xs">✨</div>
+                            <div>
+                              <p className="text-white text-xs font-medium">Badge Early Bird</p>
+                              <p className="text-zinc-500 text-[10px]">Palier 1 · 10 points</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-lg opacity-50">
+                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs">🎯</div>
+                            <div>
+                              <p className="text-zinc-400 text-xs">Accès VIP Beta</p>
+                              <p className="text-zinc-600 text-[10px]">Palier 2 · 25 points</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <Image
-                src={HERO_IMAGE_SRC}
-                alt="Hero Afroé"
-                width={420}
-                height={520}
-                className="rounded-xl shadow-2xl w-[300px] sm:w-[420px] h-auto"
-                onError={() => setImgError(true)}
-                priority
-              />
-            )}
+            </div>
           </div>
         </div>
       </section>
