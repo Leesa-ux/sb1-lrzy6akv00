@@ -137,7 +137,7 @@ export default function WaitlistLandingPage() {
               Le futur de la beauté afro démarre maintenant. 🔥 Afroé, c'est l'étincelle qui allume le game.
               <br />Pro ? Monte ton business d'un cran.
               <br />Client·e ? Connecte-toi aux meilleurs pros.
-              <br />Ce n'est pas juste une app. C'est ta nouvelle force.
+              <br />Afroé n'est pas juste une app. C'est ta nouvelle force.
             </p>
 
             {/* Bannière récompenses — replacée juste sous le texte */}
@@ -253,6 +253,9 @@ export default function WaitlistLandingPage() {
                 <p>
                   Direct, tu choppes <strong>-10% sur tes services</strong> pour chaque personne que tu réfères.
                 </p>
+                <p>
+                  Et dès le lancement,  <strong>le jeu des points démarre — à toi de grimper !</strong> 
+                </p>
 
                 <ul className="list-none space-y-2 mt-3">
                   <li>
@@ -279,7 +282,7 @@ export default function WaitlistLandingPage() {
                 </div>
 
                 <div className="text-zinc-400 mt-3 text-[11px] sm:text-[12px] italic">
-                  ℹ️ Quand l'app sera en ligne, ton score sera mis à jour : tes points seront mis à jour sur la base des vrais téléchargements et des pros payants.
+                  ℹ️ Quand l'app sera en ligne, ton score sera mis à jour sur la base des vrais téléchargements et des pros payants.
                 </div>
               </div>
               {/* === END: mockup body text === */}

@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'AFROÉ - Rejoignez la révolution digitale africaine',
-  description: 'La plateforme révolutionnaire qui connecte l\'Afrique au monde. Soyez parmi les premiers à découvrir l\'avenir du commerce digital africain.',
+  description: 'La plateforme révolutionnaire qui connecte l\'Afrique au monde. Soyez parmi les premiers à découvrir l\'avenir de la beauté afro en Europe.',
   keywords: 'AFROÉ, Afrique, commerce digital, plateforme, innovation',
   openGraph: {
     title: 'AFROÉ - Rejoignez la révolution digitale africaine',
