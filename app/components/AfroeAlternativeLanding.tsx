@@ -189,8 +189,8 @@ function Rewards(): JSX.Element {
   return (
     <div id="recompenses" className="glassy rounded-2xl p-5 text-white">
       <h3 className="font-semibold mb-1">Récompenses par étapes</h3>
-      <p className="text-[12px] text-slate-300 mb-4">Gagne du statut, des avantages et vise le Grand Prix de <span className="text-amber-300">3 500 €</span>.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+      <p className="text-[12px] text-slate-300 mb-2">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm mt-4">
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Palier 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-400">Badge Glow Starter & mise en avant waitlist</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Palier 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Palier 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
