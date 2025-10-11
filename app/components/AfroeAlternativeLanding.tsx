@@ -295,6 +295,32 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
   const boardRows = useMemo(() => markYou(rows, Number.isFinite(me.rank) ? me.rank : undefined), [rows, me.rank]);
 
+  const shareMessage = "Rejoins Afroé, la plateforme beauté afro qui change le game ! 🔥";
+  const shareLinks = useMemo(() => {
+    const msg = encodeURIComponent(shareMessage);
+    const link = encodeURIComponent(refLink || "https://afroe.com/waitlist");
+    const full = encodeURIComponent(`${shareMessage} ${refLink || "https://afroe.com/waitlist"}`);
+    return {
+      whatsapp: `https://wa.me/?text=${full}`,
+      email: `mailto:?subject=${encodeURIComponent("Rejoins Afroé")}&body=${full}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${link}`,
+    };
+  }, [refLink]);
+
+  function shareToInstagram(): void {
+    alert("Instagram ne supporte pas le partage direct de liens. Copie ton lien et partage-le dans ta story ou bio !");
+    if (refLink && navigator.clipboard) {
+      navigator.clipboard.writeText(refLink).catch(() => {});
+    }
+  }
+
+  function shareToTikTok(): void {
+    alert("TikTok ne supporte pas le partage direct de liens. Copie ton lien et ajoute-le à ta bio ou vidéo !");
+    if (refLink && navigator.clipboard) {
+      navigator.clipboard.writeText(refLink).catch(() => {});
+    }
+  }
+
   async function sendSmsCode(): Promise<void> {
     if (!phone) return;
     setSmsState("sending");
@@ -420,7 +446,13 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 <div className="p-4 space-y-3">
                   <div className="text-xs text-slate-300">Ton lien</div>
                   <div className="text-[11px] bg-slate-900/70 border border-white/10 rounded-lg px-2 py-2 break-all select-all">{refLink || "https://afroe.com/waitlist?ref=ton-code"}</div>
-                  <div className="grid grid-cols-3 gap-2 text-[11px]"><button className="glassy rounded-lg py-2">WhatsApp</button><button className="glassy rounded-lg py-2">Email</button><button className="glassy rounded-lg py-2">Insta</button></div>
+                  <div className="grid grid-cols-5 gap-2 text-[11px]">
+                    <button onClick={() => window.open(shareLinks.whatsapp, "_blank")} className="glassy rounded-lg py-2 hover:bg-white/10 transition-colors">WhatsApp</button>
+                    <button onClick={() => window.location.href = shareLinks.email} className="glassy rounded-lg py-2 hover:bg-white/10 transition-colors">Email</button>
+                    <button onClick={shareToInstagram} className="glassy rounded-lg py-2 hover:bg-white/10 transition-colors">Insta</button>
+                    <button onClick={shareToTikTok} className="glassy rounded-lg py-2 hover:bg-white/10 transition-colors">TikTok</button>
+                    <button onClick={() => window.open(shareLinks.linkedin, "_blank")} className="glassy rounded-lg py-2 hover:bg-white/10 transition-colors">LinkedIn</button>
+                  </div>
 
                   <div className="mt-2 text-xs text-slate-300">Classement</div>
                   <div className="space-y-2">
