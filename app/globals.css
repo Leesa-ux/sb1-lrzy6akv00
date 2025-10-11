@@ -89,3 +89,24 @@
     --chart-5: 340 75% 55%;
   }
 }
+
+@layer utilities {
+  .glassy {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .neon-fuchsia {
+    box-shadow: 0 0 20px rgba(217, 70, 239, 0.3);
+  }
+
+  .neon-gold {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+  }
+}
