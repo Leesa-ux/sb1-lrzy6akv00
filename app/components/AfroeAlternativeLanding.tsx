@@ -366,7 +366,10 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     <ErrorBoundary>
       <div className="min-h-screen bg-slate-950 text-white">
         <header className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-          <Image src="/images/Afroé-1760191941241.jpg" alt="Afroé Logo" width={120} height={120} className="rounded-xl" priority />
+          <div className="inline-flex items-center gap-3 glassy rounded-2xl px-4 py-3 border border-white/10">
+            <Image src="/images/Afroé-1760191941241.jpg" alt="Afroé Logo" width={50} height={50} className="rounded-lg" priority />
+            <span className="text-xl font-bold bg-gradient-to-r from-white via-fuchsia-200 to-fuchsia-400 bg-clip-text text-transparent">Afroé</span>
+          </div>
         </header>
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
