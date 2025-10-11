@@ -371,7 +371,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glassy text-[11px] text-slate-200 mb-4"><span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" /> Afroé — Brussels · Liège · Anvers</div>
-            <h1 className="text-3xl md:text-5xl font-bold leading-tight">Ton style, ton impact, <span className="text-fuchsia-400">ton futur</span>.</h1>
+            <h1 className="text-3xl md:text-5xl font-bold leading-tight">Ton Style, Ton Impact, <span className="text-fuchsia-400">Ton Futur</span>.</h1>
             <PrizeBanner />
 
             <div className="mt-6">
