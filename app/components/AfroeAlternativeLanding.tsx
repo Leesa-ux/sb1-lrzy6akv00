@@ -365,6 +365,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-slate-950 text-white">
+        <header className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+          <Image src="/images/Afroé-1760191941241.jpg" alt="Afroé Logo" width={120} height={120} className="rounded-xl" priority />
+        </header>
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glassy text-[11px] text-slate-200 mb-4"><span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" /> Afroé — Brussels · Liège · Anvers</div>
