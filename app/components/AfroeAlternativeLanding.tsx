@@ -391,6 +391,16 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               <p>Parce que la beauté Afro, c'est pas une tendance. C'est notre héritage, notre fierté, notre excellence.</p>
             </div>
 
+            <div className="mt-8 glassy neon-gold rounded-2xl p-5 md:p-6 border-2 border-amber-300/30">
+              <div className="flex items-start gap-3">
+                <div className="text-3xl">🎯</div>
+                <div>
+                  <h2 className="text-xl md:text-2xl font-bold text-amber-300 mb-2">Inscris-toi sur la liste d'attente exclusive</h2>
+                  <p className="text-slate-200 text-sm md:text-base">Rejoins la waitlist Afroé et participe au concours de lancement. Partage ton lien unique, grimpe dans le classement et gagne jusqu'à <span className="font-bold text-amber-300">3 500 €</span> + des récompenses exclusives !</p>
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={onSubmit} className="mt-7 glassy neon-blue rounded-2xl p-4 md:p-5 space-y-4 max-w-xl">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="md:col-span-2 bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
@@ -426,6 +436,31 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               </div>
               <p className="text-[11px] text-slate-400">On t'enverra le top départ par email {consentSMS && "/ SMS"}. Tu peux te désinscrire à tout moment.</p>
             </form>
+
+            <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">
+              <div className="text-center space-y-4">
+                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et gagne jusqu'à 3 500 € !</h3>
+                <p className="text-slate-200 text-sm md:text-base">Dès que tu t'inscris, tu reçois ton lien unique. Partage-le pour gagner des points et débloquer des récompenses exclusives.</p>
+                <div className="flex flex-wrap justify-center gap-3 pt-2">
+                  <button onClick={() => window.open(shareLinks.whatsapp, "_blank")} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
+                    <span>💬</span> WhatsApp
+                  </button>
+                  <button onClick={() => window.location.href = shareLinks.email} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
+                    <span>📧</span> Email
+                  </button>
+                  <button onClick={shareToInstagram} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
+                    <span>📷</span> Instagram
+                  </button>
+                  <button onClick={shareToTikTok} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
+                    <span>🎵</span> TikTok
+                  </button>
+                  <button onClick={() => window.open(shareLinks.linkedin, "_blank")} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
+                    <span>💼</span> LinkedIn
+                  </button>
+                </div>
+                <p className="text-xs text-slate-300 pt-2">⚡ Partage dès maintenant et prends de l'avance sur le classement</p>
+              </div>
+            </div>
 
             <div className="mt-5 text-slate-200"><p className="font-medium">🔥 200+ Afro lovers ont déjà rejoint la Glow List. Rejoins le crew avant le top départ.</p></div>
 
