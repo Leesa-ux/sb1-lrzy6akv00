@@ -375,7 +375,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
             <PrizeBanner />
 
             <div className="mt-6">
-              <Image src="/images/hero-desert-beauty.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={400} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto md:mx-0" />
+              <Image src="/images/Lucid_Origin_Core_Description_for_all_versionsA_cinematic_phot_1.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={400} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto md:mx-0" />
             </div>
 
             <div className="mt-5 space-y-2 text-slate-200">
