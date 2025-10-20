@@ -381,14 +381,14 @@ export default function AfroeAlternativeLanding(): JSX.Element {
             </div>
 
             <div className="mt-5 space-y-2 text-slate-200">
-              <p>T'as galéré à trouver un(e) coiffeur(se) Afro qui capte ton style ?</p>
+              <p>T'as galéré à trouver <un className="e"></un> coiffeur.se Afro qui capte ton style ?</p>
               <p>Ou t'es pro — <span className="text-slate-100">coiffeur.se, barbier, maquilleur.se, ongliste, esthéticien.ne</span> — et t'en as marre qu'on te prenne pas au sérieux ?</p>
               <p>Afroé comprend les deux côtés du miroir 💅🏾💈</p>
             </div>
 
             <div className="mt-6 text-slate-100">
               <p className="font-medium">Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
-              <p>Et si c'était toi, le/la prochain(e) <span className="text-amber-300">Glow Leader</span> ? 👑</p>
+              <p>Et si c'était toi, le/la <prochain className="e"></prochain> <span className="text-amber-300">Glow Leader</span> ? 👑</p>
             </div>
 
             <div className="mt-6 text-slate-300">
@@ -444,7 +444,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
             <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">
               <div className="text-center space-y-4">
-                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et gagne jusqu'à 3 500 € !</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente ta chance de gagner 3 500 € CASH!</h3>
                 <p className="text-slate-200 text-sm md:text-base">Dès que tu t'inscris, tu reçois ton lien unique. Partage-le pour gagner des points et débloquer des récompenses exclusives.</p>
                 <div className="flex flex-wrap justify-center gap-3 pt-2">
                   <button onClick={() => window.open(shareLinks.whatsapp, "_blank")} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
