@@ -18,42 +18,34 @@ export default function AfroeLandingNew() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0a0f1e] via-[#0d1221] to-[#0a0f1e] text-neutral-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-
           {/* LEFT COLUMN - 60% */}
           <div className="lg:col-span-3 space-y-6">
-
             {/* Prize Badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-1 text-sm text-yellow-400">
               <span>🏆</span>
-              <span>Jusqu&apos;à <span className="font-semibold">3 500 €</span> à gagner</span>
+              <span>
+                Jusqu&apos;à <span className="font-semibold">3 500 €</span> à gagner
+              </span>
             </div>
 
             {/* Main Content */}
             <div className="space-y-4 text-neutral-300 leading-relaxed">
-              <p>
-                T&apos;as galéré à trouver un(e) coiffeur(se) Afro qui capte ton style ?
-              </p>
+              <p>T&apos;as galéré à trouver un(e) coiffeur(se) Afro qui capte ton style ?</p>
               <p>
                 Ou t&apos;es pro — coiffeur.se, barbier, maquilleur.se, ongliste, esthéticien.ne — et t&apos;en as marre qu&apos;on te prenne pas au sérieux ?
               </p>
+              <p>Afroé comprend les deux côtés du miroir 💅🏿✂️</p>
+              <p>Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
               <p>
-                Afroé comprend les deux côtés du miroir 💅🏿✂️
-              </p>
-              <p>
-                Et si la beauté Afro devenait enfin visible, pro et stylée ?
-              </p>
-              <p>
-                Et si c&apos;était toi, le/la prochain(e) <span className="text-yellow-400 font-semibold">Glow Leader ? 👑</span>
+                Et si c&apos;était toi, le/la prochain(e){" "}
+                <span className="text-yellow-400 font-semibold">Glow Leader ? 👑</span>
               </p>
             </div>
 
             <div className="space-y-4 text-sm text-neutral-400 leading-relaxed">
-              <p>
-                Afroé, c&apos;est la vibe et la structure qu&apos;il manquait.
-              </p>
+              <p>Afroé, c&apos;est la vibe et la structure qu&apos;il manquait.</p>
               <p>
                 Parce que la beauté Afro, c&apos;est pas une tendance. C&apos;est notre héritage, notre fierté, notre excellence.
               </p>
@@ -61,9 +53,26 @@ export default function AfroeLandingNew() {
 
             {/* Form Section */}
             <div className="mt-8 space-y-4">
+              {/* Champ nom */}
+              <input
+                type="text"
+                placeholder="Ton prénom et ton blaze complet"
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder-neutral-500 outline-none focus:ring-2 focus:ring-fuchsia-500 backdrop-blur-sm"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  className="flex-1 rounded-xl py-3 px-6 font-semibold bg-fuchsia-600 hover:bg-fuchsia-500 transition text-white"
+                >
+                  Fais briller ton blaze 💫
+                </button>
+              </div>
+
+              {/* Champ email */}
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="Ton email"
                 className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder-neutral-500 outline-none focus:ring-2 focus:ring-fuchsia-500 backdrop-blur-sm"
               />
 
@@ -76,10 +85,11 @@ export default function AfroeLandingNew() {
                 </button>
               </div>
 
+              {/* Champ téléphone + bouton SMS */}
               <div className="flex gap-3">
                 <input
                   type="tel"
-                  placeholder="Numéro de téléphone (optionnel)"
+                  placeholder="Ton numéro de téléphone"
                   className="flex-1 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder-neutral-500 outline-none focus:ring-2 focus:ring-blue-500 backdrop-blur-sm"
                 />
                 <button
@@ -90,6 +100,7 @@ export default function AfroeLandingNew() {
                 </button>
               </div>
 
+              {/* Champ code + vérification */}
               <div className="flex gap-3 items-center">
                 <input
                   type="text"
@@ -98,47 +109,27 @@ export default function AfroeLandingNew() {
                 />
                 <button
                   type="button"
-                  className="rounded-xl px-6 py-3 font-medium bg-neutral-700 hover:bg-neutral-600 transition text-white text-sm"
-                >
-                  Recevoir code
-                </button>
-                <button
-                  type="button"
                   className="rounded-xl px-6 py-3 font-medium bg-green-600 hover:bg-green-500 transition text-white"
                 >
                   Vérifier
                 </button>
               </div>
 
-              <p className="text-xs text-neutral-500">
-                Vérification SMS réussie (2 min).
-              </p>
+              {/* Message d’état */}
+              <p className="text-xs text-neutral-500">Vérification SMS réussie (2 min).</p>
+            </div>
 
-              {/* Role Selector */}
-              <div className="flex gap-3">
-                <RoleChip
-                  label="Client"
-                  active={role === "client"}
-                  onClick={() => setRole("client")}
-                />
-                <RoleChip
-                  label="Beauty Pro"
-                  active={role === "pro"}
-                  onClick={() => setRole("pro")}
-                />
-                <RoleChip
-                  label="Influenceur"
-                  active={role === "influencer"}
-                  onClick={() => setRole("influencer")}
-                />
-              </div>
+            {/* Role Selector */}
+            <div className="flex gap-3">
+              <RoleChip label="Client" active={role === "client"} onClick={() => setRole("client")} />
+              <RoleChip label="Beauty Pro" active={role === "pro"} onClick={() => setRole("pro")} />
+              <RoleChip label="Influenceur" active={role === "influencer"} onClick={() => setRole("influencer")} />
             </div>
           </div>
 
           {/* RIGHT COLUMN - 40% */}
           <div className="lg:col-span-2">
             <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 ring-1 ring-white/10 shadow-2xl space-y-6 sticky top-6">
-
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <h2 className="text-xl font-bold">Afroé</h2>
@@ -195,36 +186,41 @@ export default function AfroeLandingNew() {
                 </div>
               </div>
 
-              {/* Comment ça marche */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-neutral-300">Comment ça marche</h3>
-                <ul className="space-y-2 text-xs text-neutral-400">
+              {/* 🌀 Comment ça marche */}
+              <div className="space-y-4 mt-10">
+                <h3 className="text-sm sm:text-base font-semibold text-neutral-200 uppercase tracking-wide">
+                  ⚙️ Comment ça marche
+                </h3>
+
+                <ul className="space-y-2 text-xs sm:text-sm text-neutral-400 leading-relaxed">
                   <li className="flex items-start gap-2">
-                    <span>•</span>
-                    <span>Partage ton lien unique.</span>
+                    <span className="text-fuchsia-500 font-bold">•</span>
+                    <span>Partage ton lien unique à ton crew.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span>•</span>
-                    <span>+10 pts si un client télécharge l&apos;app.</span>
+                    <span className="text-fuchsia-500 font-bold">•</span>
+                    <span>+10 pts dès qu’un·e client·e télécharge l’app.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span>•</span>
-                    <span>+50 pts si un Beauty Pro s&apos;inscrit.</span>
+                    <span className="text-fuchsia-500 font-bold">•</span>
+                    <span>+50 pts quand un·e Beauty Pro s’inscrit via ton lien.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span>•</span>
-                    <span>+100 pts si un influenceur (≥2k followers) rejoint.</span>
+                    <span className="text-fuchsia-500 font-bold">•</span>
+                    <span>+100 pts si un·e influenceur·e (≥ 2k followers) rejoint la Glow List.</span>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
+          {/* END RIGHT COLUMN */}
         </div>
       </div>
     </main>
   );
 }
 
+/* ---------- UI subcomponents ---------- */
 function RoleChip({
   label,
   active,
