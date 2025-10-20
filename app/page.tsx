@@ -3,8 +3,9 @@
  *   Frontend must keep the 3-line headline and referral flow intact.
  */
 
-import AfroeAlternativeLanding from './components/AfroeAlternativeLanding';
+"use client";
+import AfroeLandingNew from "./components/AfroeLandingNew";
 
 export default function Page() {
-  return <AfroeAlternativeLanding />;
+  return <AfroeLandingNew />;
 }
