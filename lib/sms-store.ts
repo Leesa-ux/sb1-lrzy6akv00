@@ -6,6 +6,7 @@ type SmsRequest = {
   email: string | null;
   verified: boolean;
   attempts: number;
+  createdAt: number;
 };
 
 const g = globalThis as unknown as { __SMS_REQUESTS?: Map<string, SmsRequest> };
@@ -23,7 +24,8 @@ export function createSmsRequest(data: {
   expiresAt: number;
   email: string | null;
 }): { requestId: string } {
-  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const now = Date.now();
+  const requestId = `req_${now}_${Math.random().toString(36).substr(2, 9)}`;
   store.set(requestId, {
     code: data.code,
     expiresAt: data.expiresAt,
@@ -32,6 +34,7 @@ export function createSmsRequest(data: {
     email: data.email,
     verified: false,
     attempts: 0,
+    createdAt: now,
   });
   return { requestId };
 }
@@ -68,11 +71,19 @@ export function linkPhoneToAccount(phoneHash: string, email: string): void {
 
 export function cleanupExpired(): void {
   const now = Date.now();
+  const maxAge = 5 * 60 * 1000;
+  let deleted = 0;
+
   Array.from(store.entries()).forEach(([key, req]) => {
-    if (req.expiresAt < now) {
+    if (req.expiresAt < now || (now - req.createdAt) > maxAge) {
       store.delete(key);
+      deleted++;
     }
   });
+
+  if (deleted > 0) {
+    console.log(`Cleaned up ${deleted} expired SMS requests`);
+  }
 }
 
-setInterval(cleanupExpired, 5 * 60 * 1000);
+setInterval(cleanupExpired, 2 * 60 * 1000);

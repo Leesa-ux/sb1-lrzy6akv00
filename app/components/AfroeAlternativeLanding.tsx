@@ -513,7 +513,16 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               </div>
               <button type="submit" disabled={submit === "loading" || !canSubmit} className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-60 transition-colors">{submit === "loading" ? "On te place…" : submit === "done" ? "C'est validé ✨" : "Prends ta place ✨"}</button>
               {submit === "error" && <p className="text-rose-300 text-sm text-center">Une erreur s'est produite. Réessaye dans quelques secondes.</p>}
-              <p className="text-[11px] text-slate-400 text-center">On t'enverra le top départ par email {consentSMS && "et SMS"}. Tu peux te désinscrire à tout moment.</p>
+              <div className="space-y-2">
+                <p className="text-[11px] text-slate-400 text-center">On t'enverra le top départ par email {consentSMS && "et SMS"}. Tu peux te désinscrire à tout moment.</p>
+                {consentSMS && (
+                  <div className="bg-slate-900/40 border border-white/10 rounded-lg p-2.5">
+                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                      🔒 <span className="font-medium text-slate-300">Confidentialité & RGPD</span> : Ton numéro est hashé et stocké de manière sécurisée. On l'utilise uniquement pour la vérification SMS et la prévention de fraude. Tu peux demander sa suppression à tout moment via <a href="mailto:privacy@afroe.com" className="text-fuchsia-400 hover:underline">privacy@afroe.com</a>. En validant, tu acceptes notre traitement de tes données conformément au RGPD.
+                    </p>
+                  </div>
+                )}
+              </div>
             </form>
 
             <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">

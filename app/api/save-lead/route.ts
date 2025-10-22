@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizePhone, hashPhone } from '@/lib/phone-utils';
+import { normalizePhone, hashPhone, maskPhoneForLog } from '@/lib/phone-utils';
 import { linkPhoneToAccount, getAccountByPhoneHash } from '@/lib/sms-store';
 
 const submissionCache = new Map<string, { timestamp: number; attempts: number }>();
@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
       const existing = getAccountByPhoneHash(phoneHash);
 
       if (existing && existing.email !== sanitizedEmail) {
+        console.warn(`Phone conflict: ${maskPhoneForLog(normalized)} already linked to different account`);
         return NextResponse.json(
           { ok: false, error: 'Ce numéro est déjà lié à un autre compte' },
           { status: 409 }
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
 
       if (!existing && smsVerified) {
         linkPhoneToAccount(phoneHash, sanitizedEmail);
+        console.log(`Phone ${maskPhoneForLog(normalized)} linked to new account`);
       }
     }
 
@@ -212,9 +214,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Log for development (non-blocking)
     if (process.env.NODE_ENV === 'development') {
-      console.log('💾 Lead saved:', leadData);
+      console.log('💾 Lead saved:', {
+        ...leadData,
+        phone: leadData.phone ? maskPhoneForLog(leadData.phone) : undefined,
+      });
     }
 
     return NextResponse.json({ 
@@ -224,7 +228,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Save Lead Error:', error);
+    console.error('Save Lead Error (no PII logged):', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
       { ok: false, error: 'Erreur serveur lors de la sauvegarde' },
       { status: 500 }

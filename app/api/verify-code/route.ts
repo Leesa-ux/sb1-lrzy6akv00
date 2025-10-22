@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizePhone, hashPhone, maskEmail } from '@/lib/phone-utils';
+import { normalizePhone, hashPhone, maskEmail, maskPhoneForLog } from '@/lib/phone-utils';
 import { getSmsRequest, markRequestVerified, incrementAttempts, getAccountByPhoneHash } from '@/lib/sms-store';
 
 const rateLimitCache = new Map<string, { attempts: number; lastAttempt: number }>();
@@ -104,6 +104,7 @@ export async function POST(request: NextRequest) {
 
     if (reqRec.code !== String(code).trim()) {
       incrementAttempts(requestId);
+      console.warn(`Failed verification attempt for ${maskPhoneForLog(normalized)}`);
       return NextResponse.json(
         { verified: false, expired: false, error: 'Code incorrect' },
         { status: 401 }
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
         ownerMatch = 'same';
       } else if (reqRec.email && existing.email !== reqRec.email) {
         ownerMatch = 'different';
+        console.warn(`Phone conflict detected: ${maskPhoneForLog(normalized)} linked to different account`);
       } else {
         ownerMatch = 'same';
       }
@@ -133,7 +135,7 @@ export async function POST(request: NextRequest) {
       ownerHint: existing ? maskEmail(existing.email) : undefined,
     });
   } catch (error) {
-    console.error('Verify Code Error:', error);
+    console.error('Verify Code Error (no phone logged):', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json({ verified: false, error: 'server-error' }, { status: 500 });
   }
 }

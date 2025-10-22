@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizePhone, hashPhone, maskEmail, generateSmsCode } from '@/lib/phone-utils';
+import { normalizePhone, hashPhone, maskEmail, generateSmsCode, maskPhoneForLog } from '@/lib/phone-utils';
 import { createSmsRequest, getAccountByPhoneHash } from '@/lib/sms-store';
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {
-      console.warn('SMS service not configured, returning success in dev mode');
+      console.warn(`SMS service not configured, dev mode for ${maskPhoneForLog(normalized)}`);
       return NextResponse.json({
         ok: true,
         requestId,
@@ -121,13 +121,13 @@ export async function POST(request: NextRequest) {
 
       if (!res.ok) {
         const t = await res.text().catch(() => '');
-        console.error('Brevo error:', t);
-        return NextResponse.json({ ok: false, error: 'brevo-failed', detail: t }, { status: 502 });
+        console.error(`Brevo error for ${maskPhoneForLog(normalized)}:`, t);
+        return NextResponse.json({ ok: false, error: 'brevo-failed' }, { status: 502 });
       }
     } catch (fetchError) {
       clearTimeout(timeoutId);
       if ((fetchError as Error).name === 'AbortError') {
-        console.error('SMS request timeout');
+        console.error(`SMS timeout for ${maskPhoneForLog(normalized)}`);
         return NextResponse.json({ ok: false, error: 'sms-timeout' }, { status: 504 });
       }
       throw fetchError;
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       ownerHint: linkedElsewhere && existing ? maskEmail(existing.email) : undefined,
     });
   } catch (e) {
-    console.error('Send SMS Error:', e);
+    console.error('Send SMS Error (no phone logged):', e instanceof Error ? e.message : 'Unknown error');
     return NextResponse.json({ ok: false, error: 'server-error' }, { status: 500 });
   }
 }
