@@ -4,8 +4,8 @@
  */
 
 "use client";
-import AfroeLandingNew from "./components/AfroeLandingNew";
+import AfroeAlternativeLanding from "./components/AfroeAlternativeLanding";
 
 export default function Page() {
-  return <AfroeLandingNew />;
+  return <AfroeAlternativeLanding />;
 }
