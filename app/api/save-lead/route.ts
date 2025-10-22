@@ -4,8 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { normalizePhone, hashPhone } from '@/lib/phone-utils';
+import { linkPhoneToAccount, getAccountByPhoneHash } from '@/lib/sms-store';
 
-// Enhanced duplicate prevention with cleanup
 const submissionCache = new Map<string, { timestamp: number; attempts: number }>();
 
 function checkSubmissionLimit(email: string, phone: string): { allowed: boolean; reason?: string } {
@@ -64,23 +65,21 @@ function sanitizeText(text: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, phone, role, referralCode } = await request.json();
+    const { email, phone, role, referralCode, name, smsVerified } = await request.json();
 
-    // Sanitize inputs
     const sanitizedEmail = sanitizeEmail(email || '');
     const sanitizedPhone = sanitizePhone(phone || '');
     const sanitizedRole = sanitizeText(role || '');
     const sanitizedReferralCode = sanitizeText(referralCode || '');
+    const sanitizedName = sanitizeText(name || '');
 
-    // Validate required fields
-    if (!sanitizedEmail || !sanitizedPhone) {
+    if (!sanitizedEmail) {
       return NextResponse.json(
-        { ok: false, error: 'Email et téléphone requis' },
+        { ok: false, error: 'Email requis' },
         { status: 400 }
       );
     }
 
-    // Validate email format
     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(sanitizedEmail)) {
       return NextResponse.json(
         { ok: false, error: 'Format email invalide' },
@@ -88,24 +87,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate phone format
-    if (!/^\+?[1-9]\d{7,14}$/.test(sanitizedPhone)) {
-      return NextResponse.json(
-        { ok: false, error: 'Format téléphone invalide' },
-        { status: 400 }
-      );
-    }
-
-    // Validate role
-    const validRoles = ['entrepreneur', 'investisseur', 'developpeur', 'client', 'autre'];
-    if (sanitizedRole && !validRoles.includes(sanitizedRole)) {
+    const validRoles = ['client', 'pro', 'influencer'];
+    if (!sanitizedRole || !validRoles.includes(sanitizedRole)) {
       return NextResponse.json(
         { ok: false, error: 'Rôle invalide' },
         { status: 400 }
       );
     }
 
-    // Prevent duplicate submissions
+    if (sanitizedPhone) {
+      const normalized = normalizePhone(sanitizedPhone);
+      if (!normalized) {
+        return NextResponse.json(
+          { ok: false, error: 'Format téléphone invalide' },
+          { status: 400 }
+        );
+      }
+
+      const phoneHash = hashPhone(normalized);
+      const existing = getAccountByPhoneHash(phoneHash);
+
+      if (existing && existing.email !== sanitizedEmail) {
+        return NextResponse.json(
+          { ok: false, error: 'Ce numéro est déjà lié à un autre compte' },
+          { status: 409 }
+        );
+      }
+
+      if (!existing && smsVerified) {
+        linkPhoneToAccount(phoneHash, sanitizedEmail);
+      }
+    }
+
     const submissionCheck = checkSubmissionLimit(sanitizedEmail, sanitizedPhone);
     if (!submissionCheck.allowed) {
       return NextResponse.json(
@@ -114,14 +127,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Prepare data for Google Sheets
     const leadData = {
       timestamp: new Date().toISOString(),
+      name: sanitizedName,
       email: sanitizedEmail,
       phone: sanitizedPhone,
-      role: sanitizedRole || 'client',
+      role: sanitizedRole,
       referralCode: sanitizedReferralCode,
-      status: sanitizedReferralCode ? 'verified' : 'pending',
+      status: smsVerified ? 'verified' : 'pending',
       source: 'waitlist',
     };
 
@@ -154,6 +167,7 @@ export async function POST(request: NextRequest) {
       const values = [
         [
           leadData.timestamp,
+          leadData.name,
           leadData.email,
           leadData.phone,
           leadData.role,

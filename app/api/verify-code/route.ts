@@ -4,7 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyOTP } from '@/lib/otpStore';
+import { normalizePhone, hashPhone, maskEmail } from '@/lib/phone-utils';
+import { getSmsRequest, markRequestVerified, incrementAttempts, getAccountByPhoneHash } from '@/lib/sms-store';
 
 const rateLimitCache = new Map<string, { attempts: number; lastAttempt: number }>();
 
@@ -19,27 +20,26 @@ function cleanupRateLimit(): void {
   });
 }
 
-function checkRateLimit(phone: string): boolean {
+function checkRateLimit(identifier: string): boolean {
   const now = Date.now();
-  const key = phone;
 
-  if (rateLimitCache.size > 50) {
+  if (rateLimitCache.size > 100) {
     cleanupRateLimit();
   }
 
-  const limit = rateLimitCache.get(key);
+  const limit = rateLimitCache.get(identifier);
 
   if (!limit) {
-    rateLimitCache.set(key, { attempts: 1, lastAttempt: now });
+    rateLimitCache.set(identifier, { attempts: 1, lastAttempt: now });
     return true;
   }
 
   if (now - limit.lastAttempt > 5 * 60 * 1000) {
-    rateLimitCache.set(key, { attempts: 1, lastAttempt: now });
+    rateLimitCache.set(identifier, { attempts: 1, lastAttempt: now });
     return true;
   }
 
-  if (limit.attempts >= 3) {
+  if (limit.attempts >= 5) {
     return false;
   }
 
@@ -48,49 +48,92 @@ function checkRateLimit(phone: string): boolean {
   return true;
 }
 
-function sanitizeInput(input: string): string {
-  return input.replace(/[^\d+]/g, '').slice(0, 16);
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const { phone, code } = await request.json();
+    const { phone, code, requestId } = await request.json();
 
     if (!phone || !code) {
-      return NextResponse.json({ ok: false, error: 'missing' }, { status: 400 });
+      return NextResponse.json({ verified: false, error: 'missing' }, { status: 400 });
     }
 
-    const sanitizedPhone = sanitizeInput(phone);
-    const sanitizedCode = String(code).trim();
-
-    if (!sanitizedPhone || !sanitizedCode) {
+    const normalized = normalizePhone(phone);
+    if (!normalized) {
       return NextResponse.json(
-        { ok: false, error: 'Téléphone et code requis' },
+        { verified: false, error: 'Numéro invalide' },
         { status: 400 }
       );
     }
 
-    if (!checkRateLimit(sanitizedPhone)) {
+    const phoneHash = hashPhone(normalized);
+
+    if (!checkRateLimit(`verify:${phoneHash}`)) {
       return NextResponse.json(
-        { ok: false, error: 'Trop de tentatives, réessayez plus tard' },
+        { verified: false, error: 'Trop de tentatives, réessayez plus tard' },
         { status: 429 }
       );
     }
 
-    const res = verifyOTP(sanitizedPhone, sanitizedCode);
-    if (!res.ok) {
-      const map: Record<string, number> = { "not-found": 404, "expired": 410, "mismatch": 401 };
+    if (!requestId) {
       return NextResponse.json(
-        { ok: false, error: res.reason },
-        { status: map[res.reason] || 400 }
+        { verified: false, error: 'Request ID manquant' },
+        { status: 400 }
       );
     }
 
-    rateLimitCache.delete(sanitizedPhone);
+    const reqRec = getSmsRequest(requestId, phoneHash);
+    if (!reqRec) {
+      return NextResponse.json(
+        { verified: false, expired: true, error: 'Code non trouvé ou expiré' },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json({ ok: true });
+    if (reqRec.expiresAt < Date.now()) {
+      return NextResponse.json(
+        { verified: false, expired: true, error: 'Code expiré' },
+        { status: 410 }
+      );
+    }
+
+    if (reqRec.attempts >= 5) {
+      return NextResponse.json(
+        { verified: false, error: 'Trop de tentatives pour ce code' },
+        { status: 429 }
+      );
+    }
+
+    if (reqRec.code !== String(code).trim()) {
+      incrementAttempts(requestId);
+      return NextResponse.json(
+        { verified: false, expired: false, error: 'Code incorrect' },
+        { status: 401 }
+      );
+    }
+
+    markRequestVerified(requestId);
+
+    rateLimitCache.delete(`verify:${phoneHash}`);
+
+    const existing = getAccountByPhoneHash(phoneHash);
+    let ownerMatch: 'same' | 'different' | 'none' = 'none';
+
+    if (existing) {
+      if (reqRec.email && existing.email === reqRec.email) {
+        ownerMatch = 'same';
+      } else if (reqRec.email && existing.email !== reqRec.email) {
+        ownerMatch = 'different';
+      } else {
+        ownerMatch = 'same';
+      }
+    }
+
+    return NextResponse.json({
+      verified: true,
+      ownerMatch,
+      ownerHint: existing ? maskEmail(existing.email) : undefined,
+    });
   } catch (error) {
     console.error('Verify Code Error:', error);
-    return NextResponse.json({ ok: false, error: 'server-error' }, { status: 500 });
+    return NextResponse.json({ verified: false, error: 'server-error' }, { status: 500 });
   }
 }

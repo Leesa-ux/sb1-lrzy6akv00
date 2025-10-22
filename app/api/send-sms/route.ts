@@ -4,16 +4,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { putOTP } from '@/lib/otpStore';
+import { normalizePhone, hashPhone, maskEmail, generateSmsCode } from '@/lib/phone-utils';
+import { createSmsRequest, getAccountByPhoneHash } from '@/lib/sms-store';
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-function checkRateLimit(phone: string): boolean {
+function checkRateLimit(identifier: string): boolean {
   const now = Date.now();
-  const key = phone;
-  const limit = rateLimitMap.get(key);
+  const limit = rateLimitMap.get(identifier);
 
-  if (rateLimitMap.size > 100) {
+  if (rateLimitMap.size > 200) {
     Array.from(rateLimitMap.entries()).forEach(([k, v]) => {
       if (now > v.resetTime) {
         rateLimitMap.delete(k);
@@ -22,11 +22,11 @@ function checkRateLimit(phone: string): boolean {
   }
 
   if (!limit || now > limit.resetTime) {
-    rateLimitMap.set(key, { count: 1, resetTime: now + 60000 });
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + 60000 });
     return true;
   }
 
-  if (limit.count >= 1) {
+  if (limit.count >= 2) {
     return false;
   }
 
@@ -34,87 +34,114 @@ function checkRateLimit(phone: string): boolean {
   return true;
 }
 
-function randCode(n = 6): string {
-  return Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join("");
-}
-
-function isValidPhone(phone: string): boolean {
-  const cleaned = phone.replace(/\s+/g, '');
-  return /^\+?[1-9]\d{7,14}$/.test(cleaned);
-}
-
-function sanitizePhone(phone: string): string {
-  return phone.replace(/[^\d+]/g, '').slice(0, 16);
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { phone, email, role, ref } = await request.json();
 
     if (!phone) {
-      return NextResponse.json({ ok: false, error: 'phone-required' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'phone_required' }, { status: 400 });
     }
 
-    const sanitizedPhone = sanitizePhone(phone);
-
-    if (!isValidPhone(sanitizedPhone)) {
+    const normalized = normalizePhone(phone);
+    if (!normalized) {
       return NextResponse.json(
         { ok: false, error: 'Numéro de téléphone invalide' },
         { status: 400 }
       );
     }
 
-    if (!checkRateLimit(sanitizedPhone)) {
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    if (!checkRateLimit(`ip:${ip}`)) {
       return NextResponse.json(
-        { ok: false, error: 'Trop de tentatives, veuillez patienter' },
+        { ok: false, error: 'Trop de tentatives depuis cette adresse IP' },
         { status: 429 }
       );
     }
 
-    const code = randCode(6);
-    const ttl = parseInt(process.env.OTP_TTL_SECONDS || "120", 10);
-    putOTP(sanitizedPhone, code, ttl);
+    if (!checkRateLimit(`phone:${normalized}`)) {
+      return NextResponse.json(
+        { ok: false, error: 'Trop de tentatives pour ce numéro, veuillez patienter' },
+        { status: 429 }
+      );
+    }
+
+    const phoneHash = hashPhone(normalized);
+
+    const existing = getAccountByPhoneHash(phoneHash);
+    const linkedElsewhere = existing && email && existing.email !== email.trim();
+
+    const code = generateSmsCode();
+    const ttl = parseInt(process.env.OTP_TTL_SECONDS || '120', 10);
+    const expiresAt = Date.now() + ttl * 1000;
+
+    const { requestId } = createSmsRequest({
+      phoneHash,
+      normalized,
+      code,
+      expiresAt,
+      email: email?.trim() || null,
+    });
 
     const content = `Afroe: ton code de vérification est ${code}. Valable ${Math.floor(ttl / 60)} min.`;
 
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {
-      return NextResponse.json(
-        { ok: false, error: 'SMS service not configured' },
-        { status: 503 }
-      );
+      console.warn('SMS service not configured, returning success in dev mode');
+      return NextResponse.json({
+        ok: true,
+        requestId,
+        expiresAt,
+        linkedElsewhere: !!linkedElsewhere,
+        ownerHint: linkedElsewhere && existing ? maskEmail(existing.email) : undefined,
+        devMode: true,
+      });
     }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const res = await fetch("https://api.brevo.com/v3/transactionalSMS/sms", {
-      method: "POST",
-      headers: {
-        "api-key": apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type: "transactional",
-        sender: process.env.BREVO_SENDER || "Afroe",
-        recipient: sanitizedPhone,
-        content,
-        tag: "afroe-otp",
-      }),
-      signal: controller.signal,
-    });
+    try {
+      const res = await fetch('https://api.brevo.com/v3/transactionalSMS/sms', {
+        method: 'POST',
+        headers: {
+          'api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'transactional',
+          sender: process.env.BREVO_SENDER || 'Afroe',
+          recipient: normalized,
+          content,
+          tag: 'afroe-otp',
+        }),
+        signal: controller.signal,
+      });
 
-    clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
 
-    if (!res.ok) {
-      const t = await res.text().catch(() => "");
-      console.error('Brevo error:', t);
-      return NextResponse.json({ ok: false, error: "brevo-failed", detail: t }, { status: 502 });
+      if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        console.error('Brevo error:', t);
+        return NextResponse.json({ ok: false, error: 'brevo-failed', detail: t }, { status: 502 });
+      }
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if ((fetchError as Error).name === 'AbortError') {
+        console.error('SMS request timeout');
+        return NextResponse.json({ ok: false, error: 'sms-timeout' }, { status: 504 });
+      }
+      throw fetchError;
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      requestId,
+      expiresAt,
+      linkedElsewhere: !!linkedElsewhere,
+      ownerHint: linkedElsewhere && existing ? maskEmail(existing.email) : undefined,
+    });
   } catch (e) {
     console.error('Send SMS Error:', e);
-    return NextResponse.json({ ok: false, error: "server-error" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'server-error' }, { status: 500 });
   }
 }
