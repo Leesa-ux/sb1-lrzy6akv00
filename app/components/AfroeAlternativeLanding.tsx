@@ -247,6 +247,7 @@ type SmsState = "idle" | "sending" | "sent" | "verifying" | "verified" | "expire
 export default function AfroeAlternativeLanding(): JSX.Element {
   const initialMe: MeData = { name: "Toi", refCode: "", points: 0, rank: NaN };
 
+  const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [role, setRole] = useState<RoleType>(null);
@@ -263,6 +264,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   const [smsState, setSmsState] = useState<SmsState>("idle");
   const [smsCode, setSmsCode] = useState<string>("");
   const [smsExpiresAt, setSmsExpiresAt] = useState<number | null>(null);
+  const [smsRequestId, setSmsRequestId] = useState<string | null>(null);
+  const [phoneOwnerConflict, setPhoneOwnerConflict] = useState<boolean>(false);
+  const [phoneOwnerHint, setPhoneOwnerHint] = useState<string | null>(null);
   const smsRemaining = useMemo(() => { if (!smsExpiresAt) return 0; return Math.max(0, smsExpiresAt - Date.now()); }, [smsExpiresAt, smsState]);
   const smsMin = Math.floor(smsRemaining / 60000);
   const smsSec = Math.floor((smsRemaining % 60000) / 1000);
@@ -324,39 +328,93 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   async function sendSmsCode(): Promise<void> {
     if (!phone) return;
     setSmsState("sending");
+    setPhoneOwnerConflict(false);
+    setPhoneOwnerHint(null);
+
     try {
-      const r = await fetch("/api/send-sms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone, email, role, ref: me.refCode || null }) });
-      if (!r.ok) throw new Error("sms");
+      const payload = { phone: phone.trim(), email: email.trim() || null, role, ref: me?.refCode || null };
+      const res = await fetch("/api/send-sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const body = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        console.warn("send-sms failed", body);
+        setSmsState("error");
+        return;
+      }
+
+      setSmsRequestId(body.requestId ?? null);
+      setSmsExpiresAt(body.expiresAt ? Number(body.expiresAt) : Date.now() + 2 * 60 * 1000);
       setSmsState("sent");
-      setSmsExpiresAt(Date.now() + 2 * 60 * 1000);
-    } catch { setSmsState("error"); }
+
+      if (body.linkedElsewhere) {
+        setPhoneOwnerConflict(true);
+        setPhoneOwnerHint(body.ownerHint ?? null);
+      }
+    } catch (err) {
+      console.error("sendSmsCode error", err);
+      setSmsState("error");
+    }
   }
 
   async function verifySmsCode(): Promise<void> {
     if (!phone || !smsCode) return;
     setSmsState("verifying");
     try {
-      const r = await fetch("/api/verify-code", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone, code: smsCode }) });
-      if (!r.ok) throw new Error("verify");
+      const payload = { phone: phone.trim(), code: smsCode.trim(), requestId: smsRequestId ?? undefined };
+      const res = await fetch("/api/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const body = await res.json().catch(() => ({}));
+
+      if (!res.ok || !body.verified) {
+        console.warn("verify failed", body);
+        setSmsState(body.expired ? "expired" : "error");
+        return;
+      }
+
+      if (body.ownerMatch === "different") {
+        setSmsState("error");
+        setPhoneOwnerConflict(true);
+        setPhoneOwnerHint(body.ownerHint ?? null);
+        return;
+      }
+
       setSmsState("verified");
-    } catch { setSmsState(smsRemaining === 0 ? "expired" : "error"); }
+      setPhoneOwnerConflict(false);
+      setPhoneOwnerHint(body.ownerHint ?? null);
+    } catch (err) {
+      console.error("verifySmsCode error", err);
+      setSmsState("error");
+    }
   }
 
   const canSubmit = useMemo(() => {
+    const nameOk = fullName.trim().length > 0;
+    const emailOk = email.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const roleOk = !!role;
+    const phoneOk = !consentSMS || phone.trim().length > 0;
     const smsOk = !consentSMS || devSkipSms || smsState === "verified";
-    return roleOk && smsOk;
-  }, [role, consentSMS, devSkipSms, smsState]);
+    const noConflict = !phoneOwnerConflict;
+    return nameOk && emailOk && roleOk && phoneOk && smsOk && noConflict;
+  }, [fullName, email, role, phone, consentSMS, devSkipSms, smsState, phoneOwnerConflict]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    if (!email || !role || !canSubmit) return;
+    if (!canSubmit) return;
     setSubmit("loading");
     try {
-      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, name: "", phone, role, sms: consentSMS, smsVerified: smsState === "verified" }) });
+      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), name: fullName.trim(), phone: phone.trim(), role, sms: consentSMS, smsVerified: smsState === "verified" }) });
       if (!res.ok) throw new Error("signup failed");
       try {
-        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email, phone, role, referralCode: me.refCode || null, status: "subscribed", source: "landing" }) });
+        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email: email.trim(), name: fullName.trim(), phone: phone.trim(), role, referralCode: me.refCode || null, status: "subscribed", source: "landing" }) });
       } catch {}
       setSubmit("done");
     } catch { setSubmit("error"); }
@@ -381,14 +439,14 @@ export default function AfroeAlternativeLanding(): JSX.Element {
             </div>
 
             <div className="mt-5 space-y-2 text-slate-200">
-              <p>T'as galéré à trouver <un className="e"></un> coiffeur.se Afro qui capte ton style ?</p>
+              <p>T'as galéré à trouver un coiffeur.se Afro qui capte ton style ?</p>
               <p>Ou t'es pro — <span className="text-slate-100">coiffeur.se, barbier, maquilleur.se, ongliste, esthéticien.ne</span> — et t'en as marre qu'on te prenne pas au sérieux ?</p>
               <p>Afroé comprend les deux côtés du miroir 💅🏾💈</p>
             </div>
 
             <div className="mt-6 text-slate-100">
               <p className="font-medium">Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
-              <p>Et si c'était toi, le/la <prochain className="e"></prochain> <span className="text-amber-300">Glow Leader</span> ? 👑</p>
+              <p>Et si c'était toi, le/la prochain <span className="text-amber-300">Glow Leader</span> ? 👑</p>
             </div>
 
             <div className="mt-6 text-slate-300">
@@ -407,39 +465,55 @@ export default function AfroeAlternativeLanding(): JSX.Element {
             </div>
 
             <form onSubmit={onSubmit} className="mt-7 glassy neon-blue rounded-2xl p-4 md:p-5 space-y-4 max-w-xl">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="md:col-span-2 bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
-                <button type="submit" disabled={submit === "loading" || !canSubmit} className="bg-fuchsia-600 hover:bg-fuchsia-500 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-60">{submit === "loading" ? "On te place…" : submit === "done" ? "C'est validé ✨" : "Prends ta place ✨"}</button>
+              <div className="space-y-2">
+                <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ton blaze complet 💫 (prénom + nom)" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Numéro de téléphone (optionnel)" className="md:col-span-1 bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
-                <button type="button" onClick={() => setConsentSMS((v) => !v)} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border", consentSMS ? "bg-blue-600 border-blue-500" : "bg-slate-800 border-white/10")} aria-pressed={consentSMS}>{consentSMS ? "Envoie-moi un SMS" : "Sans SMS"}</button>
-                <div className="flex items-center gap-2">
-                  <button type="button" disabled={!phone || !consentSMS || smsState === "sending" || smsState === "sent" || smsState === "verified"} onClick={sendSmsCode} className={clsx("rounded-xl px-3 py-3 text-[12px] font-medium border", !phone || !consentSMS ? "bg-slate-800 border-white/10 opacity-50" : "bg-slate-900/60 border-white/10 hover:border-white/20")}>{smsState === "sending" ? "Envoi…" : smsState === "sent" ? "Code envoyé" : smsState === "verified" ? "Vérifié ✅" : "Recevoir code"}</button>
-                  <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={smsCode} onChange={(e) => setSmsCode(e.target.value)} placeholder="Code" className="w-24 bg-slate-900/60 border border-white/10 rounded-xl px-2 py-3 text-[12px] outline-none focus:ring-1 focus:ring-fuchsia-400" />
-                  <button type="button" disabled={!smsCode || smsState === "verifying" || (!devSkipSms && consentSMS && smsRemaining === 0)} onClick={verifySmsCode} className={clsx("rounded-xl px-3 py-3 text-[12px] font-medium border", !smsCode ? "bg-slate-800 border-white/10 opacity-50" : "bg-slate-900/60 border-white/10 hover:border-white/20")}>{smsState === "verifying" ? "Vérif…" : "Vérifier"}</button>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <input type="tel" required={consentSMS} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={consentSMS ? "Numéro de téléphone" : "Numéro de téléphone (optionnel)"} className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
+                <button type="button" onClick={() => setConsentSMS((v) => !v)} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border", consentSMS ? "bg-blue-600 border-blue-500" : "bg-slate-800 border-white/10")} aria-pressed={consentSMS}>{consentSMS ? "Vérifier par SMS" : "Sans SMS"}</button>
               </div>
               {consentSMS && (
-                <div className="text-[11px] text-slate-400 flex items-center gap-2">
-                  <span>Vérification SMS requise {devSkipSms ? "(mode dev)" : "(2 min)"}.</span>
-                  {!devSkipSms && smsState === "sent" && (<span className="text-amber-300">⏱ {String(smsMin).padStart(2, "0")}:{String(smsSec).padStart(2, "0")}</span>)}
-                  {smsState === "expired" && <span className="text-rose-300">Expiré — renvoyer le code.</span>}
-                  {smsState === "error" && <span className="text-rose-300">Erreur — réessaye.</span>}
-                  {smsState === "verified" && <span className="text-emerald-300">Numéro vérifié ✅</span>}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <button type="button" disabled={!phone || smsState === "sending" || smsState === "sent" || smsState === "verified"} onClick={sendSmsCode} className={clsx("rounded-xl px-3 py-3 text-sm font-medium border", !phone ? "bg-slate-800 border-white/10 opacity-50" : "bg-slate-900/60 border-white/10 hover:border-white/20")}>{smsState === "sending" ? "Envoi…" : smsState === "sent" ? "Code envoyé" : smsState === "verified" ? "Vérifié ✅" : "Recevoir code"}</button>
+                  <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={smsCode} onChange={(e) => setSmsCode(e.target.value)} placeholder="Code SMS" className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
+                  <button type="button" disabled={!smsCode || smsState === "verifying" || (!devSkipSms && smsRemaining === 0)} onClick={verifySmsCode} className={clsx("rounded-xl px-3 py-3 text-sm font-medium border", !smsCode ? "bg-slate-800 border-white/10 opacity-50" : "bg-slate-900/60 border-white/10 hover:border-white/20")}>{smsState === "verifying" ? "Vérif…" : "Vérifier"}</button>
+                </div>
+              )}
+              {consentSMS && (
+                <div className="space-y-2">
+                  <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2">
+                    <span>Vérification SMS requise {devSkipSms ? "(mode dev)" : "(2 min)"}.</span>
+                    {!devSkipSms && smsState === "sent" && (<span className="text-amber-300">⏱ {String(smsMin).padStart(2, "0")}:{String(smsSec).padStart(2, "0")}</span>)}
+                    {smsState === "expired" && <span className="text-rose-300">Expiré — renvoyer le code.</span>}
+                    {smsState === "error" && !phoneOwnerConflict && <span className="text-rose-300">Erreur — réessaye.</span>}
+                    {smsState === "verified" && <span className="text-emerald-300">Numéro vérifié ✅</span>}
+                  </div>
+                  {phoneOwnerConflict && (
+                    <div className="bg-rose-900/20 border border-rose-500/30 rounded-xl p-3">
+                      <div className="text-rose-300 text-sm font-medium mb-1">⚠️ Numéro déjà utilisé</div>
+                      <p className="text-[11px] text-rose-200">Ce numéro est déjà lié à un autre compte. Si c'est votre numéro, contactez support@afroe.com pour assistance.</p>
+                      {phoneOwnerHint && <p className="text-[11px] text-rose-300 mt-1">Numéro lié à : {phoneOwnerHint}</p>}
+                    </div>
+                  )}
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2">
-                {([
-                  { key: "client" as const, label: "Client" },
-                  { key: "pro" as const, label: "Beauty Pro" },
-                  { key: "influencer" as const, label: "Influenceur" },
-                ] as const).map((opt) => (
-                  <button key={opt.key} type="button" onClick={() => setRole(opt.key)} className={clsx("px-3 py-2 rounded-xl border text-sm", role === opt.key ? "border-amber-300 bg-amber-300/10" : "border-white/10 bg-slate-900/60 hover:border-white/20")}>{opt.label}</button>
-                ))}
+              <div>
+                <div className="text-[11px] text-slate-300 mb-2">Je suis :</div>
+                <div className="flex flex-wrap gap-2">
+                  {([
+                    { key: "client" as const, label: "Client" },
+                    { key: "pro" as const, label: "Beauty Pro" },
+                    { key: "influencer" as const, label: "Influenceur" },
+                  ] as const).map((opt) => (
+                    <button key={opt.key} type="button" onClick={() => setRole(opt.key)} className={clsx("px-4 py-2 rounded-xl border text-sm font-medium", role === opt.key ? "border-amber-300 bg-amber-300/10 text-amber-300" : "border-white/10 bg-slate-900/60 hover:border-white/20")}>{opt.label}</button>
+                  ))}
+                </div>
               </div>
-              <p className="text-[11px] text-slate-400">On t'enverra le top départ par email {consentSMS && "/ SMS"}. Tu peux te désinscrire à tout moment.</p>
+              <button type="submit" disabled={submit === "loading" || !canSubmit} className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-60 transition-colors">{submit === "loading" ? "On te place…" : submit === "done" ? "C'est validé ✨" : "Prends ta place ✨"}</button>
+              {submit === "error" && <p className="text-rose-300 text-sm text-center">Une erreur s'est produite. Réessaye dans quelques secondes.</p>}
+              <p className="text-[11px] text-slate-400 text-center">On t'enverra le top départ par email {consentSMS && "et SMS"}. Tu peux te désinscrire à tout moment.</p>
             </form>
 
             <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">
