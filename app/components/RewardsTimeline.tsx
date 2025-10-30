@@ -3,7 +3,7 @@ import { REWARDS } from "./rewards-data";
 export default function RewardsTimeline() {
   return (
     <div className="relative w-full">
-      <div className="hidden md:block absolute top-6 left-0 w-full h-1 bg-zinc-800" />
+      <div className="hidden md:block absolute top-6 left-0 w-full h-[2px] bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F]" />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4">
         {REWARDS.map((r, idx) => (
