@@ -2,37 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Performance optimizations */
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  * {
-    @apply border-border;
-  }
-  
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Optimize animations for performance */
-  .transform-gpu {
-    transform: translateZ(0);
-    will-change: transform;
-  }
-  
-  /* Reduce layout shifts */
-  img, video {
-    height: auto;
-    max-width: 100%;
-  }
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -88,9 +57,31 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  img, video {
+    height: auto;
+    max-width: 100%;
+  }
 }
 
 @layer utilities {
+  .transform-gpu {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
   .glassy {
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(12px);
