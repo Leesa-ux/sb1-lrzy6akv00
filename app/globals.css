@@ -100,4 +100,12 @@
   .neon-gold {
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
   }
+
+  .logo-glow {
+    filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.4)) drop-shadow(0 0 60px rgba(217, 70, 239, 0.3));
+  }
+
+  .vignette-bg {
+    background: radial-gradient(ellipse at center, rgba(11, 11, 11, 0.8) 0%, rgba(0, 0, 0, 1) 70%);
+  }
 }

@@ -422,49 +422,66 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-slate-950 text-white">
+      <div className="min-h-screen bg-black text-white vignette-bg">
         <header className="max-w-7xl mx-auto px-4 md:px-6 py-6">
           <div className="inline-flex items-center gap-3 glassy rounded-2xl px-4 py-3 border border-white/10">
             <Image src="/images/Afroé-1760191941241.jpg" alt="Afroé Logo" width={50} height={50} className="rounded-lg" priority />
             <span className="text-xl font-bold bg-gradient-to-r from-white via-fuchsia-200 to-fuchsia-400 bg-clip-text text-transparent">Afroé</span>
           </div>
         </header>
-        <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-bold leading-tight">Ton Style, Ton Impact, <span className="text-fuchsia-400">Ton Futur</span>.</h1>
+        <section className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+          <div className="flex flex-col items-center justify-center mb-12 md:mb-16">
+            <div className="relative mb-8 md:mb-10">
+              <Image
+                src="/images/afroe-logo.jpg"
+                alt="Logo Afroé – beauté et culture afro-européenne"
+                width={280}
+                height={280}
+                className="rounded-3xl logo-glow w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover"
+                priority
+              />
+            </div>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-center mb-4">
+              Ton Style, Ton Impact, <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Ton Futur</span>.
+            </h1>
             <PrizeBanner />
+          </div>
 
-            <div className="mt-6">
-              <Image src="/images/Lucid_Origin_Core_Description_for_all_versionsA_cinematic_phot_1.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={600} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto md:mx-0 object-cover aspect-square" />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start max-w-7xl mx-auto">
+            <div className="space-y-6">
+              <div className="mt-6">
+                <Image src="/images/Lucid_Origin_Core_Description_for_all_versionsA_cinematic_phot_1.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={600} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto object-cover aspect-square" />
+              </div>
 
-            <div className="mt-5 space-y-2 text-slate-200">
-              <p>T'as galéré à trouver un coiffeur.se Afro qui capte ton style ?</p>
-              <p>Ou t'es pro — <span className="text-slate-100">coiffeur.se, barbier, maquilleur.se, ongliste, esthéticien.ne</span> — et t'en as marre qu'on te prenne pas au sérieux ?</p>
-              <p>Afroé comprend les deux côtés du miroir 💅🏾💈</p>
-            </div>
+              <div className="space-y-2 text-slate-200">
+                <p>T'as galéré à trouver un coiffeur.se Afro qui capte ton style ?</p>
+                <p>Ou t'es pro — <span className="text-slate-100">coiffeur.se, barbier, maquilleur.se, ongliste, esthéticien.ne</span> — et t'en as marre qu'on te prenne pas au sérieux ?</p>
+                <p>Afroé comprend les deux côtés du miroir 💅🏾💈</p>
+              </div>
 
-            <div className="mt-6 text-slate-100">
-              <p className="font-medium">Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
-              <p>Et si c'était toi, le/la prochain <span className="text-amber-300">Glow Leader</span> ? 👑</p>
-            </div>
+              <div className="text-slate-100">
+                <p className="font-medium">Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
+                <p>Et si c'était toi, le/la prochain <span className="text-amber-300">Glow Leader</span> ? 👑</p>
+              </div>
 
-            <div className="mt-6 text-slate-300">
-              <p>Afroé, c'est la vibe et la structure qu'il manquait.</p>
-              <p>Parce que la beauté Afro, c'est pas une tendance. C'est notre héritage, notre fierté, notre excellence.</p>
-            </div>
-
-            <div className="mt-8 glassy neon-gold rounded-2xl p-5 md:p-6 border-2 border-amber-300/30">
-              <div className="flex items-start gap-3">
-                <div className="text-3xl">🎯</div>
-                <div>
-                  <h2 className="text-xl md:text-2xl font-bold text-amber-300 mb-2">Inscris-toi sur la liste d'attente exclusive</h2>
-                  <p className="text-slate-200 text-sm md:text-base">Rejoins la waitlist Afroé et participe au concours de lancement. Partage ton lien unique, grimpe dans le classement et gagne jusqu'à <span className="font-bold text-amber-300">3 500 €</span> + des récompenses exclusives !</p>
-                </div>
+              <div className="text-slate-300">
+                <p>Afroé, c'est la vibe et la structure qu'il manquait.</p>
+                <p>Parce que la beauté Afro, c'est pas une tendance. C'est notre héritage, notre fierté, notre excellence.</p>
               </div>
             </div>
 
-            <form onSubmit={onSubmit} className="mt-7 glassy neon-blue rounded-2xl p-4 md:p-5 space-y-4 max-w-xl">
+            <div className="space-y-6">
+              <div className="glassy neon-gold rounded-2xl p-5 md:p-6 border-2 border-amber-300/30">
+                <div className="flex items-start gap-3">
+                  <div className="text-3xl">🎯</div>
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-bold text-amber-300 mb-2">Inscris-toi sur la liste d'attente exclusive</h2>
+                    <p className="text-slate-200 text-sm md:text-base">Rejoins la waitlist Afroé et participe au concours de lancement. Partage ton lien unique, grimpe dans le classement et gagne jusqu'à <span className="font-bold text-amber-300">3 500 €</span> + des récompenses exclusives !</p>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={onSubmit} className="glassy neon-blue rounded-2xl p-4 md:p-5 space-y-4">
               <div className="space-y-2">
                 <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ton blaze complet 💫 (prénom + nom)" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
                 <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
@@ -557,9 +574,10 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               <Stat label="Tes points" value={typeof me.points === "number" ? me.points : 0} />
               <div className="min-w-[220px] grow"><Progress value={typeof me.points === "number" ? me.points : 0} goal={nextGoal} /></div>
             </div>
+            </div>
           </div>
 
-          <div className="relative w-full lg:justify-self-end">
+          <div className="relative w-full lg:justify-self-end mt-10 lg:mt-0">
             <div className="mx-auto lg:mx-0 w-[320px] h-[640px] rounded-[36px] border border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 shadow-[0_0_40px_rgba(59,130,246,.25)] p-2">
               <div className="w-full h-full rounded-[28px] overflow-hidden bg-slate-950">
                 <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
