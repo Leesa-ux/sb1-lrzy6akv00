@@ -433,7 +433,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
           <div className="flex flex-col items-center justify-center mb-12 md:mb-16">
             <div className="relative mb-8 md:mb-10">
               <Image
-                src="/images/afroe-logo.jpg"
+                src="/images/Design sans titre.jpg"
                 alt="Logo Afroé – beauté et culture afro-européenne"
                 width={280}
                 height={280}

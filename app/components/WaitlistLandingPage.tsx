@@ -12,7 +12,7 @@ import { MdSpa } from "react-icons/md";
 import RewardsTimeline from "./RewardsTimeline";
 
 // Logo
-const LOGO_IMAGE_SRC = "/images/afroe-logo.jpg";
+const LOGO_IMAGE_SRC = "/images/Design sans titre.jpg";
 
 function ProgressBar({ points, breaks = [10, 25, 50, 100] }: { points: number; breaks?: number[] }) {
   const pct = Math.min(100, (points / breaks[3]) * 100);
