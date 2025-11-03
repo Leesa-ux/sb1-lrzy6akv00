@@ -76,7 +76,7 @@ export default function WaitlistLandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0B0B] text-white">
+    <div className="min-h-screen bg-black text-white vignette-bg">
       {/* HEADER */}
       <header className="mx-auto w-full max-w-7xl px-6 pt-8 pb-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3" aria-label="Accueil Afroé">
@@ -105,19 +105,35 @@ export default function WaitlistLandingPage() {
 
       {/* HERO */}
       <section className="mx-auto w-full max-w-7xl px-6 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* LEFT */}
-          <div className="order-2 md:order-1">
-            <h1 className="font-h1 text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] bg-clip-text text-transparent">
-              ON CHANGE DE GAME
-            </h1>
+        {/* CENTERED LOGO */}
+        <div className="flex flex-col items-center justify-center mb-12 md:mb-16 text-center">
+          <div className="relative mb-8 md:mb-10">
+            <Image
+              src={LOGO_IMAGE_SRC}
+              alt="Logo Afroé – beauté et culture afro-européenne"
+              width={280}
+              height={280}
+              className="rounded-3xl logo-glow w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover"
+              priority
+            />
+          </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 leading-tight">
+            Ton Style, Ton Impact, <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Ton Futur</span>.
+          </h1>
+          <p className="text-lg sm:text-xl text-zinc-300 leading-relaxed mb-8 max-w-3xl">
+            Le futur de la beauté afro démarre maintenant. 🔥 Afroé, c'est l'étincelle qui allume le game.
+          </p>
+        </div>
 
-            <p className="text-lg sm:text-xl text-zinc-300 leading-relaxed mb-6">
-              Le futur de la beauté afro démarre maintenant. 🔥 Afroé, c'est l'étincelle qui allume le game.
-              <br />Pro ? Monte ton business d'un cran.
-              <br />Client·e ? Connecte-toi aux meilleurs pros.
-              <br />Ce n'est pas juste une app. C'est ta nouvelle force.
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          {/* LEFT */}
+          <div>
+
+            <div className="space-y-4 text-zinc-300 mb-6">
+              <p className="text-base">Pro ? Monte ton business d'un cran. 💼</p>
+              <p className="text-base">Client·e ? Connecte-toi aux meilleurs pros. ✨</p>
+              <p className="text-base font-semibold text-white">Ce n'est pas juste une app. C'est ta nouvelle force.</p>
+            </div>
 
             <form onSubmit={handleSubmit} className="grid gap-4 max-w-md">
               <input
@@ -138,24 +154,25 @@ export default function WaitlistLandingPage() {
               />
               <button
                 type="submit"
-                className="bg-gradient-to-r from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] rounded-2xl py-4 font-bold text-base text-black hover:opacity-90 transition-opacity"
+                className="bg-gradient-to-r from-blue-500 via-fuchsia-500 to-pink-500 rounded-2xl py-4 font-bold text-base text-white hover:opacity-90 transition-opacity shadow-lg"
               >
-                Prends ta place
+                Prends ta place ✨
               </button>
               <p className="text-xs text-zinc-500 mt-1">{roleNote}</p>
             </form>
           </div>
 
           {/* RIGHT - mock phone */}
-          <div className="order-1 md:order-2 flex justify-center items-center">
-            <div className="relative mx-auto mt-10 w-[280px] sm:w-[320px] rounded-[2rem] bg-black text-white overflow-hidden border border-zinc-800 shadow-[0_0_30px_rgba(146,209,79,0.2)]">
-              <div className="bg-gradient-to-b from-[#8E58C7] via-[#1B9AA2] to-[#92D14F] py-4 text-center flex flex-col items-center gap-2">
-                <Image src={LOGO_IMAGE_SRC} alt="Logo Afroé" width={50} height={50} className="rounded-full" priority />
+          <div className="flex justify-center items-center">
+            <div className="relative mx-auto w-[280px] sm:w-[320px] rounded-[2rem] bg-black text-white overflow-hidden border border-zinc-800 shadow-[0_0_30px_rgba(217,70,239,0.3)]">
+              <div className="bg-gradient-to-br from-blue-500 via-fuchsia-500 to-pink-500 py-4 text-center flex flex-col items-center gap-2">
+                <Image src={LOGO_IMAGE_SRC} alt="Logo Afroé" width={50} height={50} className="rounded-full shadow-lg" priority />
                 <span className="text-sm font-medium tracking-wide">Barbe • Maquillage • Ongles • Coiffure • Soins</span>
               </div>
-              <div className="p-5 text-xs text-zinc-300 leading-relaxed">
-                <p className="text-[#92D14F] font-semibold mb-2">🎁 Jusqu'à 3500€ de récompenses</p>
+              <div className="p-5 text-xs text-zinc-300 leading-relaxed space-y-3">
+                <p className="text-fuchsia-400 font-semibold">🎁 Jusqu'à 3500€ de récompenses</p>
                 <p>Invite, monte de niveau, et débloque des cadeaux exclusifs.</p>
+                <p className="text-amber-300 text-[10px]">Partage ton lien unique • Grimpe dans le classement • Gagne des prix</p>
               </div>
             </div>
           </div>
