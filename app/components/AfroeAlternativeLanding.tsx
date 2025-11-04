@@ -439,17 +439,19 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start max-w-7xl mx-auto">
             <div className="space-y-6">
-              <div className="mt-6 relative">
-                <Image src="/images/Lucid_Origin_Core_Description_for_all_versionsA_cinematic_phot_1.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={600} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto object-cover aspect-square" />
-                <div className="absolute -top-4 -left-4 md:-top-6 md:-left-6">
+              <div className="flex flex-col items-center gap-6 md:gap-8">
+                <div className="pt-2">
                   <Image
                     src="/images/LOGOAfroé (1).jpg"
                     alt="Logo Afroé – beauté et culture afro-européenne"
-                    width={120}
-                    height={120}
-                    className="rounded-2xl w-20 h-20 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_20px_rgba(59,130,246,0.3)]"
+                    width={100}
+                    height={100}
+                    className="rounded-2xl w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-cover shadow-[0_0_25px_rgba(59,130,246,0.4),0_0_50px_rgba(217,70,239,0.25),0_4px_15px_rgba(0,0,0,0.5)]"
                     priority
                   />
+                </div>
+                <div className="w-full">
+                  <Image src="/images/Lucid_Origin_Core_Description_for_all_versionsA_cinematic_phot_1.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={600} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto object-cover aspect-square" />
                 </div>
               </div>
 
