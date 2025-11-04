@@ -624,6 +624,10 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                       <li>+100 pts si un influenceur (&gt;2k followers) rejoint.</li>
                     </ul>
                   </div>
+
+                  <p className="mt-2 text-sm md:text-base text-center opacity-90" style={{ color: '#E5E5E5' }}>
+                    Chaque nom ici fait monter la beauté Afro. Tu te places où ? 👀
+                  </p>
                 </div>
               </div>
             </div>
@@ -631,15 +635,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 md:px-6 pb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Leaderboard rows={boardRows.length ? boardRows : [
-            { rank: 1, name: "Aïcha", invites: 63 },
-            { rank: 2, name: "Malik", invites: 49 },
-            { rank: 3, name: "Kenya", invites: 41 },
-            { rank: 4, name: "Nadia", invites: 28 },
-            { rank: 5, name: "Yann", invites: 22 },
-          ]} />
-
+        <section className="max-w-7xl mx-auto px-4 md:px-6 pb-10">
           <div className="space-y-3">
             <div className="glassy rounded-2xl p-5 text-white">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
