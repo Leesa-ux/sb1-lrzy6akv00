@@ -431,16 +431,6 @@ export default function AfroeAlternativeLanding(): JSX.Element {
         </header>
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-10">
           <div className="flex flex-col items-center justify-center mb-12 md:mb-16">
-            <div className="relative mb-8 md:mb-10">
-              <Image
-                src="/images/Design sans titre.jpg"
-                alt="Logo Afroé – beauté et culture afro-européenne"
-                width={280}
-                height={280}
-                className="rounded-3xl logo-glow w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover"
-                priority
-              />
-            </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-center mb-4">
               Ton Style, Ton Impact, <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Ton Futur</span>.
             </h1>
@@ -449,8 +439,18 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start max-w-7xl mx-auto">
             <div className="space-y-6">
-              <div className="mt-6">
+              <div className="mt-6 relative">
                 <Image src="/images/Lucid_Origin_Core_Description_for_all_versionsA_cinematic_phot_1.jpg" alt="Visuel Afroé Glow — beauté Afro moderne" width={600} height={600} className="rounded-2xl shadow-[0_0_30px_rgba(255,0,153,.25)] mx-auto object-cover aspect-square" />
+                <div className="absolute -top-4 -left-4 md:-top-6 md:-left-6">
+                  <Image
+                    src="/images/LOGOAfroé (1).jpg"
+                    alt="Logo Afroé – beauté et culture afro-européenne"
+                    width={120}
+                    height={120}
+                    className="rounded-2xl w-20 h-20 md:w-28 md:h-28 lg:w-32 lg:h-32 object-cover shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_20px_rgba(59,130,246,0.3)]"
+                    priority
+                  />
+                </div>
               </div>
 
               <div className="space-y-2 text-slate-200">
