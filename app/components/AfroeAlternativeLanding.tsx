@@ -434,6 +434,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-center mb-4">
               Ton Style, Ton Impact, <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Ton Futur</span>.
             </h1>
+            <p className="text-lg md:text-xl text-center mb-6 max-w-3xl mx-auto px-4" style={{ color: '#E5E5E5' }}>
+              Afroé, l'app qui connecte les pros et les passionné·es de la beauté Afro, à domicile ou en salon.
+            </p>
             <PrizeBanner />
           </div>
 
