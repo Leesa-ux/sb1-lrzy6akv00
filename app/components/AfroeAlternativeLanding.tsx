@@ -178,7 +178,7 @@ function PrizeBanner(): JSX.Element {
         <span className="text-amber-300 text-xl">🏆</span>
         <div>
           <div className="text-sm md:text-base font-semibold">Jusqu'à <span className="text-amber-300">3 500 €</span> à gagner</div>
-          <div className="text-[12px] text-slate-200/90">Le/La #1 du classement remporte 3 500 €. Des récompenses sont débloquées à chaque palier.</div>
+          <div className="text-[12px] text-slate-200/90">Le/La #1 du classement remporte 3 500 €. Des récompenses sont débloquées à chaque étape.</div>
         </div>
       </div>
     </div>
@@ -191,9 +191,9 @@ function Rewards(): JSX.Element {
       <h3 className="font-semibold mb-1">Récompenses par étapes</h3>
       <p className="text-[12px] text-slate-300 mb-2">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm mt-4">
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Palier 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-400">Badge Glow Starter & mise en avant waitlist</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Palier 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Palier 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-400">Badge Glow Starter & mise en avant waitlist</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold"><div className="text-slate-300">Grand Prix</div><div className="text-2xl font-bold text-amber-300">3 500 €</div><div className="text-[11px] text-slate-200">#1 du classement au lancement</div></div>
       </div>
       <ul className="mt-4 text-[11px] text-slate-400 space-y-1 list-disc list-inside">

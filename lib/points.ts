@@ -40,7 +40,7 @@ export function nextMilestone(points: number) {
   return { target: 100, missing: 0, emoji:'🔥' };
 }
 
-export function palier2Copy(role: "client"|"influenceur"|"pro") {
+export function etape2Copy(role: "client"|"influenceur"|"pro") {
   if (role === "pro") return "1 mois booking fees off (après 2 mois payés)";
   if (role === "influenceur") return "Spotlight Afroé (IG/TikTok)";
   return "Bon service gratuit (cap 30)";

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getUserPoints, nextMilestone, palier2Copy } from "@/lib/points";
+import { getUserPoints, nextMilestone, etape2Copy } from "@/lib/points";
 import { Resend } from "resend";
 
 const getResend = () => process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -20,19 +20,19 @@ export async function POST(req: Request) {
     const { total } = await getUserPoints(u.id);
     const nm = nextMilestone(total);
     const referralLink = `${APP_URL}/?ref=${u.referralCode}`;
-    const pal2 = palier2Copy(u.role as any);
+    const etape2 = etape2Copy(u.role as any);
 
     let subject = "", html = "", preheader = "";
 
     if (kind === "weekly") {
       subject = `${u.email.split("@")[0]}, t’es à ${total} pts — encore ${nm.missing} pour ${nm.emoji}`;
-      preheader = `Il te manque ${nm.missing} pts pour le prochain palier.`;
+      preheader = `Il te manque ${nm.missing} pts pour la prochaine étape.`;
       html = `
         <h1>Ton score Afroé : ${total} pts 🔥</h1>
         <p>Encore <b>${nm.missing} pts</b> et tu débloques <b>${nm.target} pts</b> ${nm.emoji}.</p>
         <ul>
           <li>🌱 10 pts → Badge VIP + Tuto</li>
-          <li>✨ 25 pts → ${pal2}</li>
+          <li>✨ 25 pts → ${etape2}</li>
           <li>💎 50 pts → Afroé Pack</li>
           <li>🔥 100 pts → Cagnotte 3 500 €</li>
         </ul>
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       const s = Math.floor((diff / 1000) % 60);
       const countdown = `${d}j ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
 
-      subject = `⏳ ${u.email.split("@")[0]}, ${d ? d+' jours' : (h? h+'h' : 'Dernières heures')} pour passer ${nm.target} pts`;
+      subject = `⏳ ${u.email.split("@")[0]}, ${d ? d+' jours' : (h? h+'h' : 'Dernières heures')} pour atteindre ${nm.target} pts`;
       preheader = `Après, c’est terminé. Joue ta place maintenant.`;
       html = `
         <h1>Dernière ligne droite ⏳</h1>
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
         <p>Tu es à <b>${total} pts</b> — encore <b>${nm.missing}</b> pour <b>${nm.target} pts</b> ${nm.emoji}.</p>
         <ul>
           <li>🌱 10 pts → Badge VIP + Tuto</li>
-          <li>✨ 25 pts → ${pal2}</li>
+          <li>✨ 25 pts → ${etape2}</li>
           <li>💎 50 pts → Afroé Pack</li>
           <li>🔥 100 pts → Cagnotte 3 500 €</li>
         </ul>
