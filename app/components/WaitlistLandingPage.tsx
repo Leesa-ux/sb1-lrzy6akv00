@@ -65,8 +65,8 @@ export default function WaitlistLandingPage() {
 
   const roleNote = useMemo(() => {
     if (role === "pro") return "Pro : 1 mois de booking fees off (après 2 mois payés) à l'étape 2.";
-    if (role === "influenceur") return "Influenceur·e : spotlight IG/TikTok à l'étape 2.";
-    return "Client·e : bon service beauté gratuit (cap 30) à l'étape 2.";
+    if (role === "influenceur") return "Influenceur.euse : spotlight IG/TikTok à l'étape 2.";
+    return "Client.e : bon service beauté gratuit (cap 30) à l'étape 2.";
   }, [role]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -131,7 +131,7 @@ export default function WaitlistLandingPage() {
 
             <div className="space-y-4 text-zinc-300 mb-6">
               <p className="text-base">Pro ? Monte ton business d'un cran. 💼</p>
-              <p className="text-base">Client·e ? Connecte-toi aux meilleurs pros. ✨</p>
+              <p className="text-base">Client.e ? Connecte-toi aux meilleurs pros. ✨</p>
               <p className="text-base font-semibold text-white">Ce n'est pas juste une app. C'est ta nouvelle force.</p>
             </div>
 

@@ -198,7 +198,7 @@ function Rewards(): JSX.Element {
       </div>
       <ul className="mt-4 text-[11px] text-slate-400 space-y-1 list-disc list-inside">
         <li>Points validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</li>
-        <li>Influenceur éligible : &ge; 2 000 followers.</li>
+        <li>Influenceur.euse éligible : &ge; 2 000 followers.</li>
         <li>Un seul compte par personne. Fraude = exclusion.</li>
       </ul>
     </div>
@@ -525,9 +525,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 <div className="text-[11px] text-slate-300 mb-2">Je suis :</div>
                 <div className="flex flex-wrap gap-2">
                   {([
-                    { key: "client" as const, label: "Client" },
+                    { key: "client" as const, label: "Client.e" },
                     { key: "pro" as const, label: "Beauty Pro" },
-                    { key: "influencer" as const, label: "Influenceur" },
+                    { key: "influencer" as const, label: "Influenceur.euse" },
                   ] as const).map((opt) => (
                     <button key={opt.key} type="button" onClick={() => setRole(opt.key)} className={clsx("px-4 py-2 rounded-xl border text-sm font-medium", role === opt.key ? "border-amber-300 bg-amber-300/10 text-amber-300" : "border-white/10 bg-slate-900/60 hover:border-white/20")}>{opt.label}</button>
                   ))}
@@ -649,9 +649,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Client</div><div className="text-2xl font-bold">+10</div><div className="text-[11px] text-slate-400">Téléchargement de l'app</div></div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Client.e</div><div className="text-2xl font-bold">+10</div><div className="text-[11px] text-slate-400">Téléchargement de l'app</div></div>
                 <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Beauty Pro</div><div className="text-2xl font-bold">+50</div><div className="text-[11px] text-slate-400">Inscription validée</div></div>
-                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur</div><div className="text-2xl font-bold">+100</div><div className="text-[11px] text-slate-400">&ge; 2 000 followers</div></div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur.euse</div><div className="text-2xl font-bold">+100</div><div className="text-[11px] text-slate-400">&ge; 2 000 followers</div></div>
                 <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Bonus Lancement</div><div className="text-2xl font-bold">x2</div><div className="text-[11px] text-slate-400">Téléchargements & inscriptions le jour J</div></div>
               </div>
               <p className="text-[12px] text-slate-400 mt-3">Les points finaux sont validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</p>
