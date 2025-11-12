@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
   phone        String?
   role         String   @default("client")
@@ -23,15 +23,12 @@ model User {
 }
 
 model ReferralEvent {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   type      String
-  actorL1Id String
-  actorL2Id String?
+  actorL1Id String   @db.ObjectId
+  actorL2Id String?  @db.ObjectId
   createdAt DateTime @default(now())
 
-  actorL1   User     @relation("ActorL1", fields: [actorL1Id], references: [id])
-  actorL2   User?    @relation("ActorL2", fields: [actorL2Id], references: [id])
-
-  @@index([actorL1Id])
-  @@index([actorL2Id])
+  actorL1   User     @relation("ActorL1", fields: [actorL1Id], references: [id], onDelete: Cascade)
+  actorL2   User?    @relation("ActorL2", fields: [actorL2Id], references: [id], onDelete: Cascade)
 }
