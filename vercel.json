@@ -8,6 +8,18 @@
     {
       "path": "/api/progress-email",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/followup-1h",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/activation-48h",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/inactivity-check",
+      "schedule": "0 10 * * *"
     }
   ]
 }

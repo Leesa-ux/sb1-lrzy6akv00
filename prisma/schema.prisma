@@ -11,12 +11,20 @@ model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
   phone        String?
+  firstName    String?
   role         String   @default("client")
   points       Int      @default(0)
+  rank         Int      @default(0)
   referralCode String   @unique
   referredBy   String?
+  refCount     Int      @default(0)
+  lastRefAt    DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  emailSentAt       DateTime?
+  emailOpenedAt     DateTime?
+  lastMilestoneSent Int?
 
   referralEventsL1 ReferralEvent[] @relation("ActorL1")
   referralEventsL2 ReferralEvent[] @relation("ActorL2")
