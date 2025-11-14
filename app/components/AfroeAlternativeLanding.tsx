@@ -448,7 +448,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               </div>
 
               <div className="space-y-2 text-slate-200">
-                <p>T'as galéré à trouver un coiffeur.se Afro qui capte ton style ?</p>
+                <p className="font-bold">T'as galéré à trouver un coiffeur.se Afro qui capte ton style ?</p>
                 <p>Ou t'es pro — <span className="text-slate-100">coiffeur.se, barbier, maquilleur.se, ongliste, esthéticien.ne</span> — et t'en as marre qu'on te prenne pas au sérieux ?</p>
                 <p>Afroé comprend les deux côtés du miroir 💅🏾💈</p>
               </div>
