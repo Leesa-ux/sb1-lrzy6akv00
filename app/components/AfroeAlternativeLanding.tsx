@@ -561,7 +561,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               </div>
             </div>
 
-            <div className="mt-5 text-slate-200"><p className="font-medium">🔥 200+ Afro lovers ont déjà rejoint la Glow List. Rejoins le crew avant le top départ.</p></div>
+            <div className="mt-5 text-slate-200"><p className="font-medium">🔥 20+ Afro beauty lovers ont déjà rejoint la Glow List. Rejoins le crew avant le top départ.</p></div>
 
             <div className="mt-6 flex flex-wrap gap-2 items-center">
               <Stat label="Ton rang" value={Number.isFinite(me.rank) ? `#${me.rank}` : "—"} />
