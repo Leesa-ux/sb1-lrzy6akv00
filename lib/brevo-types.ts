@@ -54,9 +54,9 @@ export const MILESTONES: Milestone[] = [10, 50, 100, 200];
 
 export function getSMSByRole(role: Role, refLink: string): string {
   const messages = {
-    client: `Afroé ✨ Bienvenue sur la Glow List !\nAmi·e = +2 pts · Pro = +25 pts · Influenceur ≥2k = +15 pts.\nÀ 10 pts : badge + mise en avant + -10%.\nTon lien : ${refLink}`,
+    client: `Afroé ✨ Bienvenue sur la Glow List !\nAmi·e = +2 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts.\nÀ 10 pts : badge + mise en avant + -10%.\nTon lien : ${refLink}`,
+    influencer: `Afroé ✨ Bienvenue sur la Glow List !\nInfluenceur ≥2k = +15 pts · Client = +2 pts · Pro = +25 pts.\nVise 50–100 pts pour les rewards + Jackpot 3 500 €.\nTon lien : ${refLink}`,
     pro: `Afroé ✨ Bienvenue Beauty Pro !\nChaque pro = +25 pts · client = +2 pts · influenceur ≥2k = +15 pts.\nÀ 100 pts : Glow Kit + 1h coaching + Jackpot 3 500 €.\nTon lien : ${refLink}`,
-    influencer: `Afroé ✨ Bienvenue sur la Glow List !\nInfluenceur ≥2k = +15 pts · Pro = +25 pts · Client = +2 pts.\nVise 50–100 pts pour les rewards + Jackpot 3 500 €.\nTon lien : ${refLink}`,
   };
 
   return messages[role];

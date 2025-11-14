@@ -32,20 +32,20 @@ Bienvenue sur la Glow List ✨ Ton lien est prêt
 {% if contact.ROLE == 'client' %}
 
 <p>Chaque ami·e inscrit·e via ton lien = <strong>+2 pts</strong></p>
-<p>Chaque beauty pro = <strong>+25 pts</strong></p>
 <p>Chaque influenceur·euse ≥ 2 000 followers = <strong>+15 pts</strong></p>
+<p>Chaque beauty pro = <strong>+25 pts</strong></p>
 
 {% elsif contact.ROLE == 'pro' %}
 
 <p>Chaque Beauty Pro que tu invites = <strong>+25 pts</strong></p>
-<p>Chaque influenceur·euse ≥ 2 000 followers = <strong>+15 pts</strong></p>
 <p>Chaque client·e que tu ramènes = <strong>+2 pts</strong></p>
+<p>Chaque influenceur·euse ≥ 2 000 followers = <strong>+15 pts</strong></p>
 
 {% elsif contact.ROLE == 'influencer' %}
 
 <p>Chaque influenceur·euse ≥ 2 000 followers inscrit·e avec ton lien = <strong>+15 pts</strong></p>
-<p>Chaque Beauty Pro = <strong>+25 pts</strong></p>
 <p>Chaque client·e = <strong>+2 pts</strong></p>
+<p>Chaque Beauty Pro = <strong>+25 pts</strong></p>
 
 {% endif %}
 
@@ -69,7 +69,7 @@ Bienvenue sur la Glow List ✨ Ton lien est prêt
 **Client·e:**
 ```
 Afroé ✨ Bienvenue sur la Glow List !
-Ami·e = +2 pts · Pro = +25 pts · Influenceur ≥2k = +15 pts.
+Ami·e = +2 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts.
 À 10 pts : badge + mise en avant + -10%.
 Ton lien : {{REF_LINK}}
 ```
@@ -85,7 +85,7 @@ Ton lien : {{REF_LINK}}
 **Influenceur·euse:**
 ```
 Afroé ✨ Bienvenue sur la Glow List !
-Influenceur ≥2k = +15 pts · Pro = +25 pts · Client = +2 pts.
+Influenceur ≥2k = +15 pts · Client = +2 pts · Pro = +25 pts.
 Vise 50–100 pts pour les rewards + Jackpot 3 500 €.
 Ton lien : {{REF_LINK}}
 ```
@@ -115,11 +115,11 @@ Ton lien : {{REF_LINK}}
 Chaque inscription compte !</p>
 
 {% if contact.ROLE == 'client' %}
-<p>Ami·e = <strong>+2 pts</strong> · Pro = <strong>+25 pts</strong> · Influenceur = <strong>+15 pts</strong></p>
+<p>Ami·e = <strong>+2 pts</strong> · Influenceur = <strong>+15 pts</strong> · Pro = <strong>+25 pts</strong></p>
 {% elsif contact.ROLE == 'pro' %}
 <p>Pro = <strong>+25 pts</strong> · Client = <strong>+2 pts</strong> · Influenceur = <strong>+15 pts</strong></p>
 {% elsif contact.ROLE == 'influencer' %}
-<p>Influenceur = <strong>+15 pts</strong> · Pro = <strong>+25 pts</strong> · Client = <strong>+2 pts</strong></p>
+<p>Influenceur = <strong>+15 pts</strong> · Client = <strong>+2 pts</strong> · Pro = <strong>+25 pts</strong></p>
 {% endif %}
 
 <p>On se voit au sommet du classement 🔥<br>
@@ -308,8 +308,8 @@ Hey ! Le classement Afroé bouge vite ! Partage ton lien pour ne pas te faire d�
 
 {% if contact.ROLE == 'client' %}
 <p>Ami·e inscrit·e = <strong>+10 pts</strong> (x2 aujourd'hui = 20 pts !)<br>
-Pro = <strong>+100 pts</strong><br>
-Influenceur = <strong>+50 pts</strong></p>
+Influenceur = <strong>+50 pts</strong><br>
+Pro = <strong>+100 pts</strong></p>
 
 {% elsif contact.ROLE == 'pro' %}
 <p>Beauty Pro = <strong>+100 pts</strong> (x2 aujourd'hui = 200 pts !)<br>
@@ -318,8 +318,8 @@ Influenceur = <strong>+50 pts</strong></p>
 
 {% elsif contact.ROLE == 'influencer' %}
 <p>Influenceur = <strong>+50 pts</strong> (x2 aujourd'hui = 100 pts !)<br>
-Pro = <strong>+100 pts</strong><br>
-Client·e = <strong>+10 pts</strong></p>
+Client·e = <strong>+10 pts</strong><br>
+Pro = <strong>+100 pts</strong></p>
 
 {% endif %}
 
