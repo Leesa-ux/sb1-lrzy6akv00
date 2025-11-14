@@ -122,8 +122,8 @@ export default function AfroeLandingNew() {
             {/* Role Selector */}
             <div className="flex gap-3">
               <RoleChip label="Client.e" active={role === "client"} onClick={() => setRole("client")} />
-              <RoleChip label="Beauty Pro" active={role === "pro"} onClick={() => setRole("pro")} />
               <RoleChip label="Influenceur.euse" active={role === "influencer"} onClick={() => setRole("influencer")} />
+              <RoleChip label="Beauty Pro" active={role === "pro"} onClick={() => setRole("pro")} />
             </div>
           </div>
 

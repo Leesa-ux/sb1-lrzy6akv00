@@ -526,8 +526,8 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 <div className="flex flex-wrap gap-2">
                   {([
                     { key: "client" as const, label: "Client.e" },
-                    { key: "pro" as const, label: "Beauty Pro" },
                     { key: "influencer" as const, label: "Influenceur.euse" },
+                    { key: "pro" as const, label: "Beauty Pro" },
                   ] as const).map((opt) => (
                     <button key={opt.key} type="button" onClick={() => setRole(opt.key)} className={clsx("px-4 py-2 rounded-xl border text-sm font-medium", role === opt.key ? "border-amber-300 bg-amber-300/10 text-amber-300" : "border-white/10 bg-slate-900/60 hover:border-white/20")}>{opt.label}</button>
                   ))}
