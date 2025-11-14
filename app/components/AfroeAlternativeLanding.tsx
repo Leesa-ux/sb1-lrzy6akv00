@@ -455,7 +455,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
               <div className="text-slate-100">
                 <p className="font-medium">Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
-                <p>Et si c'était toi, le/la prochain <span className="text-amber-300">Glow Leader</span> ? 👑</p>
+                <p>Et si c'était toi, le/la prochain.e <span className="text-amber-300">Glow Leader</span> ? 👑</p>
               </div>
 
               <div className="text-slate-300">
