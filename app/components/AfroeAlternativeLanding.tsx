@@ -612,6 +612,10 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                       <li>+2 pts pour un·e client·e.</li>
                       <li>+15 pts pour un·e influenceur·euse (&gt;2k followers).</li>
                       <li>+25 pts pour un·e Beauty Pro.</li>
+                       <li className="font-bold italic">après le lancement</li>
+                      <li>+10 pts pour un·e client·e.</li>
+                      <li>+50 pts pour un·e influenceur·euse (&gt;2k followers).</li>
+                      <li>+100 pts pour un·e Beauty Pro.</li>
                     </ul>
                   </div>
 
