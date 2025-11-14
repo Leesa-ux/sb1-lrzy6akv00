@@ -425,7 +425,6 @@ export default function AfroeAlternativeLanding(): JSX.Element {
       <div className="min-h-screen bg-black text-white vignette-bg">
         <header className="max-w-7xl mx-auto px-4 md:px-6 py-6">
           <div className="inline-flex items-center gap-3 glassy rounded-2xl px-4 py-3 border border-white/10">
-            <Image src="/images/Afroé-1760191941241.jpg" alt="Afroé Logo" width={50} height={50} className="rounded-lg" priority />
             <span className="text-xl font-bold bg-gradient-to-r from-white via-fuchsia-200 to-fuchsia-400 bg-clip-text text-transparent">Afroé</span>
           </div>
         </header>
