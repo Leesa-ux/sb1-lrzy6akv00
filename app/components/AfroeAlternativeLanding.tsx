@@ -631,10 +631,10 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                     <ul className="mt-1 text-[11px] text-slate-300 space-y-1 list-disc list-inside">
                       <li>Partage ton lien unique.</li>
                       <li className="font-bold italic">avant le lancement</li>
-                      <li>+2 pts pour un·e client·e.</li>
-                      <li>+15 pts pour un·e influenceur·euse (&gt;2k followers).</li>
-                      <li>+25 pts pour un·e Beauty Pro.</li>
-                       <li className="font-bold italic">après le lancement</li>
+                      <li className="font-bold italic">+2 pts pour un·e client·e</li>
+                      <li className="font-bold italic">+15 pts pour un·e influenceur·euse</li>
+                      <li className="font-bold italic">+25 pts pour un·e Beauty Pro</li>
+                      <li className="font-bold italic">après le lancement</li>
                       <li>+10 pts si un·e client·e télécharge l'appli.</li>
                       <li>+50 pts si un·e influenceur·euse (&gt;2k followers) rejoint.</li>
                       <li>+100 pts si un·e Beauty Pro s'inscrit (min. 2 mois).</li>
