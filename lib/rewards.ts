@@ -42,7 +42,10 @@ export const REWARDS_CONFIG = {
       ],
     },
   ],
-  grandPrize: { amount: 3500, condition: '#1 du classement au lancement' },
+  grandPrize: {
+    iphone: 'iPhone 17 Pro pour le rang #1 au lancement',
+    cashDraw: { amount: 3500, condition: 'Tirage au sort parmi tous les participants avec 100 pts ou plus' }
+  },
   rules: {
     influencerMinFollowers: 2000,
     oneAccountPerPerson: true,

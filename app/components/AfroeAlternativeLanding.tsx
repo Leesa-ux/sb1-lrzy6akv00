@@ -182,11 +182,11 @@ function PrizeBanner(): JSX.Element {
         <div className="space-y-2 text-[12px] md:text-sm">
           <div className="flex items-start gap-2">
             <span className="text-amber-300">🥇</span>
-            <div><span className="font-semibold text-amber-300">iPhone 17 Pro</span> — awarded to the #1 ranked participant at launch</div>
+            <div><span className="font-semibold text-amber-300">iPhone 17 Pro</span> — pour le rang #1 au lancement</div>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-amber-300">💸</span>
-            <div><span className="font-semibold text-amber-300">€3,500</span> — awarded via random draw among all participants who reached 100 points or more</div>
+            <div><span className="font-semibold text-amber-300">€3,500</span> — tirage au sort parmi tous les participants ayant atteint 100 points ou plus</div>
           </div>
         </div>
       </div>
@@ -210,14 +210,14 @@ function Rewards(): JSX.Element {
               <span className="text-base">💸</span>
               <div className="text-[11px] leading-tight">
                 <span className="text-amber-300 font-semibold">€3,500</span>
-                <span className="text-slate-200"> — random draw among all participants with 100 pts or more</span>
+                <span className="text-slate-200"> — tirage au sort parmi tous les participants avec 100 pts ou plus</span>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-base">🥇</span>
               <div className="text-[11px] leading-tight">
                 <span className="text-amber-300 font-semibold">iPhone 17 Pro</span>
-                <span className="text-slate-200"> — for the #1 ranked participant at launch</span>
+                <span className="text-slate-200"> — pour le rang #1 au lancement</span>
               </div>
             </div>
           </div>
@@ -568,7 +568,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
             <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">
               <div className="text-center space-y-4">
-                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente de gagner un iPhone 17 Pro ou 3 500 € !</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente de gagner un iPhone 17 Pro ou €3,500 !</h3>
                 <p className="text-slate-200 text-sm md:text-base">Dès que tu t'inscris, tu reçois ton lien unique. Partage-le pour gagner des points et débloquer des récompenses exclusives.</p>
                 <div className="flex flex-wrap justify-center gap-3 pt-2">
                   <button onClick={() => window.open(shareLinks.whatsapp, "_blank")} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
@@ -587,7 +587,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                     <span>💼</span> LinkedIn
                   </button>
                 </div>
-                <p className="text-xs text-slate-300 pt-2">100 pts = accès au tirage 3 500 €.</p>
+                <p className="text-xs text-slate-300 pt-2">100 pts = accès au tirage €3,500 + chance de gagner l'iPhone 17 Pro si tu es #1.</p>
               </div>
             </div>
 
@@ -637,14 +637,14 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                     <div className="text-xs font-medium">Comment ça marche</div>
                     <ul className="mt-1 text-[11px] text-slate-300 space-y-1 list-disc list-inside">
                       <li>Partage ton lien unique.</li>
-                      <li className="font-bold italic">avant le lancement</li>
-                      <li className="font-bold italic">+2 pts pour un·e client·e</li>
-                      <li className="font-bold italic">+15 pts pour un·e influenceur·euse</li>
-                      <li className="font-bold italic">+25 pts pour un·e Beauty Pro</li>
-                      <li className="font-bold italic">après le lancement</li>
-                      <li>+10 pts si un·e client·e télécharge l'appli.</li>
-                      <li>+50 pts si un·e influenceur·euse (&gt;2k followers) rejoint.</li>
-                      <li>+100 pts si un·e Beauty Pro s'inscrit (min. 2 mois).</li>
+                      <li className="font-bold italic ml-3">Avant le lancement :</li>
+                      <li className="ml-6">+2 pts pour un·e client·e</li>
+                      <li className="ml-6">+15 pts pour un·e influenceur·euse</li>
+                      <li className="ml-6">+25 pts pour un·e Beauty Pro</li>
+                      <li className="font-bold italic ml-3">Après le lancement :</li>
+                      <li className="ml-6">+10 pts si un·e client·e télécharge l'appli.</li>
+                      <li className="ml-6">+50 pts si un·e influenceur·euse (&gt;2k followers) rejoint.</li>
+                      <li className="ml-6">+100 pts si un·e Beauty Pro s'inscrit (min. 2 mois).</li>
                     </ul>
                   </div>
 
