@@ -204,18 +204,22 @@ function Rewards(): JSX.Element {
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold">
-          <div className="text-slate-300">Grand Prix</div>
-          <div className="space-y-1 mt-2">
-            <div className="flex items-center gap-1 text-sm">
-              <span>🥇</span>
-              <div className="text-amber-300 font-semibold">iPhone 17 Pro</div>
+          <div className="text-slate-300 mb-2">Grand Prix</div>
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <span className="text-base">💸</span>
+              <div className="text-[11px] leading-tight">
+                <span className="text-amber-300 font-semibold">€3,500</span>
+                <span className="text-slate-200"> — random draw among all participants with 100 pts or more</span>
+              </div>
             </div>
-            <div className="text-[10px] text-slate-200">#1 ranked participant</div>
-            <div className="flex items-center gap-1 text-sm mt-2">
-              <span>💸</span>
-              <div className="text-amber-300 font-semibold">€3,500</div>
+            <div className="flex items-start gap-2">
+              <span className="text-base">🥇</span>
+              <div className="text-[11px] leading-tight">
+                <span className="text-amber-300 font-semibold">iPhone 17 Pro</span>
+                <span className="text-slate-200"> — for the #1 ranked participant at launch</span>
+              </div>
             </div>
-            <div className="text-[10px] text-slate-200">Random draw (≥100 pts)</div>
           </div>
         </div>
       </div>
