@@ -28,6 +28,7 @@ model User {
 
   phoneVerified     Boolean  @default(false)
   referralValidated Boolean  @default(false)
+  fraudScore        Int      @default(0)
 
   referralEventsL1 ReferralEvent[] @relation("ActorL1")
   referralEventsL2 ReferralEvent[] @relation("ActorL2")

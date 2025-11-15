@@ -82,6 +82,7 @@ interface Row {
   name: string;
   invites: number;
   you?: boolean;
+  phoneVerified?: boolean;
 }
 
 export function isRow(x: unknown): x is Row {
@@ -156,11 +157,17 @@ function Leaderboard({ rows }: LeaderboardProps): JSX.Element {
           <div key={`row-${r.rank}-${r.name}`} className={clsx(
             "flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10",
             r.rank <= 3 && "shadow-[0_0_16px_rgba(255,0,153,.35)]",
-            r.you && "ring-1 ring-amber-300"
+            r.you && "ring-1 ring-amber-300",
+            !r.phoneVerified && r.invites >= 100 && "opacity-60"
           )}>
             <div className="flex items-center gap-3">
               <span className="w-7 text-center">{r.rank <= 3 ? "👑" : r.rank}</span>
-              <span className={clsx("text-sm", r.you && "font-semibold")}>{r.name}{r.you && " (toi)"}</span>
+              <div className="flex items-center gap-2">
+                <span className={clsx("text-sm", r.you && "font-semibold")}>{r.name}{r.you && " (toi)"}</span>
+                {r.phoneVerified && (
+                  <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded border border-green-500/30" title="Numéro vérifié">✓ Vérifié</span>
+                )}
+              </div>
             </div>
             <div className="text-xs text-slate-300">{r.invites} pts</div>
           </div>
