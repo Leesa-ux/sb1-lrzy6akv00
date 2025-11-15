@@ -613,8 +613,8 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                       <li>+25 pts pour un·e Beauty Pro.</li>
                        <li className="font-bold italic">après le lancement</li>
                       <li>+10 pts si un·e client·e télécharge l'appli.</li>
-                      <li>+50 pts pour un·e influenceur·euse (&gt;2k followers) rejoint.</li>
-                      <li>+100 pts pour un·e Beauty Pro s'inscrit.</li>
+                      <li>+50 pts si un·e influenceur·euse (&gt;2k followers) rejoint.</li>
+                      <li>+100 pts si un·e Beauty Pro s'inscrit (min. 2 mois).</li>
                     </ul>
                   </div>
 
