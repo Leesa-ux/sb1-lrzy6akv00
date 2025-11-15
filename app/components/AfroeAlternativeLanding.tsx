@@ -174,11 +174,20 @@ function Leaderboard({ rows }: LeaderboardProps): JSX.Element {
 function PrizeBanner(): JSX.Element {
   return (
     <div className="glassy neon-gold rounded-2xl p-4 md:p-5 text-white mt-4">
-      <div className="flex items-center gap-3">
-        <span className="text-amber-300 text-xl">🏆</span>
-        <div>
-          <div className="text-sm md:text-base font-semibold">Jusqu'à <span className="text-amber-300">3 500 €</span> à gagner</div>
-          <div className="text-[12px] text-slate-200/90">Le/La #1 du classement remporte 3 500 €. Des récompenses sont débloquées à chaque étape.</div>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <span className="text-amber-300 text-xl">🏆</span>
+          <div className="text-sm md:text-base font-semibold">Récompenses au lancement</div>
+        </div>
+        <div className="space-y-2 text-[12px] md:text-sm">
+          <div className="flex items-start gap-2">
+            <span className="text-amber-300">🥇</span>
+            <div><span className="font-semibold text-amber-300">iPhone 17 Pro</span> — awarded to the #1 ranked participant at launch</div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-amber-300">💸</span>
+            <div><span className="font-semibold text-amber-300">€3,500</span> — awarded via random draw among all participants who reached 100 points or more</div>
+          </div>
         </div>
       </div>
     </div>
@@ -194,7 +203,21 @@ function Rewards(): JSX.Element {
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-400">Badge Glow Starter & mise en avant waitlist</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold"><div className="text-slate-300">Grand Prix</div><div className="text-2xl font-bold text-amber-300">3 500 €</div><div className="text-[11px] text-slate-200">#1 du classement au lancement</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold">
+          <div className="text-slate-300">Grand Prix</div>
+          <div className="space-y-1 mt-2">
+            <div className="flex items-center gap-1 text-sm">
+              <span>🥇</span>
+              <div className="text-amber-300 font-semibold">iPhone 17 Pro</div>
+            </div>
+            <div className="text-[10px] text-slate-200">#1 ranked participant</div>
+            <div className="flex items-center gap-1 text-sm mt-2">
+              <span>💸</span>
+              <div className="text-amber-300 font-semibold">€3,500</div>
+            </div>
+            <div className="text-[10px] text-slate-200">Random draw (≥100 pts)</div>
+          </div>
+        </div>
       </div>
       <ul className="mt-4 text-[11px] text-slate-400 space-y-1 list-disc list-inside">
         <li>Points validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</li>
@@ -470,7 +493,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   <div className="text-3xl">🎯</div>
                   <div>
                     <h2 className="text-xl md:text-2xl font-bold text-amber-300 mb-2">Inscris-toi sur la liste d'attente exclusive</h2>
-                    <p className="text-slate-200 text-sm md:text-base">Rejoins la waitlist Afroé et participe au concours de lancement. Partage ton lien unique, grimpe dans le classement et gagne jusqu'à <span className="font-bold text-amber-300">3 500 €</span> + des récompenses exclusives !</p>
+                    <p className="text-slate-200 text-sm md:text-base">Rejoins la waitlist Afroé et participe au concours de lancement. Partage ton lien unique, grimpe dans le classement et gagne un <span className="font-bold text-amber-300">iPhone 17 Pro</span> (rang #1) ou <span className="font-bold text-amber-300">€3,500 cash</span> (tirage au sort ≥100 pts) + des récompenses exclusives !</p>
                   </div>
                 </div>
               </div>
@@ -538,7 +561,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
             <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">
               <div className="text-center space-y-4">
-                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente ta chance de gagner 3 500 € CASH!</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente ta chance de gagner un iPhone 17 Pro ou €3,500 CASH!</h3>
                 <p className="text-slate-200 text-sm md:text-base">Dès que tu t'inscris, tu reçois ton lien unique. Partage-le pour gagner des points et débloquer des récompenses exclusives.</p>
                 <div className="flex flex-wrap justify-center gap-3 pt-2">
                   <button onClick={() => window.open(shareLinks.whatsapp, "_blank")} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
@@ -637,7 +660,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   <span className="text-[11px] inline-flex items-center gap-1 text-amber-300 bg-amber-400/10 border border-amber-300/30 px-2 py-0.5 rounded-md">⚠️ dès le lancement prévu mi‑décembre</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="text-xs text-slate-200/90 bg-amber-400/10 border border-amber-300/30 text-amber-300 px-2 py-1 rounded-lg">Objectif : 3 500 €</div>
+                  <div className="text-xs text-slate-200/90 bg-amber-400/10 border border-amber-300/30 text-amber-300 px-2 py-1 rounded-lg">🥇 iPhone 17 Pro + 💸 €3,500</div>
                   <Countdown />
                 </div>
               </div>
