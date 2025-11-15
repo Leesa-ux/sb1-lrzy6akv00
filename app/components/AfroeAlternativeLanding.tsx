@@ -565,7 +565,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
             <div className="mt-6 glassy neon-fuchsia rounded-2xl p-5 md:p-6 border-2 border-fuchsia-400/30">
               <div className="text-center space-y-4">
-                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente ta chance de gagner un iPhone 17 Pro ou €3,500 CASH!</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white">Invite tes amis, grimpe dans le classement et tente de gagner un iPhone 17 Pro ou 3 500 € !</h3>
                 <p className="text-slate-200 text-sm md:text-base">Dès que tu t'inscris, tu reçois ton lien unique. Partage-le pour gagner des points et débloquer des récompenses exclusives.</p>
                 <div className="flex flex-wrap justify-center gap-3 pt-2">
                   <button onClick={() => window.open(shareLinks.whatsapp, "_blank")} className="glassy rounded-xl px-5 py-3 font-medium text-sm hover:scale-105 transition-transform border border-white/20 flex items-center gap-2">
@@ -584,7 +584,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                     <span>💼</span> LinkedIn
                   </button>
                 </div>
-                <p className="text-xs text-slate-300 pt-2">⚡ Partage dès maintenant et prends de l'avance sur le classement</p>
+                <p className="text-xs text-slate-300 pt-2">100 pts = accès au tirage 3 500 €.</p>
               </div>
             </div>
 
