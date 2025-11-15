@@ -274,9 +274,10 @@ type SmsState = "idle" | "checking" | "sending" | "sent" | "verifying" | "verifi
 export default function AfroeAlternativeLanding(): JSX.Element {
   const initialMe: MeData = { name: "Toi", refCode: "", points: 0, rank: NaN };
 
-  const [fullName, setFullName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
+  const [phoneLocal, setPhoneLocal] = useState<string>("");
   const [role, setRole] = useState<RoleType>(null);
   const [consentSMS, setConsentSMS] = useState<boolean>(true);
   const [me, setMe] = useState<MeData>(initialMe);
@@ -364,16 +365,22 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     }
   }
 
+  function getFullPhone(): string {
+    return "+32" + phoneLocal.trim();
+  }
+
   async function verifyPhoneAndSendCode(): Promise<void> {
-    if (!phone || resendCooldown > 0) return;
+    if (!phoneLocal || resendCooldown > 0) return;
 
-    const belgianPhoneRegex = /^\+32\d{9}$/;
-    const normalizedPhone = phone.trim();
+    const belgianLocalRegex = /^\d{9}$/;
+    const normalizedLocal = phoneLocal.trim();
 
-    if (!belgianPhoneRegex.test(normalizedPhone)) {
-      setPhoneError("Numéro belge invalide. Format attendu : +32 suivi de 9 chiffres.");
+    if (!belgianLocalRegex.test(normalizedLocal)) {
+      setPhoneError("Numéro belge invalide. Tape 9 chiffres après +32, sans le 0.");
       return;
     }
+
+    const normalizedPhone = getFullPhone();
 
     setPhoneError("");
     setGlobalError("");
@@ -428,10 +435,11 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
   async function verifySmsCode(code?: string): Promise<void> {
     const codeToVerify = code || smsCode;
-    if (!phone || !codeToVerify) return;
+    const fullPhone = getFullPhone();
+    if (!fullPhone || !codeToVerify) return;
     setSmsState("verifying");
     try {
-      const payload = { phone: phone.trim(), code: codeToVerify.trim(), requestId: smsRequestId ?? undefined };
+      const payload = { phone: fullPhone, code: codeToVerify.trim(), requestId: smsRequestId ?? undefined };
       const res = await fetch("/api/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -464,7 +472,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   }
 
   function resetPhoneVerification(): void {
-    setPhone("");
+    setPhoneLocal("");
     setSmsCode("");
     setSmsState("idle");
     setPhoneVerified(false);
@@ -486,24 +494,27 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   }
 
   const canSubmit = useMemo(() => {
-    const nameOk = fullName.trim().length > 0;
+    const firstNameOk = firstName.trim().length > 0;
+    const lastNameOk = lastName.trim().length > 0;
     const emailOk = email.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const roleOk = !!role;
-    const phoneOk = !consentSMS || (phone.trim().length > 0 && phoneVerified);
+    const phoneOk = !consentSMS || (phoneLocal.trim().length > 0 && phoneVerified);
     const smsOk = !consentSMS || devSkipSms || phoneVerified;
     const noConflict = !phoneOwnerConflict;
-    return nameOk && emailOk && roleOk && phoneOk && smsOk && noConflict;
-  }, [fullName, email, role, phone, consentSMS, devSkipSms, phoneVerified, phoneOwnerConflict]);
+    return firstNameOk && lastNameOk && emailOk && roleOk && phoneOk && smsOk && noConflict;
+  }, [firstName, lastName, email, role, phoneLocal, consentSMS, devSkipSms, phoneVerified, phoneOwnerConflict]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     if (!canSubmit) return;
     setSubmit("loading");
     try {
-      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), name: fullName.trim(), phone: phone.trim(), role, sms: consentSMS, smsVerified: smsState === "verified" }) });
+      const fullPhone = getFullPhone();
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
+      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), firstName: firstName.trim(), lastName: lastName.trim(), phone: fullPhone, role, sms: consentSMS, smsVerified: smsState === "verified" }) });
       if (!res.ok) throw new Error("signup failed");
       try {
-        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email: email.trim(), name: fullName.trim(), phone: phone.trim(), role, referralCode: me.refCode || null, status: "subscribed", source: "landing" }) });
+        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email: email.trim(), name: fullName, phone: fullPhone, role, referralCode: me.refCode || null, status: "subscribed", source: "landing" }) });
       } catch {}
       setSubmit("done");
     } catch { setSubmit("error"); }
@@ -573,16 +584,29 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   {globalError}
                 </div>
               )}
-              <div className="space-y-2">
-                <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ton blaze complet 💫 (prénom + nom)" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] text-slate-300 mb-1">Prénom <span className="text-slate-400">· Ton blaze</span></label>
+                    <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ex: Aïcha" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-300 mb-1">Nom</label>
+                    <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Ex: Diop" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
+                  </div>
+                </div>
                 <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
               </div>
               <div className="space-y-2">
+                <label className="block text-[11px] text-slate-300">Numéro de téléphone <span className="text-slate-400">· Numéro belge uniquement</span></label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <input type="tel" required={consentSMS} value={phone} onChange={(e) => { setPhone(e.target.value); setPhoneError(""); setGlobalError(""); }} placeholder="+32 (numéro belge uniquement)" className={clsx("rounded-xl px-3 py-3 text-sm outline-none focus:ring-1", phoneError ? "bg-slate-900/60 border-2 border-rose-500 focus:ring-rose-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} disabled={phoneVerified} />
+                  <div className="flex">
+                    <div className="flex items-center bg-slate-800 border border-white/10 border-r-0 rounded-l-xl px-3 py-3 text-sm text-slate-300">+32</div>
+                    <input type="tel" inputMode="numeric" pattern="[0-9]*" required={consentSMS} value={phoneLocal} onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); if (val.length <= 9) { setPhoneLocal(val); setPhoneError(""); setGlobalError(""); } }} placeholder="9 chiffres (sans le 0)" className={clsx("flex-1 rounded-r-xl px-3 py-3 text-sm outline-none focus:ring-1", phoneError ? "bg-slate-900/60 border-2 border-rose-500 focus:ring-rose-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} disabled={phoneVerified} />
+                  </div>
                   {!phoneVerified ? (
                     smsState === "idle" || smsState === "error" || smsState === "expired" || smsState === "checking" ? (
-                      <button type="button" disabled={!phone || resendCooldown > 0 || smsState === "checking"} onClick={verifyPhoneAndSendCode} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border flex items-center justify-center gap-2", consentSMS && phone && !phoneError ? "bg-blue-600 border-blue-500 hover:bg-blue-500" : "bg-slate-800 border-white/10 opacity-50")}>
+                      <button type="button" disabled={!phoneLocal || resendCooldown > 0 || smsState === "checking"} onClick={verifyPhoneAndSendCode} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border flex items-center justify-center gap-2", consentSMS && phoneLocal && !phoneError ? "bg-blue-600 border-blue-500 hover:bg-blue-500" : "bg-slate-800 border-white/10 opacity-50")}>
                         {smsState === "checking" ? (
                           <>
                             <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
