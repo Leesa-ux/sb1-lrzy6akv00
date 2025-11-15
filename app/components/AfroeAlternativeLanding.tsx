@@ -294,12 +294,21 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   const [smsRequestId, setSmsRequestId] = useState<string | null>(null);
   const [phoneOwnerConflict, setPhoneOwnerConflict] = useState<boolean>(false);
   const [phoneOwnerHint, setPhoneOwnerHint] = useState<string | null>(null);
+  const [smsCodeInputRef, setSmsCodeInputRef] = useState<HTMLInputElement | null>(null);
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
   const smsRemaining = useMemo(() => { if (!smsExpiresAt) return 0; return Math.max(0, smsExpiresAt - Date.now()); }, [smsExpiresAt, smsState]);
   const smsMin = Math.floor(smsRemaining / 60000);
   const smsSec = Math.floor((smsRemaining % 60000) / 1000);
 
   const refLink = me.refCode ? `https://afroe.com/waitlist?ref=${me.refCode}` : "";
   const nextGoal = computeNextGoal(typeof me.points === "number" ? me.points : 0);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   useEffect(() => {
     let mounted = true;
@@ -353,10 +362,11 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   }
 
   async function sendSmsCode(): Promise<void> {
-    if (!phone) return;
+    if (!phone || resendCooldown > 0) return;
     setSmsState("sending");
     setPhoneOwnerConflict(false);
     setPhoneOwnerHint(null);
+    setSmsCode("");
 
     try {
       const payload = { phone: phone.trim(), email: email.trim() || null, role, ref: me?.refCode || null };
@@ -377,6 +387,13 @@ export default function AfroeAlternativeLanding(): JSX.Element {
       setSmsRequestId(body.requestId ?? null);
       setSmsExpiresAt(body.expiresAt ? Number(body.expiresAt) : Date.now() + 2 * 60 * 1000);
       setSmsState("sent");
+      setResendCooldown(60);
+
+      setTimeout(() => {
+        if (smsCodeInputRef) {
+          smsCodeInputRef.focus();
+        }
+      }, 100);
 
       if (body.linkedElsewhere) {
         setPhoneOwnerConflict(true);
@@ -388,11 +405,12 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     }
   }
 
-  async function verifySmsCode(): Promise<void> {
-    if (!phone || !smsCode) return;
+  async function verifySmsCode(code?: string): Promise<void> {
+    const codeToVerify = code || smsCode;
+    if (!phone || !codeToVerify) return;
     setSmsState("verifying");
     try {
-      const payload = { phone: phone.trim(), code: smsCode.trim(), requestId: smsRequestId ?? undefined };
+      const payload = { phone: phone.trim(), code: codeToVerify.trim(), requestId: smsRequestId ?? undefined };
       const res = await fetch("/api/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -420,6 +438,14 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     } catch (err) {
       console.error("verifySmsCode error", err);
       setSmsState("error");
+    }
+  }
+
+  function handleSmsCodeChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    const value = e.target.value;
+    setSmsCode(value);
+    if (value.length === 6 && /^\d{6}$/.test(value)) {
+      verifySmsCode(value);
     }
   }
 
@@ -511,24 +537,41 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <input type="tel" required={consentSMS} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={consentSMS ? "Numéro de téléphone" : "Numéro de téléphone (optionnel)"} className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
-                <button type="button" onClick={() => setConsentSMS((v) => !v)} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border", consentSMS ? "bg-blue-600 border-blue-500" : "bg-slate-800 border-white/10")} aria-pressed={consentSMS}>{consentSMS ? "Vérifier par SMS" : "Sans SMS"}</button>
+                <input type="tel" required={consentSMS} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={consentSMS ? "Numéro de téléphone" : "Numéro de téléphone (optionnel)"} className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" disabled={smsState === "verified"} />
+                {smsState === "idle" || smsState === "error" || smsState === "expired" ? (
+                  <button type="button" disabled={!phone || resendCooldown > 0} onClick={sendSmsCode} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border", consentSMS && phone ? "bg-blue-600 border-blue-500 hover:bg-blue-500" : "bg-slate-800 border-white/10 opacity-50")} aria-pressed={consentSMS}>{resendCooldown > 0 ? `Renvoyer (${resendCooldown}s)` : "Envoyer le code"}</button>
+                ) : (
+                  <button type="button" onClick={() => setConsentSMS(false)} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium hover:border-white/20">Sans SMS</button>
+                )}
               </div>
-              {consentSMS && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <button type="button" disabled={!phone || smsState === "sending" || smsState === "sent" || smsState === "verified"} onClick={sendSmsCode} className={clsx("rounded-xl px-3 py-3 text-sm font-medium border", !phone ? "bg-slate-800 border-white/10 opacity-50" : "bg-slate-900/60 border-white/10 hover:border-white/20")}>{smsState === "sending" ? "Envoi…" : smsState === "sent" ? "Code envoyé" : smsState === "verified" ? "Vérifié ✅" : "Recevoir code"}</button>
-                  <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={smsCode} onChange={(e) => setSmsCode(e.target.value)} placeholder="Code SMS" className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
-                  <button type="button" disabled={!smsCode || smsState === "verifying" || (!devSkipSms && smsRemaining === 0)} onClick={verifySmsCode} className={clsx("rounded-xl px-3 py-3 text-sm font-medium border", !smsCode ? "bg-slate-800 border-white/10 opacity-50" : "bg-slate-900/60 border-white/10 hover:border-white/20")}>{smsState === "verifying" ? "Vérif…" : "Vérifier"}</button>
+              {consentSMS && (smsState === "sent" || smsState === "verifying" || smsState === "verified") && (
+                <div className="space-y-2">
+                  <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={smsCode} onChange={handleSmsCodeChange} ref={setSmsCodeInputRef} placeholder="Code SMS (6 chiffres)" disabled={smsState === "verified"} className={clsx("w-full rounded-xl px-3 py-3 text-sm outline-none focus:ring-2", smsState === "verified" ? "bg-emerald-900/20 border-2 border-emerald-500 text-emerald-300" : smsState === "verifying" ? "bg-slate-900/60 border border-blue-400 focus:ring-blue-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} />
+                  {smsState === "verified" && (
+                    <div className="text-emerald-300 text-sm flex items-center gap-2">
+                      <span>✅</span>
+                      <span>Numéro vérifié !</span>
+                    </div>
+                  )}
+                  {smsState === "verifying" && (
+                    <div className="text-blue-300 text-sm flex items-center gap-2">
+                      <span>⏳</span>
+                      <span>Vérification en cours…</span>
+                    </div>
+                  )}
                 </div>
               )}
-              {consentSMS && (
+              {consentSMS && smsState !== "idle" && (
                 <div className="space-y-2">
                   <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2">
-                    <span>Vérification SMS requise {devSkipSms ? "(mode dev)" : "(2 min)"}.</span>
-                    {!devSkipSms && smsState === "sent" && (<span className="text-amber-300">⏱ {String(smsMin).padStart(2, "0")}:{String(smsSec).padStart(2, "0")}</span>)}
-                    {smsState === "expired" && <span className="text-rose-300">Expiré — renvoyer le code.</span>}
-                    {smsState === "error" && !phoneOwnerConflict && <span className="text-rose-300">Erreur — réessaye.</span>}
-                    {smsState === "verified" && <span className="text-emerald-300">Numéro vérifié ✅</span>}
+                    {smsState === "sent" && (
+                      <>
+                        <span>Code envoyé {devSkipSms ? "(mode dev)" : ""}</span>
+                        {!devSkipSms && (<span className="text-amber-300">⏱ Expire dans {String(smsMin).padStart(2, "0")}:{String(smsSec).padStart(2, "0")}</span>)}
+                      </>
+                    )}
+                    {smsState === "expired" && <span className="text-rose-300">Code expiré — renvoie un nouveau code.</span>}
+                    {smsState === "error" && !phoneOwnerConflict && <span className="text-rose-300">Code incorrect — réessaye ou renvoie un code.</span>}
                   </div>
                   {phoneOwnerConflict && (
                     <div className="bg-rose-900/20 border border-rose-500/30 rounded-xl p-3">
