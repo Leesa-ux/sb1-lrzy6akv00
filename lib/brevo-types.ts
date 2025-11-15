@@ -35,6 +35,7 @@ export const EMAIL_TEMPLATE_IDS = {
   MILESTONE: 104,
   REMINDER_5D: 105,
   LAUNCH_DAY: 106,
+  GLOW_ELITE: 107,
 } as const;
 
 export const POINT_RULES = {

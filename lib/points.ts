@@ -5,6 +5,7 @@ const L2 = { lead_client:0.5, lead_pro:1.5, activated_client:1.5, activated_pro:
 
 type EventType = keyof typeof L1;
 const BREAKS = [10, 25, 50, 100] as const;
+const INTERNAL_TIERS = [10, 50, 100, 200] as const;
 
 export async function getUserPoints(userId: string) {
   // Somme L1 : events où user est l’actorL1
@@ -44,4 +45,12 @@ export function etape2Copy(role: "client"|"influenceur"|"pro") {
   if (role === "pro") return "1 mois booking fees off (après 2 mois payés)";
   if (role === "influenceur") return "Spotlight Afroé (IG/TikTok)";
   return "Bon service gratuit (cap 30)";
+}
+
+export function getTierByPoints(points: number): { name: string; tier: number } | null {
+  if (points >= 200) return { name: "Glow Elite", tier: 200 };
+  if (points >= 100) return { name: "Glow Icons", tier: 100 };
+  if (points >= 50) return { name: "Glow Circle Insiders", tier: 50 };
+  if (points >= 10) return { name: "Glow Starters", tier: 10 };
+  return null;
 }

@@ -176,6 +176,36 @@ export async function sendMilestoneEmail(
   });
 }
 
+export async function sendGlowEliteEmail(userId: string): Promise<void> {
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user) return;
+
+  if (user.lastMilestoneSent === 200) return;
+
+  await sendBrevoEmail({
+    to: [{ email: user.email, name: user.firstName || undefined }],
+    templateId: EMAIL_TEMPLATE_IDS.GLOW_ELITE,
+    params: {
+      FIRSTNAME: user.firstName || "Glow Elite",
+      POINTS: user.points,
+      RANK: user.rank,
+      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+    },
+  });
+
+  if (user.phone) {
+    await sendBrevoSMS({
+      phone: user.phone,
+      message: `🌟 FÉLICITATIONS ! Tu as atteint le palier Glow Elite (200 pts) ! Des récompenses exclusives t'attendent ! Continue de partager ton lien Afroé !`,
+    });
+  }
+
+  await db.user.update({
+    where: { id: userId },
+    data: { lastMilestoneSent: 200 },
+  });
+}
+
 export async function checkAndSendMilestoneEmails(
   userId: string,
   oldPoints: number,
@@ -185,6 +215,10 @@ export async function checkAndSendMilestoneEmails(
     if (oldPoints < milestone && newPoints >= milestone) {
       await sendMilestoneEmail(userId, milestone);
     }
+  }
+
+  if (oldPoints < 200 && newPoints >= 200) {
+    await sendGlowEliteEmail(userId);
   }
 }
 
