@@ -594,7 +594,6 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                     {(boardRows.length ? boardRows.slice(0, 4) : [
                       { rank: 1, name: "Aïcha", invites: 63 },
                       { rank: 2, name: "Malik", invites: 49 },
-                      { rank: 3, name: "Kenya", invites: 41 },
                       { rank: 12, name: me.name, invites: typeof me.points === "number" ? me.points : 3, you: true },
                     ]).filter(isRow).map((r) => (
                       <div key={`mrow-${r.rank}-${r.name}`} className="flex items-center justify-between bg-slate-900/60 border border-white/10 rounded-lg px-2 py-1.5">
@@ -613,9 +612,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                       <li>+15 pts pour un·e influenceur·euse (&gt;2k followers).</li>
                       <li>+25 pts pour un·e Beauty Pro.</li>
                        <li className="font-bold italic">après le lancement</li>
-                      <li>+10 pts pour un·e client·e.</li>
-                      <li>+50 pts pour un·e influenceur·euse (&gt;2k followers).</li>
-                      <li>+100 pts pour un·e Beauty Pro.</li>
+                      <li>+10 pts si un·e client·e télécharge l'appli.</li>
+                      <li>+50 pts pour un·e influenceur·euse (&gt;2k followers) rejoint.</li>
+                      <li>+100 pts pour un·e Beauty Pro s'inscrit.</li>
                     </ul>
                   </div>
 
