@@ -252,7 +252,7 @@ function Countdown({ target = LAUNCH_TARGET }: CountdownProps): JSX.Element {
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-md bg-slate-800 border border-white/10">⏳ J-{d} {String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}</span>
+    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-md bg-slate-800 border border-white/10">Lancement dans : {d}j {String(h).padStart(2, "0")}h {String(m).padStart(2, "0")}m {String(s).padStart(2, "0")}s</span>
   );
 }
 
