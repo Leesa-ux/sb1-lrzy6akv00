@@ -4,16 +4,70 @@ import {
   sendWelcomeEmail,
   syncUserToBrevo,
 } from "@/lib/automation-service";
+import { getClientIp } from "@/lib/get-client-ip";
+import { isTempEmail } from "@/lib/temp-email-domains";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, phone, firstName, role } = body;
+    const {
+      email,
+      phone,
+      firstName,
+      lastName,
+      role,
+      deviceFingerprint,
+      formLoadTime,
+      formSubmitTime,
+    } = body;
 
-    if (!email || !role) {
+    if (!email || !firstName || !lastName || !role) {
       return NextResponse.json(
-        { error: "Email and role are required" },
+        { error: "Email, first name, last name, and role are required" },
         { status: 400 }
+      );
+    }
+
+    const ipAddress = getClientIp(req);
+    const userAgent = req.headers.get("user-agent") || "unknown";
+    const fraudFlags: string[] = [];
+    let isBlocked = false;
+
+    if (isTempEmail(email)) {
+      console.warn("Blocked temp email:", email);
+      return NextResponse.json(
+        { error: "Temporary email addresses are not allowed" },
+        { status: 403 }
+      );
+    }
+
+    if (formLoadTime && formSubmitTime) {
+      const timeToSubmit = (formSubmitTime - formLoadTime) / 1000;
+      if (timeToSubmit < 3) {
+        fraudFlags.push("fast_submit");
+      }
+    }
+
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+    const recentSignupsFromIp = await db.user.count({
+      where: {
+        createdAt: { gte: oneHourAgo },
+      },
+    });
+
+    if (recentSignupsFromIp >= 3) {
+      fraudFlags.push("repeated_ip");
+    }
+
+    const existingUser = await db.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Email already registered" },
+        { status: 409 }
       );
     }
 
@@ -21,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.create({
       data: {
-        email,
+        email: email.toLowerCase(),
         phone: phone || null,
         firstName: firstName || null,
         role,
@@ -40,6 +94,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       referralCode: user.referralCode,
       refLink: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+      fraudFlags: fraudFlags.length > 0 ? fraudFlags : undefined,
     });
   } catch (error) {
     console.error("Signup complete error:", error);

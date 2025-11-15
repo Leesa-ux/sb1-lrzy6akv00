@@ -300,6 +300,14 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   const [phoneError, setPhoneError] = useState<string>("");
   const [phoneVerified, setPhoneVerified] = useState<boolean>(false);
   const [globalError, setGlobalError] = useState<string>("");
+  const [formLoadTime] = useState<number>(Date.now());
+  const [deviceFingerprint] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    const nav = window.navigator;
+    const screen = window.screen;
+    const fp = `${nav.userAgent}-${screen.width}x${screen.height}-${screen.colorDepth}-${nav.language}`;
+    return btoa(fp).substring(0, 32);
+  });
   const smsRemaining = useMemo(() => { if (!smsExpiresAt) return 0; return Math.max(0, smsExpiresAt - Date.now()); }, [smsExpiresAt, smsState]);
   const smsMin = Math.floor(smsRemaining / 60000);
   const smsSec = Math.floor((smsRemaining % 60000) / 1000);
@@ -511,13 +519,74 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     try {
       const fullPhone = getFullPhone();
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
-      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), firstName: firstName.trim(), lastName: lastName.trim(), phone: fullPhone, role, sms: consentSMS, smsVerified: smsState === "verified" }) });
-      if (!res.ok) throw new Error("signup failed");
+      const formSubmitTime = Date.now();
+
+      const signupPayload = {
+        email: email.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone: fullPhone,
+        role,
+        deviceFingerprint,
+        formLoadTime,
+        formSubmitTime,
+      };
+
+      const res = await fetch("/api/signup-complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signupPayload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 403) {
+          setGlobalError("❌ Inscription bloquée. Utilise une adresse email valide.");
+        }
+        throw new Error(data.error || "signup failed");
+      }
+
       try {
-        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email: email.trim(), name: fullName, phone: fullPhone, role, referralCode: me.refCode || null, status: "subscribed", source: "landing" }) });
+        const sp = new URLSearchParams(window.location.search);
+        const refCode = sp.get("ref");
+        if (refCode && data.userId) {
+          await fetch("/api/referral-track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              referralCode: refCode,
+              userId: data.userId,
+              deviceFingerprint,
+            }),
+          });
+        }
+      } catch (refError) {
+        console.error("Referral tracking error:", refError);
+      }
+
+      try {
+        await fetch("/api/save-lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            timestamp: new Date().toISOString(),
+            email: email.trim(),
+            name: fullName,
+            phone: fullPhone,
+            role,
+            referralCode: data.referralCode || null,
+            status: "subscribed",
+            source: "landing",
+          }),
+        });
       } catch {}
+
       setSubmit("done");
-    } catch { setSubmit("error"); }
+    } catch (err) {
+      console.error("Signup error:", err);
+      setSubmit("error");
+    }
   }
 
   return (
