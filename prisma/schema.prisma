@@ -26,6 +26,9 @@ model User {
   emailOpenedAt     DateTime?
   lastMilestoneSent Int?
 
+  phoneVerified     Boolean  @default(false)
+  referralValidated Boolean  @default(false)
+
   referralEventsL1 ReferralEvent[] @relation("ActorL1")
   referralEventsL2 ReferralEvent[] @relation("ActorL2")
 }

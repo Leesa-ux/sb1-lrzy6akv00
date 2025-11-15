@@ -10,11 +10,11 @@ import { type Role } from "@/lib/brevo-types";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { referrerId, referralCode, isLaunchDay = false } = body;
+    const { referrerId, referredUserId, milestoneType, isLaunchDay = false } = body;
 
-    if (!referrerId) {
+    if (!referrerId || !referredUserId) {
       return NextResponse.json(
-        { error: "Referrer ID is required" },
+        { error: "Referrer ID and referred user ID are required" },
         { status: 400 }
       );
     }
@@ -23,8 +23,16 @@ export async function POST(req: NextRequest) {
       where: { id: referrerId },
     });
 
+    const referredUser = await db.user.findUnique({
+      where: { id: referredUserId },
+    });
+
     if (!referrer) {
       return NextResponse.json({ error: "Referrer not found" }, { status: 404 });
+    }
+
+    if (!referredUser) {
+      return NextResponse.json({ error: "Referred user not found" }, { status: 404 });
     }
 
     const pointsToAdd = calculatePointsForRole(
@@ -33,6 +41,16 @@ export async function POST(req: NextRequest) {
     );
 
     await updateUserPoints(referrerId, pointsToAdd);
+
+    await db.user.update({
+      where: { id: referrerId },
+      data: { referralValidated: true },
+    });
+
+    await db.user.update({
+      where: { id: referredUserId },
+      data: { referralValidated: true },
+    });
 
     const allUsers = await db.user.findMany({
       orderBy: { points: "desc" },
@@ -59,6 +77,8 @@ export async function POST(req: NextRequest) {
       pointsAdded: pointsToAdd,
       newTotal: updatedReferrer?.points || 0,
       rank: updatedReferrer?.rank || 0,
+      milestoneType: milestoneType || "unknown",
+      referralValidated: true,
     });
   } catch (error) {
     console.error("Referral completion error:", error);

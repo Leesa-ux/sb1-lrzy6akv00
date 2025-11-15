@@ -265,6 +265,8 @@ interface MeData {
   refCode: string;
   points: number;
   rank: number;
+  phoneVerified?: boolean;
+  userId?: string;
 }
 
 type RoleType = "client" | "pro" | "influencer" | null;
@@ -308,6 +310,87 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     const fp = `${nav.userAgent}-${screen.width}x${screen.height}-${screen.colorDepth}-${nav.language}`;
     return btoa(fp).substring(0, 32);
   });
+
+  const [showVerificationBanner, setShowVerificationBanner] = useState<boolean>(false);
+  const [verificationPhone, setVerificationPhone] = useState<string>("");
+  const [verificationCode, setVerificationCode] = useState<string>("");
+  const [verificationState, setVerificationState] = useState<"idle" | "sending" | "sent" | "verifying" | "success" | "error">("idle");
+  const [verificationError, setVerificationError] = useState<string>("");
+
+  useEffect(() => {
+    if (me.userId && (me.points >= 100 || me.rank <= 10) && !me.phoneVerified) {
+      setShowVerificationBanner(true);
+    } else {
+      setShowVerificationBanner(false);
+    }
+  }, [me.points, me.rank, me.phoneVerified, me.userId]);
+
+  async function sendVerificationOtp(): Promise<void> {
+    if (!verificationPhone || verificationPhone.length !== 9) {
+      setVerificationError("Entre un numéro belge valide (9 chiffres)");
+      return;
+    }
+
+    setVerificationState("sending");
+    setVerificationError("");
+
+    try {
+      const res = await fetch("/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: "+32" + verificationPhone,
+          userId: me.userId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send OTP");
+      }
+
+      setVerificationState("sent");
+    } catch (err: any) {
+      setVerificationError(err.message || "Erreur lors de l'envoi du SMS");
+      setVerificationState("error");
+    }
+  }
+
+  async function verifyOtpCode(): Promise<void> {
+    if (!verificationCode || verificationCode.length !== 6) {
+      setVerificationError("Entre le code à 6 chiffres");
+      return;
+    }
+
+    setVerificationState("verifying");
+    setVerificationError("");
+
+    try {
+      const res = await fetch("/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: "+32" + verificationPhone,
+          code: verificationCode,
+          userId: me.userId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Code invalide");
+      }
+
+      setVerificationState("success");
+      setMe({ ...me, phoneVerified: true });
+      setShowVerificationBanner(false);
+    } catch (err: any) {
+      setVerificationError(err.message || "Code invalide");
+      setVerificationState("error");
+    }
+  }
   const smsRemaining = useMemo(() => { if (!smsExpiresAt) return 0; return Math.max(0, smsExpiresAt - Date.now()); }, [smsExpiresAt, smsState]);
   const smsMin = Math.floor(smsRemaining / 60000);
   const smsSec = Math.floor((smsRemaining % 60000) / 1000);
@@ -582,6 +665,15 @@ export default function AfroeAlternativeLanding(): JSX.Element {
         });
       } catch {}
 
+      if (data.userId) {
+        setMe({
+          ...me,
+          userId: data.userId,
+          refCode: data.referralCode || "",
+          phoneVerified: false,
+        });
+      }
+
       setSubmit("done");
     } catch (err) {
       console.error("Signup error:", err);
@@ -597,6 +689,109 @@ export default function AfroeAlternativeLanding(): JSX.Element {
             <span className="text-xl font-bold bg-gradient-to-r from-white via-fuchsia-200 to-fuchsia-400 bg-clip-text text-transparent">Afroé</span>
           </div>
         </header>
+
+        {showVerificationBanner && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6">
+            <div className="glassy border-2 border-amber-400/50 rounded-2xl p-4 md:p-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🚨</span>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-amber-300 mb-2">Vérifie ton numéro pour rester éligible aux récompenses</h3>
+                  <p className="text-sm text-slate-200 mb-4">Tu as atteint {me.points >= 100 ? "100+ points" : "le Top 10"} ! Pour participer au concours, vérifie ton numéro maintenant.</p>
+
+                  {verificationState === "idle" && (
+                    <div className="space-y-3">
+                      <div className="flex">
+                        <div className="flex items-center bg-slate-800 border border-white/10 border-r-0 rounded-l-xl px-3 py-2 text-sm text-slate-300">+32</div>
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={verificationPhone}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, "");
+                            if (val.length <= 9) setVerificationPhone(val);
+                          }}
+                          placeholder="9 chiffres (sans le 0)"
+                          className="flex-1 bg-slate-900/60 border border-white/10 rounded-r-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-amber-400"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={sendVerificationOtp}
+                        className="w-full md:w-auto bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl px-6 py-2.5 text-sm"
+                      >
+                        Vérifier par SMS
+                      </button>
+                      {verificationError && (
+                        <p className="text-rose-400 text-sm">{verificationError}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {verificationState === "sending" && (
+                    <p className="text-sm text-blue-300">Envoi du code...</p>
+                  )}
+
+                  {verificationState === "sent" && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-green-300 mb-2">✓ Code envoyé par SMS !</p>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={verificationCode}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          if (val.length <= 6) setVerificationCode(val);
+                        }}
+                        placeholder="Code à 6 chiffres"
+                        className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-amber-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={verifyOtpCode}
+                        className="w-full md:w-auto bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl px-6 py-2.5 text-sm"
+                      >
+                        Valider le code
+                      </button>
+                      {verificationError && (
+                        <p className="text-rose-400 text-sm">{verificationError}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {verificationState === "verifying" && (
+                    <p className="text-sm text-blue-300">Vérification...</p>
+                  )}
+
+                  {verificationState === "success" && (
+                    <div className="bg-green-900/30 border border-green-500/40 rounded-xl p-3">
+                      <p className="text-green-300 text-sm font-medium">✓ Numéro vérifié avec succès !</p>
+                    </div>
+                  )}
+
+                  {verificationState === "error" && verificationError && (
+                    <div className="space-y-3">
+                      <p className="text-rose-400 text-sm">{verificationError}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVerificationState("idle");
+                          setVerificationError("");
+                          setVerificationCode("");
+                        }}
+                        className="text-sm text-blue-400 hover:text-blue-300 underline"
+                      >
+                        Réessayer
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-10">
           <div className="flex flex-col items-center justify-center mb-12 md:mb-16">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-center mb-4">
