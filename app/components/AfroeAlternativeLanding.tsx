@@ -269,7 +269,7 @@ interface MeData {
 
 type RoleType = "client" | "pro" | "influencer" | null;
 type SubmitState = "idle" | "loading" | "done" | "error";
-type SmsState = "idle" | "sending" | "sent" | "verifying" | "verified" | "expired" | "error";
+type SmsState = "idle" | "checking" | "sending" | "sent" | "verifying" | "verified" | "expired" | "error";
 
 export default function AfroeAlternativeLanding(): JSX.Element {
   const initialMe: MeData = { name: "Toi", refCode: "", points: 0, rank: NaN };
@@ -296,6 +296,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
   const [phoneOwnerHint, setPhoneOwnerHint] = useState<string | null>(null);
   const [smsCodeInputRef, setSmsCodeInputRef] = useState<HTMLInputElement | null>(null);
   const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const [phoneError, setPhoneError] = useState<string>("");
+  const [phoneVerified, setPhoneVerified] = useState<boolean>(false);
+  const [globalError, setGlobalError] = useState<string>("");
   const smsRemaining = useMemo(() => { if (!smsExpiresAt) return 0; return Math.max(0, smsExpiresAt - Date.now()); }, [smsExpiresAt, smsState]);
   const smsMin = Math.floor(smsRemaining / 60000);
   const smsSec = Math.floor((smsRemaining % 60000) / 1000);
@@ -361,27 +364,49 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     }
   }
 
-  async function sendSmsCode(): Promise<void> {
+  async function verifyPhoneAndSendCode(): Promise<void> {
     if (!phone || resendCooldown > 0) return;
-    setSmsState("sending");
+
+    const belgianPhoneRegex = /^\+32\d{9}$/;
+    const normalizedPhone = phone.trim();
+
+    if (!belgianPhoneRegex.test(normalizedPhone)) {
+      setPhoneError("Numéro belge invalide. Format attendu : +32 suivi de 9 chiffres.");
+      return;
+    }
+
+    setPhoneError("");
+    setGlobalError("");
+    setSmsState("checking");
     setPhoneOwnerConflict(false);
     setPhoneOwnerHint(null);
     setSmsCode("");
 
     try {
-      const payload = { phone: phone.trim(), email: email.trim() || null, role, ref: me?.refCode || null };
-      const res = await fetch("/api/send-sms", {
+      const res = await fetch("/api/verify-phone", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ phone: normalizedPhone }),
       });
 
       const body = await res.json().catch(() => ({}));
 
-      if (!res.ok) {
-        console.warn("send-sms failed", body);
-        setSmsState("error");
-        return;
+      if (!body.ok) {
+        if (body.reason === "duplicate") {
+          setPhoneError("Numéro déjà utilisé. Utilise un autre numéro.");
+          setGlobalError("❌ Ce numéro existe déjà sur la Glow List.");
+          setSmsState("idle");
+          return;
+        } else if (body.reason === "invalid") {
+          setPhoneError("Numéro belge invalide. Format attendu : +32 suivi de 9 chiffres.");
+          setGlobalError("❌ Numéro belge invalide.");
+          setSmsState("idle");
+          return;
+        } else {
+          setGlobalError("❌ Erreur lors de l'envoi du code. Réessaie.");
+          setSmsState("error");
+          return;
+        }
       }
 
       setSmsRequestId(body.requestId ?? null);
@@ -394,13 +419,9 @@ export default function AfroeAlternativeLanding(): JSX.Element {
           smsCodeInputRef.focus();
         }
       }, 100);
-
-      if (body.linkedElsewhere) {
-        setPhoneOwnerConflict(true);
-        setPhoneOwnerHint(body.ownerHint ?? null);
-      }
     } catch (err) {
-      console.error("sendSmsCode error", err);
+      console.error("verifyPhoneAndSendCode error", err);
+      setGlobalError("❌ Erreur serveur. Réessaie plus tard.");
       setSmsState("error");
     }
   }
@@ -433,12 +454,27 @@ export default function AfroeAlternativeLanding(): JSX.Element {
       }
 
       setSmsState("verified");
+      setPhoneVerified(true);
       setPhoneOwnerConflict(false);
       setPhoneOwnerHint(body.ownerHint ?? null);
     } catch (err) {
       console.error("verifySmsCode error", err);
       setSmsState("error");
     }
+  }
+
+  function resetPhoneVerification(): void {
+    setPhone("");
+    setSmsCode("");
+    setSmsState("idle");
+    setPhoneVerified(false);
+    setPhoneError("");
+    setGlobalError("");
+    setPhoneOwnerConflict(false);
+    setPhoneOwnerHint(null);
+    setSmsRequestId(null);
+    setSmsExpiresAt(null);
+    setResendCooldown(0);
   }
 
   function handleSmsCodeChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -453,11 +489,11 @@ export default function AfroeAlternativeLanding(): JSX.Element {
     const nameOk = fullName.trim().length > 0;
     const emailOk = email.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const roleOk = !!role;
-    const phoneOk = !consentSMS || phone.trim().length > 0;
-    const smsOk = !consentSMS || devSkipSms || smsState === "verified";
+    const phoneOk = !consentSMS || (phone.trim().length > 0 && phoneVerified);
+    const smsOk = !consentSMS || devSkipSms || phoneVerified;
     const noConflict = !phoneOwnerConflict;
     return nameOk && emailOk && roleOk && phoneOk && smsOk && noConflict;
-  }, [fullName, email, role, phone, consentSMS, devSkipSms, smsState, phoneOwnerConflict]);
+  }, [fullName, email, role, phone, consentSMS, devSkipSms, phoneVerified, phoneOwnerConflict]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -532,55 +568,67 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               </div>
 
               <form onSubmit={onSubmit} className="glassy neon-blue rounded-2xl p-4 md:p-5 space-y-4">
+              {globalError && (
+                <div className="bg-rose-900/30 border border-rose-500/40 rounded-xl p-3 text-rose-300 text-sm font-medium">
+                  {globalError}
+                </div>
+              )}
               <div className="space-y-2">
                 <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ton blaze complet 💫 (prénom + nom)" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
                 <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <input type="tel" required={consentSMS} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={consentSMS ? "Numéro de téléphone" : "Numéro de téléphone (optionnel)"} className="bg-slate-900/60 border border-white/10 rounded-xl px-3 py-3 text-sm outline-none focus:ring-1 focus:ring-fuchsia-400" disabled={smsState === "verified"} />
-                {smsState === "idle" || smsState === "error" || smsState === "expired" ? (
-                  <button type="button" disabled={!phone || resendCooldown > 0} onClick={sendSmsCode} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border", consentSMS && phone ? "bg-blue-600 border-blue-500 hover:bg-blue-500" : "bg-slate-800 border-white/10 opacity-50")} aria-pressed={consentSMS}>{resendCooldown > 0 ? `Renvoyer (${resendCooldown}s)` : "Envoyer le code"}</button>
-                ) : (
-                  <button type="button" onClick={() => setConsentSMS(false)} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium hover:border-white/20">Sans SMS</button>
+              <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <input type="tel" required={consentSMS} value={phone} onChange={(e) => { setPhone(e.target.value); setPhoneError(""); setGlobalError(""); }} placeholder="+32 (numéro belge uniquement)" className={clsx("rounded-xl px-3 py-3 text-sm outline-none focus:ring-1", phoneError ? "bg-slate-900/60 border-2 border-rose-500 focus:ring-rose-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} disabled={phoneVerified} />
+                  {!phoneVerified ? (
+                    smsState === "idle" || smsState === "error" || smsState === "expired" || smsState === "checking" ? (
+                      <button type="button" disabled={!phone || resendCooldown > 0 || smsState === "checking"} onClick={verifyPhoneAndSendCode} className={clsx("rounded-xl px-4 py-3 text-sm font-medium border flex items-center justify-center gap-2", consentSMS && phone && !phoneError ? "bg-blue-600 border-blue-500 hover:bg-blue-500" : "bg-slate-800 border-white/10 opacity-50")}>
+                        {smsState === "checking" ? (
+                          <>
+                            <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                            <span>Vérification…</span>
+                          </>
+                        ) : resendCooldown > 0 ? `Renvoyer (${resendCooldown}s)` : "Vérifier par SMS"}
+                      </button>
+                    ) : (
+                      <button type="button" onClick={() => setConsentSMS(false)} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium hover:border-white/20">Sans SMS</button>
+                    )
+                  ) : (
+                    <button type="button" onClick={resetPhoneVerification} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium hover:border-white/20 text-fuchsia-400">Changer de numéro</button>
+                  )}
+                </div>
+                {phoneError && (
+                  <p className="text-rose-300 text-xs">{phoneError}</p>
                 )}
               </div>
               {consentSMS && (smsState === "sent" || smsState === "verifying" || smsState === "verified") && (
                 <div className="space-y-2">
                   <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={smsCode} onChange={handleSmsCodeChange} ref={setSmsCodeInputRef} placeholder="Code SMS (6 chiffres)" disabled={smsState === "verified"} className={clsx("w-full rounded-xl px-3 py-3 text-sm outline-none focus:ring-2", smsState === "verified" ? "bg-emerald-900/20 border-2 border-emerald-500 text-emerald-300" : smsState === "verifying" ? "bg-slate-900/60 border border-blue-400 focus:ring-blue-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} />
+                  <p className="text-[11px] text-slate-400">On vérifie ton numéro pour éviter les faux comptes. Code valable 2 min.</p>
                   {smsState === "verified" && (
-                    <div className="text-emerald-300 text-sm flex items-center gap-2">
-                      <span>✅</span>
-                      <span>Numéro vérifié !</span>
+                    <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3">
+                      <div className="text-emerald-300 text-sm font-medium flex items-center gap-2">
+                        <span>✅</span>
+                        <span>Numéro vérifié. Tu peux prendre ta place.</span>
+                      </div>
                     </div>
                   )}
                   {smsState === "verifying" && (
-                    <div className="text-blue-300 text-sm flex items-center gap-2">
-                      <span>⏳</span>
+                    <div className="text-blue-300 text-xs flex items-center gap-2">
+                      <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-300 border-t-transparent rounded-full"></span>
                       <span>Vérification en cours…</span>
+                    </div>
+                  )}
+                  {smsState === "sent" && !devSkipSms && (
+                    <div className="text-[11px] text-amber-300 flex items-center gap-2">
+                      <span>⏱</span>
+                      <span>Expire dans {String(smsMin).padStart(2, "0")}:{String(smsSec).padStart(2, "0")}</span>
                     </div>
                   )}
                 </div>
               )}
-              {consentSMS && smsState !== "idle" && (
-                <div className="space-y-2">
-                  <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2">
-                    {smsState === "sent" && (
-                      <>
-                        <span>Code envoyé {devSkipSms ? "(mode dev)" : ""}</span>
-                        {!devSkipSms && (<span className="text-amber-300">⏱ Expire dans {String(smsMin).padStart(2, "0")}:{String(smsSec).padStart(2, "0")}</span>)}
-                      </>
-                    )}
-                    {smsState === "expired" && <span className="text-rose-300">Code expiré — renvoie un nouveau code.</span>}
-                    {smsState === "error" && !phoneOwnerConflict && <span className="text-rose-300">Code incorrect — réessaye ou renvoie un code.</span>}
-                  </div>
-                  {phoneOwnerConflict && (
-                    <div className="bg-rose-900/20 border border-rose-500/30 rounded-xl p-3">
-                      <div className="text-rose-300 text-sm font-medium mb-1">⚠️ Numéro déjà utilisé</div>
-                      <p className="text-[11px] text-rose-200">Ce numéro est déjà lié à un autre compte. Si c'est votre numéro, contactez support@afroe.com pour assistance.</p>
-                      {phoneOwnerHint && <p className="text-[11px] text-rose-300 mt-1">Numéro lié à : {phoneOwnerHint}</p>}
-                    </div>
-                  )}
-                </div>
+              {consentSMS && smsState === "error" && !phoneOwnerConflict && (
+                <p className="text-rose-300 text-xs">Code incorrect ou expiré. Réessaie.</p>
               )}
 
               <div>
@@ -595,7 +643,12 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   ))}
                 </div>
               </div>
-              <button type="submit" disabled={submit === "loading" || !canSubmit} className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-60 transition-colors">{submit === "loading" ? "On te place…" : submit === "done" ? "C'est validé ✨" : "Prends ta place ✨"}</button>
+              <div className="space-y-2">
+                <button type="submit" disabled={submit === "loading" || !canSubmit} className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-60 transition-colors">{submit === "loading" ? "On te place…" : submit === "done" ? "C'est validé ✨" : "Prends ta place ✨"}</button>
+                {consentSMS && !phoneVerified && (
+                  <p className="text-[11px] text-slate-400 text-center">Valide d'abord ton numéro par SMS.</p>
+                )}
+              </div>
               {submit === "error" && <p className="text-rose-300 text-sm text-center">Une erreur s'est produite. Réessaye dans quelques secondes.</p>}
               <div className="space-y-2">
                 <p className="text-[11px] text-slate-400 text-center">On t'enverra le top départ par email {consentSMS && "et SMS"}. Tu peux te désinscrire à tout moment.</p>
