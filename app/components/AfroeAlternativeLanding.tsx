@@ -495,8 +495,11 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               <div className="glassy neon-gold rounded-2xl p-5 md:p-6 border-2 border-amber-300/30">
                 <div className="flex items-start gap-3">
                   <div className="text-3xl">🎯</div>
-                  <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-amber-300 mb-2">Inscris-toi sur la liste d'attente exclusive</h2>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h2 className="text-xl md:text-2xl font-bold text-amber-300">Inscris-toi sur la liste d'attente exclusive</h2>
+                      <span className="text-[11px] inline-flex items-center gap-1 text-amber-300 bg-amber-400/10 border border-amber-300/30 px-2 py-0.5 rounded-md">🎁 2 prix à gagner</span>
+                    </div>
                     <p className="text-slate-200 text-sm md:text-base">Rejoins la waitlist Afroé et participe au concours de lancement. Partage ton lien unique, grimpe dans le classement et gagne un <span className="font-bold text-amber-300">iPhone 17 Pro</span> (rang #1) ou <span className="font-bold text-amber-300">€3,500 cash</span> (tirage au sort ≥100 pts) + des récompenses exclusives !</p>
                   </div>
                 </div>
