@@ -664,11 +664,24 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   <Countdown />
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Client.e</div><div className="text-2xl font-bold">+10</div><div className="text-[11px] text-slate-400">Téléchargement de l'app</div></div>
-                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur.euse</div><div className="text-2xl font-bold">+50</div><div className="text-[11px] text-slate-400">&ge; 2 000 followers</div></div>
-                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Beauty Pro</div><div className="text-2xl font-bold">+100</div><div className="text-[11px] text-slate-400">Inscription validée</div></div>
-                <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Bonus Lancement</div><div className="text-2xl font-bold">x2</div><div className="text-[11px] text-slate-400">Téléchargements & inscriptions le jour J</div></div>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm font-semibold text-amber-300 mb-2">Avant le lancement</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Client·e</div><div className="text-2xl font-bold">+2</div><div className="text-[11px] text-slate-400">Inscription waitlist</div></div>
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur·euse</div><div className="text-2xl font-bold">+15</div><div className="text-[11px] text-slate-400">&ge; 2k followers</div></div>
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Beauty Pro</div><div className="text-2xl font-bold">+25</div><div className="text-[11px] text-slate-400">Inscription waitlist</div></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-blue-300 mb-2">Après le lancement</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Client·e</div><div className="text-2xl font-bold">+10</div><div className="text-[11px] text-slate-400">Téléchargement app</div></div>
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur·euse</div><div className="text-2xl font-bold">+50</div><div className="text-[11px] text-slate-400">&ge; 2k followers validé</div></div>
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Beauty Pro</div><div className="text-2xl font-bold">+100</div><div className="text-[11px] text-slate-400">Inscription validée</div></div>
+                  </div>
+                </div>
               </div>
               <p className="text-[12px] text-slate-400 mt-3">Les points finaux sont validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</p>
             </div>
