@@ -39,7 +39,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           <div className="max-w-md text-center space-y-3">
             <div className="text-3xl">⚡️</div>
             <h2 className="text-xl font-semibold">Quelque chose a planté.</h2>
-            <p className="text-slate-300 text-sm">On a capté l'erreur et on la loggue. Rafraîchis la page. Si ça persiste, envoie-moi la dernière action.</p>
+            <p className="text-slate-100 text-sm">On a capté l'erreur et on la loggue. Rafraîchis la page. Si ça persiste, envoie-moi la dernière action.</p>
             <pre className="text-[11px] bg-slate-900/80 border border-white/10 rounded p-3 overflow-auto">{String(this.state?.error?.message ?? this.state?.error ?? "")}</pre>
             <button className="mt-1 px-3 py-2 text-sm rounded-lg bg-slate-800 border border-white/10 hover:border-white/20" onClick={() => this.setState({ hasError: false, error: null })}>Réessayer</button>
           </div>
@@ -110,7 +110,7 @@ interface StatProps {
 function Stat({ label, value }: StatProps): JSX.Element {
   return (
     <div className="glassy rounded-xl p-3 min-w-[120px] text-center">
-      <div className="text-[11px] text-slate-300">{label}</div>
+      <div className="text-[11px] text-slate-100">{label}</div>
       <div className="text-xl font-semibold text-white mt-0.5">{value}</div>
     </div>
   );
@@ -134,11 +134,11 @@ function Progress({ value, goal }: ProgressProps): JSX.Element {
     : "Objectif validé — respect.";
   return (
     <div>
-      <div className="text-[11px] text-slate-300 mb-1">{line}</div>
+      <div className="text-[11px] text-slate-100 mb-1">{line}</div>
       <div className="w-full h-2 glassy rounded-full overflow-hidden">
         <div className="h-full bg-gradient-to-r from-fuchsia-500 to-blue-500" style={{ width: `${pct}%` }} />
       </div>
-      <div className="text-[11px] text-slate-400 mt-1">{value}/{goal} pts</div>
+      <div className="text-[11px] text-slate-100 mt-1">{value}/{goal} pts</div>
     </div>
   );
 }
@@ -151,7 +151,7 @@ function Leaderboard({ rows }: LeaderboardProps): JSX.Element {
   const safeRows = Array.isArray(rows) ? rows.filter(isRow) : [];
   return (
     <div className="glassy rounded-2xl p-4 text-white">
-      <div className="flex items-center gap-2 mb-3"><span className="text-fuchsia-400">🔥</span><h3 className="font-semibold">Classement des Glow Leaders</h3></div>
+      <div className="flex items-center gap-2 mb-3"><span className="text-fuchsia-400" role="img" aria-label="tendance">🔥</span><h3 className="font-semibold">Classement des Glow Leaders</h3></div>
       <div className="space-y-2">
         {safeRows.map((r) => (
           <div key={`row-${r.rank}-${r.name}`} className={clsx(
@@ -161,7 +161,7 @@ function Leaderboard({ rows }: LeaderboardProps): JSX.Element {
             !r.phoneVerified && r.invites >= 100 && "opacity-60"
           )}>
             <div className="flex items-center gap-3">
-              <span className="w-7 text-center">{r.rank <= 3 ? "👑" : r.rank}</span>
+              <span className="w-7 text-center" aria-label={r.rank <= 3 ? `Top ${r.rank} position` : `Position ${r.rank}`}>{r.rank <= 3 ? <span role="img" aria-hidden="true">👑</span> : r.rank}</span>
               <div className="flex items-center gap-2">
                 <span className={clsx("text-sm", r.you && "font-semibold")}>{r.name}{r.you && " (toi)"}</span>
                 {r.phoneVerified && (
@@ -169,11 +169,11 @@ function Leaderboard({ rows }: LeaderboardProps): JSX.Element {
                 )}
               </div>
             </div>
-            <div className="text-xs text-slate-300">{r.invites} pts</div>
+            <div className="text-xs text-slate-100">{r.invites} pts</div>
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[11px] text-slate-400">Chaque nom ici fait monter la beauté Afro. Tu te places où ? 👀</p>
+      <p className="mt-3 text-[11px] text-slate-200">Chaque nom ici fait monter la beauté Afro. Tu te places où ? <span role="img" aria-label="yeux scrutateurs">👀</span></p>
     </div>
   );
 }
@@ -205,13 +205,13 @@ function Rewards(): JSX.Element {
   return (
     <div id="recompenses" className="glassy rounded-2xl p-5 text-white">
       <h3 className="font-semibold mb-1">Récompenses par étapes</h3>
-      <p className="text-[12px] text-slate-300 mb-2">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
+      <p className="text-[12px] text-slate-100 mb-2">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm mt-4">
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-400">Badge Glow Starter & mise en avant waitlist</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-100">Étape 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-200">Badge Glow Starter & mise en avant waitlist</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-100">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-200">Accès anticipé (VIP) + shoutout IG</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-100">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-200">Glow Kit édition limitée</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold">
-          <div className="text-slate-300 mb-2">Grand Prix</div>
+          <div className="text-slate-100 mb-2">Grand Prix</div>
           <div className="space-y-2">
             <div className="flex items-start gap-2">
               <span className="text-base">💸</span>
@@ -230,7 +230,7 @@ function Rewards(): JSX.Element {
           </div>
         </div>
       </div>
-      <ul className="mt-4 text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+      <ul className="mt-4 text-[11px] text-slate-200 space-y-1 list-disc list-inside">
         <li>Points validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</li>
         <li>Influenceur.euse éligible : &ge; 2 000 followers.</li>
         <li>Un seul compte par personne. Fraude = exclusion.</li>
@@ -701,7 +701,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
           <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6">
             <div className="glassy border-2 border-amber-400/50 rounded-2xl p-4 md:p-6 space-y-4">
               <div className="flex items-start gap-3">
-                <span className="text-2xl">🚨</span>
+                <span className="text-2xl" role="img" aria-label="Alerte importante">🚨</span>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-amber-300 mb-2">Vérifie ton numéro pour rester éligible aux récompenses</h3>
                   <p className="text-sm text-slate-200 mb-4">Tu as atteint {me.points >= 100 ? "100+ points" : "le Top 10"} ! Pour participer au concours, vérifie ton numéro maintenant.</p>
