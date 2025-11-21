@@ -258,35 +258,218 @@ function PrizeBanner(): JSX.Element {
   );
 }
 
+function TierCard({
+  medal,
+  name,
+  points,
+  context,
+  benefits,
+  tagline,
+  expandedBenefits,
+  borderColor = "border-white/10",
+  glowClass = ""
+}: {
+  medal: string;
+  name: string;
+  points: string;
+  context: string;
+  benefits: string[];
+  tagline: string;
+  expandedBenefits?: { title: string; items: string[] }[];
+  borderColor?: string;
+  glowClass?: string;
+}): JSX.Element {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className={clsx("bg-slate-900/60 border rounded-xl p-4 hover:scale-[1.02] transition-transform", borderColor, glowClass)}>
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-2xl">{medal}</span>
+        <div className="flex-1">
+          <div className="font-semibold text-white">{name}</div>
+          <div className="text-sm text-amber-300 font-bold">{points}</div>
+        </div>
+      </div>
+
+      <p className="text-[11px] text-slate-400 mb-3">{context}</p>
+
+      <div className="space-y-1.5 text-[12px] text-slate-200">
+        {benefits.map((benefit, idx) => (
+          <div key={idx} className="flex items-start gap-1.5">
+            <span className="text-green-400 mt-0.5">✓</span>
+            <span>{benefit}</span>
+          </div>
+        ))}
+      </div>
+
+      {expandedBenefits && !expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-3 text-[11px] text-fuchsia-400 hover:text-fuchsia-300 underline"
+        >
+          En savoir plus →
+        </button>
+      )}
+
+      {expanded && expandedBenefits && (
+        <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+          {expandedBenefits.map((section, idx) => (
+            <div key={idx}>
+              <div className="text-[11px] font-medium text-white mb-1">{section.title}</div>
+              <div className="space-y-1">
+                {section.items.map((item, itemIdx) => (
+                  <div key={itemIdx} className="text-[11px] text-slate-300 pl-3">
+                    → {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          <button
+            onClick={() => setExpanded(false)}
+            className="text-[11px] text-slate-400 hover:text-slate-300 underline"
+          >
+            Réduire
+          </button>
+        </div>
+      )}
+
+      <p className="mt-3 text-[11px] text-slate-400 italic">{tagline}</p>
+    </div>
+  );
+}
+
 function Rewards(): JSX.Element {
   return (
     <div id="recompenses" className="glassy rounded-2xl p-5 text-white">
       <h3 className="font-semibold mb-1">Récompenses par étapes</h3>
-      <p className="text-[12px] text-slate-100 mb-2">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm mt-4">
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-100">Étape 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-200">Badge Glow Starter & mise en avant waitlist</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-100">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-200">Accès anticipé (VIP) + shoutout IG</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-100">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-200">Glow Kit édition limitée</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold">
-          <div className="text-slate-100 mb-2">Grand Prix</div>
-          <div className="space-y-2">
-            <div className="flex items-start gap-2">
-              <span className="text-base">💸</span>
-              <div className="text-[11px] leading-tight">
-                <span className="text-amber-300 font-semibold">€3,500</span>
-                <span className="text-slate-200"> — tirage au sort parmi tous les participants avec 100 pts ou plus</span>
-              </div>
+      <p className="text-[12px] text-slate-100 mb-4">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <TierCard
+          medal="🥉"
+          name="Glow Starters"
+          points="10 pts"
+          context="Pour tes 3 premiers parrainages"
+          benefits={[
+            "Badge Glow Starter officiel",
+            "Mise en avant sur le classement",
+            "-10% sur ta 1ère réservation"
+          ]}
+          tagline="Crédibilité instantanée. Gain rapide. 🎯"
+          borderColor="border-amber-300/20"
+        />
+
+        <TierCard
+          medal="🥈"
+          name="Glow Circle Insiders"
+          points="50 pts"
+          context="Rassemble ton équipe — 15+ parrainages"
+          benefits={[
+            "Accès anticipé VIP à la bêta d'Afroé",
+            "Shoutout IG dans 'Glow Ambassadors'",
+            "Invitation au Glow Circle privé",
+            "-20% sur ta 1ère réservation"
+          ]}
+          tagline="Communauté, reconnaissance et statut privilégié."
+          borderColor="border-blue-300/20"
+          expandedBenefits={[
+            {
+              title: "Glow Circle privé",
+              items: [
+                "Groupe exclusif WhatsApp/Discord",
+                "Premiers à tester les nouvelles features",
+                "Feedback direct avec l'équipe Afroé"
+              ]
+            }
+          ]}
+        />
+
+        <TierCard
+          medal="🥇"
+          name="Glow Icons"
+          points="100 pts"
+          context="Pour les glow-getters sérieux"
+          benefits={[
+            "Glow Kit édition limitée",
+            "Session stratégie 1-on-1",
+            "-20% sur ta 1ère réservation"
+          ]}
+          tagline="Visibilité premium + support pour élever ta marque personnelle."
+          borderColor="border-amber-400/30"
+          glowClass="neon-gold"
+          expandedBenefits={[
+            {
+              title: "Glow Kit édition limitée",
+              items: [
+                "Merch custom Afroé",
+                "Outils pro sélectionnés"
+              ]
+            },
+            {
+              title: "Ton choix de session",
+              items: [
+                "Session stratégie 1-on-1 OU",
+                "Consultation Personal Brand (1h)"
+              ]
+            }
+          ]}
+        />
+
+        <TierCard
+          medal="🏆"
+          name="Glow Elites"
+          points="200 pts+"
+          context="Sur invitation uniquement — Contacte-nous à 200 pts"
+          benefits={[
+            "Invitation à l'événement IRL (Paris/Londres)",
+            "Feature dans notre presse/blog/podcast",
+            "Co-création d'une 'Glow Story'",
+            "Coaching avec expert beauté",
+            "-50% sur ta 1ère réservation"
+          ]}
+          tagline="C'est pas qu'une récompense. C'est une plateforme. 🔥"
+          borderColor="border-fuchsia-400/30"
+          expandedBenefits={[
+            {
+              title: "Événement de lancement IRL",
+              items: [
+                "Paris ou Londres (à déterminer)",
+                "Networking avec les pros et l'équipe",
+                "Expérience VIP exclusive"
+              ]
+            },
+            {
+              title: "Coaching personnalisé",
+              items: [
+                "Session avec entrepreneur beauté",
+                "Ou stratégie de marque personnelle"
+              ]
+            }
+          ]}
+        />
+      </div>
+
+      <div className="mt-6 p-4 bg-slate-900/60 border border-amber-300/30 rounded-xl neon-gold">
+        <div className="text-sm font-semibold text-amber-300 mb-3">🏆 Grand Prix</div>
+        <div className="space-y-2">
+          <div className="flex items-start gap-2">
+            <span className="text-base">💸</span>
+            <div className="text-[12px] leading-tight">
+              <span className="text-amber-300 font-semibold">€3,500</span>
+              <span className="text-slate-200"> — tirage au sort parmi tous les participants avec 100 pts ou plus</span>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="text-base">🥇</span>
-              <div className="text-[11px] leading-tight">
-                <span className="text-amber-300 font-semibold">iPhone 17 Pro</span>
-                <span className="text-slate-200"> — pour le rang #1 au lancement</span>
-              </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-base">🥇</span>
+            <div className="text-[12px] leading-tight">
+              <span className="text-amber-300 font-semibold">iPhone 17 Pro</span>
+              <span className="text-slate-200"> — pour le rang #1 au lancement</span>
             </div>
           </div>
         </div>
       </div>
+
       <ul className="mt-4 text-[11px] text-slate-200 space-y-1 list-disc list-inside">
         <li>Points validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</li>
         <li>Influenceur.euse éligible : &ge; 2 000 followers.</li>
