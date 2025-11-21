@@ -178,6 +178,63 @@ function Leaderboard({ rows }: LeaderboardProps): JSX.Element {
   );
 }
 
+function UrgencyBadge({ currentCount }: { currentCount: number }): JSX.Element {
+  const TOTAL_SPOTS = 1000;
+  const BONUS_THRESHOLD = 100;
+  const remainingSpots = Math.max(0, TOTAL_SPOTS - currentCount);
+  const bonusRemaining = Math.max(0, BONUS_THRESHOLD - currentCount);
+
+  return (
+    <div className="text-sm text-center mb-4">
+      {bonusRemaining > 0 ? (
+        <>
+          <span className="text-slate-300">🎯 Les 100 premiers:</span>{" "}
+          <span className="text-amber-300 font-semibold">Bonus +50 points</span>{" "}
+          <span className="text-slate-400">·</span>{" "}
+          <span className="text-rose-300 font-semibold">
+            {bonusRemaining} places restantes
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="text-slate-300">📊 Total d'inscrits:</span>{" "}
+          <span className="text-fuchsia-300 font-semibold">{currentCount}</span>{" "}
+          <span className="text-slate-400">·</span>{" "}
+          <span className="text-slate-400">
+            {remainingSpots} places restantes sur {TOTAL_SPOTS}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ThreeStepPreview(): JSX.Element {
+  return (
+    <div className="mb-4">
+      <div className="text-xs font-medium text-slate-400 mb-2 text-center">
+        COMMENT ÇA MARCHE
+      </div>
+      <div className="flex items-center justify-center gap-2 text-xs text-slate-300 flex-wrap">
+        <span className="flex items-center gap-1">
+          <span className="w-5 h-5 rounded-full bg-fuchsia-500 text-white flex items-center justify-center font-bold text-[10px]">1</span>
+          Inscription
+        </span>
+        <span className="text-slate-600">→</span>
+        <span className="flex items-center gap-1">
+          <span className="w-5 h-5 rounded-full bg-fuchsia-500 text-white flex items-center justify-center font-bold text-[10px]">2</span>
+          Vérification
+        </span>
+        <span className="text-slate-600">→</span>
+        <span className="flex items-center gap-1">
+          <span className="w-5 h-5 rounded-full bg-amber-400 text-black flex items-center justify-center font-bold text-[10px]">3</span>
+          Parrainage
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function PrizeBanner(): JSX.Element {
   return (
     <div className="glassy neon-gold rounded-2xl p-4 md:p-5 text-white mt-4">
@@ -773,8 +830,15 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   )}
 
                   {verificationState === "success" && (
-                    <div className="bg-green-900/30 border border-green-500/40 rounded-xl p-3">
-                      <p className="text-green-300 text-sm font-medium">✓ Numéro vérifié avec succès !</p>
+                    <div className="glassy rounded-xl p-4 border border-blue-400/30 text-center">
+                      <div className="text-3xl mb-2">📱</div>
+                      <div className="font-semibold text-white mb-1">
+                        Inscription réussie !
+                      </div>
+                      <div className="text-sm text-slate-300">
+                        On vient de t'envoyer un code par SMS pour vérifier ton numéro.
+                        Après validation, tu recevras ton lien de parrainage. 🎉
+                      </div>
                     </div>
                   )}
 
@@ -802,11 +866,12 @@ export default function AfroeAlternativeLanding(): JSX.Element {
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-10">
           <div className="flex flex-col items-center justify-center mb-12 md:mb-16">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-center mb-4">
-              Ton Style, Ton Impact, <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Ton Futur</span>.
+              Ton crew beauté Afro. <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Pro, stylé, chez toi</span>.
             </h1>
             <p className="text-lg md:text-xl text-center mb-6 max-w-3xl mx-auto px-4" style={{ color: '#E5E5E5' }}>
               Afroé, l'app qui connecte les pros et les passionné·es de la beauté Afro, à domicile ou en salon.
             </p>
+            <UrgencyBadge currentCount={rows.length} />
             <PrizeBanner />
           </div>
 
@@ -826,7 +891,15 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
               <div className="text-slate-100">
                 <p className="font-medium">Et si la beauté Afro devenait enfin visible, pro et stylée ?</p>
-                <p>Et si c'était toi, le/la prochain.e <span className="text-amber-300">Glow Leader</span> ? 👑</p>
+                <p>Et si c'était toi, le/la prochain.e{" "}
+                  <span
+                    className="text-amber-300 cursor-help border-b border-amber-300/50 border-dotted"
+                    title="Glow Leader = Top parrain avec le plus de points"
+                  >
+                    Glow Leader
+                  </span>{" "}
+                  ? 👑
+                </p>
               </div>
 
               <div className="text-slate-300">
@@ -872,6 +945,8 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   </div>
                 </div>
               </div>
+
+              <ThreeStepPreview />
 
               <form onSubmit={onSubmit} className="glassy neon-blue rounded-2xl p-4 md:p-5 space-y-4">
               {globalError && (
@@ -925,10 +1000,13 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                   <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} value={smsCode} onChange={handleSmsCodeChange} ref={setSmsCodeInputRef} placeholder="Code SMS (6 chiffres)" disabled={smsState === "verified"} className={clsx("w-full rounded-xl px-3 py-3 text-sm outline-none focus:ring-2", smsState === "verified" ? "bg-emerald-900/20 border-2 border-emerald-500 text-emerald-300" : smsState === "verifying" ? "bg-slate-900/60 border border-blue-400 focus:ring-blue-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} />
                   <p className="text-[11px] text-slate-400">On vérifie ton numéro pour éviter les faux comptes. Code valable 2 min.</p>
                   {smsState === "verified" && (
-                    <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3">
-                      <div className="text-emerald-300 text-sm font-medium flex items-center gap-2">
-                        <span>✅</span>
-                        <span>Numéro vérifié. Tu peux prendre ta place.</span>
+                    <div className="glassy rounded-xl p-4 border border-emerald-400/30 text-center">
+                      <div className="text-3xl mb-2">🎉</div>
+                      <div className="font-semibold text-white mb-1">
+                        Numéro vérifié avec succès !
+                      </div>
+                      <div className="text-sm text-slate-300">
+                        Tu peux maintenant finaliser ton inscription et recevoir ton lien de parrainage unique. 👑
                       </div>
                     </div>
                   )}
