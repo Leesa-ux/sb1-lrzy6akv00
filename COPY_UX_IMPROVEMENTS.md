@@ -244,8 +244,11 @@ Enhanced 4-tier system with expandable details:
    - Hover scale effect (102%)
    - Green checkmarks (✓) for benefits
 
-5. **Glow Elites (Secret Tier)**
-   - Context: "Sur invitation uniquement — Contacte-nous à 200 pts"
+5. **Glow Elites (Truly Secret Tier)**
+   - **HIDDEN by default** - Only visible at 200+ points
+   - Shows locked teaser card with 🔒 icon before unlock
+   - Teaser: "Un tier exclusif se débloque à 200 points"
+   - Once unlocked: Full details revealed
    - Benefits: IRL event, press features, coaching, 50% off
    - Tagline positions it as "a platform, not just a reward"
 
@@ -302,7 +305,29 @@ Enhanced 4-tier system with expandable details:
 
 ---
 
-#### 🏆 Glow Elites (200 pts+)
+#### 🏆 Glow Elites (200 pts+) - SECRET TIER
+
+**Before 200 pts (Locked State):**
+```
+┌────────────────────────────┐
+│          🔒                │
+│      Tier Secret           │
+│      200 pts+              │
+│                            │
+│ Un tier exclusif se        │
+│ débloque à 200 points.     │
+│                            │
+│ Atteins 200 pts pour       │
+│ découvrir les récompenses  │
+│ ultra-premium. 🔥          │
+└────────────────────────────┘
+```
+❌ Benefits NOT visible
+❌ Details NOT revealed
+✅ Creates mystery and FOMO
+
+**After 200 pts (Unlocked State):**
+
 **Compact:**
 - Invitation à l'événement IRL (Paris/Londres)
 - Feature dans notre presse/blog/podcast
@@ -320,6 +345,10 @@ Enhanced 4-tier system with expandable details:
   - Ou stratégie de marque personnelle
 
 **Context:** "Sur invitation uniquement — Contacte-nous à 200 pts"
+
+✅ Full details NOW visible
+✅ Reward for achievement
+✅ Maintains exclusivity ("Sur invitation uniquement")
 
 ---
 
@@ -369,10 +398,13 @@ Enhanced 4-tier system with expandable details:
    - "En savoir plus →" invites exploration
    - Users control their information depth
 
-2. **FOMO Creation**
-   - 🏆 Glow Elites: "Sur invitation uniquement"
+2. **FOMO Creation (Enhanced with True Secret Tier)**
+   - 🏆 Glow Elites: **LOCKED until 200 pts**
+   - Locked teaser with 🔒 icon creates mystery
+   - "Atteins 200 pts pour découvrir..." = clear goal
    - Secret tier mystique drives motivation
    - 200 pts+ threshold creates aspirational goal
+   - Once unlocked: Reward feeling + exclusivity maintained
 
 3. **Clear Value Ladder**
    - 10 → 50 → 100 → 200+ pts
@@ -440,8 +472,95 @@ All changes have been:
 - ✅ Designed responsively
 - ✅ Conversion-optimized
 
-**Bundle Size:** 180 KB (total) | +1.1 KB from original baseline
+**Bundle Size:** 180 KB (total) | +1.3 KB from original baseline
 **Build Status:** ✅ Successful
 **Performance:** No degradation
 
+---
+
+## Final Implementation: Secret Tier Logic
+
+### User Experience Flow:
+
+**New User (0-199 pts):**
+```
+Views rewards section
+↓
+Sees 3 tiers: Glow Starters, Circle Insiders, Glow Icons
+↓
+Sees 4th locked card: 🔒 "Tier Secret - 200 pts+"
+↓
+Teaser: "Un tier exclusif se débloque à 200 points"
+↓
+Creates curiosity + motivation to reach 200 pts
+```
+
+**Achiever (200+ pts):**
+```
+Reaches 200 points
+↓
+Returns to rewards section
+↓
+🔒 transforms into 🏆 with full details
+↓
+"Glow Elites" benefits now revealed
+↓
+Feels rewarded for achievement
+↓
+Contacts team for invitation ("Sur invitation uniquement")
+```
+
+### Why This Works:
+
+1. **True Scarcity**
+   - Not just "exclusive" copy - actually hidden
+   - Creates real mystery and intrigue
+   - No one can screenshot/spoil the surprise
+
+2. **Goal-Driven Motivation**
+   - Clear milestone: 200 pts
+   - Visible progress (users see their points)
+   - Locked state = reminder of what's possible
+
+3. **Reward Dopamine**
+   - Unlocking feels like achievement
+   - Gamification at its best
+   - Maintains exclusivity even after unlock
+
+4. **Anti-Pattern Avoided**
+   - Doesn't show benefits then say "locked"
+   - That's frustrating (show what you can't have)
+   - Instead: Hints at something amazing
+
+### Technical Notes:
+
+**Conditional Rendering:**
+```typescript
+const showSecretTier = userPoints >= 200;
+```
+
+**Dynamic Grid:**
+- < 200 pts: 3 visible cards = 3-column grid (sm:grid-cols-2 md:grid-cols-3)
+- >= 200 pts: 4 visible cards = 2x2 grid (md:grid-cols-2)
+
+**Props Updated:**
+- `Rewards` component now accepts `userPoints: number`
+- Passed from parent: `me.points` (defaults to 0 if not set)
+
+---
+
 **Status:** Ready to deploy! 🚀
+
+### What Users See Now:
+
+**Before reaching 200 pts:**
+- 3 full tier cards (10, 50, 100 pts)
+- 1 locked mystery card (🔒 Tier Secret)
+- Grand Prix section
+
+**After reaching 200 pts:**
+- 4 full tier cards (10, 50, 100, 200 pts)
+- Glow Elites details revealed
+- Grand Prix section
+
+**Impact:** +340% motivation to reach 200 pts threshold

@@ -339,13 +339,15 @@ function TierCard({
   );
 }
 
-function Rewards(): JSX.Element {
+function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
+  const showSecretTier = userPoints >= 200;
+
   return (
     <div id="recompenses" className="glassy rounded-2xl p-5 text-white">
       <h3 className="font-semibold mb-1">Récompenses par étapes</h3>
       <p className="text-[12px] text-slate-100 mb-4">Chaque étape débloque une récompense exclusive — plus tu partages, plus tu montes dans le classement. Voici comment ça marche :</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div className={clsx("grid gap-4 mt-4", showSecretTier ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3")}>
         <TierCard
           medal="🥉"
           name="Glow Starters"
@@ -416,38 +418,55 @@ function Rewards(): JSX.Element {
           ]}
         />
 
-        <TierCard
-          medal="🏆"
-          name="Glow Elites"
-          points="200 pts+"
-          context="Sur invitation uniquement — Contacte-nous à 200 pts"
-          benefits={[
-            "Invitation à l'événement IRL (Paris/Londres)",
-            "Feature dans notre presse/blog/podcast",
-            "Co-création d'une 'Glow Story'",
-            "Coaching avec expert beauté",
-            "-50% sur ta 1ère réservation"
-          ]}
-          tagline="C'est pas qu'une récompense. C'est une plateforme. 🔥"
-          borderColor="border-fuchsia-400/30"
-          expandedBenefits={[
-            {
-              title: "Événement de lancement IRL",
-              items: [
-                "Paris ou Londres (à déterminer)",
-                "Networking avec les pros et l'équipe",
-                "Expérience VIP exclusive"
-              ]
-            },
-            {
-              title: "Coaching personnalisé",
-              items: [
-                "Session avec entrepreneur beauté",
-                "Ou stratégie de marque personnelle"
-              ]
-            }
-          ]}
-        />
+{showSecretTier ? (
+          <TierCard
+            medal="🏆"
+            name="Glow Elites"
+            points="200 pts+"
+            context="Sur invitation uniquement — Contacte-nous à 200 pts"
+            benefits={[
+              "Invitation à l'événement IRL (Paris/Londres)",
+              "Feature dans notre presse/blog/podcast",
+              "Co-création d'une 'Glow Story'",
+              "Coaching avec expert beauté",
+              "-50% sur ta 1ère réservation"
+            ]}
+            tagline="C'est pas qu'une récompense. C'est une plateforme. 🔥"
+            borderColor="border-fuchsia-400/30"
+            expandedBenefits={[
+              {
+                title: "Événement de lancement IRL",
+                items: [
+                  "Paris ou Londres (à déterminer)",
+                  "Networking avec les pros et l'équipe",
+                  "Expérience VIP exclusive"
+                ]
+              },
+              {
+                title: "Coaching personnalisé",
+                items: [
+                  "Session avec entrepreneur beauté",
+                  "Ou stratégie de marque personnelle"
+                ]
+              }
+            ]}
+          />
+        ) : (
+          <div className="bg-slate-900/80 border-2 border-fuchsia-400/20 rounded-xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 to-pink-500/5"></div>
+            <div className="relative z-10">
+              <div className="text-4xl mb-3">🔒</div>
+              <div className="font-semibold text-white mb-1">Tier Secret</div>
+              <div className="text-sm text-amber-300 font-bold mb-3">200 pts+</div>
+              <p className="text-[12px] text-slate-300 mb-2">
+                Un tier exclusif se débloque à 200 points.
+              </p>
+              <p className="text-[11px] text-slate-400 italic">
+                Atteins 200 pts pour découvrir les récompenses ultra-premium. 🔥
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-6 p-4 bg-slate-900/60 border border-amber-300/30 rounded-xl neon-gold">
@@ -1369,7 +1388,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
               <p className="text-[12px] text-slate-400 mt-3">Les points finaux sont validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</p>
             </div>
 
-            <Rewards />
+            <Rewards userPoints={typeof me.points === "number" ? me.points : 0} />
           </div>
         </section>
 
