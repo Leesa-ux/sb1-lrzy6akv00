@@ -13,8 +13,11 @@ model User {
   phone        String?
   firstName    String?
   role         String   @default("client")
+
+  // Legacy points field (keep for backward compatibility)
   points       Int      @default(0)
   rank         Int      @default(0)
+
   referralCode String   @unique
   referredBy   String?
   refCount     Int      @default(0)
@@ -29,6 +32,29 @@ model User {
   phoneVerified     Boolean  @default(false)
   referralValidated Boolean  @default(false)
   fraudScore        Int      @default(0)
+
+  // NEW: Pre-launch referral counters (waitlist phase)
+  waitlistClients      Int @default(0)
+  waitlistInfluencers  Int @default(0)
+  waitlistPros         Int @default(0)
+
+  // NEW: Post-launch conversion counters (validation phase)
+  appDownloads         Int @default(0)
+  validatedInfluencers Int @default(0)
+  validatedPros        Int @default(0)
+
+  // NEW: Early-bird tracking
+  earlyBird       Boolean @default(false)
+  earlyBirdBonus  Int     @default(0)
+
+  // NEW: Points and ranking (dual-phase system)
+  provisionalPoints Int @default(0)  // Used during waitlist phase
+  finalPoints       Int @default(0)  // Calculated at launch
+  nextMilestone     Int @default(10) // Next tier threshold
+
+  // NEW: Prize eligibility
+  eligibleForJackpot Boolean @default(false) // true if finalPoints >= 100
+  isTopRank          Boolean @default(false) // true if rank == 1 at launch
 
   referralEventsL1 ReferralEvent[] @relation("ActorL1")
   referralEventsL2 ReferralEvent[] @relation("ActorL2")

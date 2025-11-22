@@ -36,6 +36,9 @@ export async function syncUserToBrevo(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
 
+  // Use provisionalPoints for current leaderboard, but sync both
+  const currentPoints = IS_POST_LAUNCH ? user.finalPoints : user.provisionalPoints;
+
   await upsertBrevoContact({
     email: user.email,
     firstName: user.firstName || undefined,
@@ -44,10 +47,25 @@ export async function syncUserToBrevo(userId: string): Promise<void> {
       ROLE: user.role as Role,
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       RANK: user.rank,
-      POINTS: user.points,
+      POINTS: currentPoints, // Use current phase points
+      PROVISIONAL_POINTS: user.provisionalPoints, // NEW: Waitlist phase points
+      FINAL_POINTS: user.finalPoints, // NEW: Launch phase points
       REF_COUNT: user.refCount,
-      NEXT_MILESTONE: getNextMilestone(user.points),
+      NEXT_MILESTONE: user.nextMilestone,
       LAST_REF_AT: user.lastRefAt?.toISOString() || new Date().toISOString(),
+      EARLY_BIRD: user.earlyBird, // NEW: Early-bird status
+      EARLY_BIRD_BONUS: user.earlyBirdBonus, // NEW: Bonus points amount
+      // Referral counters
+      WAITLIST_CLIENTS: user.waitlistClients,
+      WAITLIST_INFLUENCERS: user.waitlistInfluencers,
+      WAITLIST_PROS: user.waitlistPros,
+      // Validation counters (for post-launch)
+      APP_DOWNLOADS: user.appDownloads,
+      VALIDATED_INFLUENCERS: user.validatedInfluencers,
+      VALIDATED_PROS: user.validatedPros,
+      // Prize eligibility
+      ELIGIBLE_FOR_JACKPOT: user.eligibleForJackpot,
+      IS_TOP_RANK: user.isTopRank,
     },
   });
 }

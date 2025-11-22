@@ -11,9 +11,21 @@ export interface BrevoContact {
     REF_LINK: string;
     RANK: number;
     POINTS: number;
+    PROVISIONAL_POINTS?: number;
+    FINAL_POINTS?: number;
     REF_COUNT: number;
-    NEXT_MILESTONE: Milestone;
+    NEXT_MILESTONE: number; // Changed from Milestone to number to allow any integer
     LAST_REF_AT: string;
+    EARLY_BIRD?: boolean;
+    EARLY_BIRD_BONUS?: number;
+    WAITLIST_CLIENTS?: number;
+    WAITLIST_INFLUENCERS?: number;
+    WAITLIST_PROS?: number;
+    APP_DOWNLOADS?: number;
+    VALIDATED_INFLUENCERS?: number;
+    VALIDATED_PROS?: number;
+    ELIGIBLE_FOR_JACKPOT?: boolean;
+    IS_TOP_RANK?: boolean;
   };
 }
 
