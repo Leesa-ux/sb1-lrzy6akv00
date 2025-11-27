@@ -1394,8 +1394,14 @@ export default function AfroeAlternativeLanding(): JSX.Element {
 
         <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
           <div className="glassy neon-fuchsia rounded-2xl p-6 md:p-8 text-white text-center">
-            <p className="text-lg md:text-xl font-semibold">Tu ne vends pas. Tu rayonnes.</p>
-            <p className="text-slate-200 mt-2">Afroé — ton art, ta réussite, ton indépendance. Ton cercle = ton pouvoir. Let's glow. ✨</p>
+            <div className="space-y-2">
+              <p className="text-lg md:text-xl font-semibold">
+                <span className="inline-block">Providers → « Master It. »</span>
+                <span className="mx-2 text-slate-400">•</span>
+                <span className="inline-block">Clients → « Own It. »</span>
+              </p>
+            </div>
+            <p className="text-slate-200 mt-3">Afroé — ton art, ta réussite, ton indépendance. Ton cercle = ton pouvoir. Let's glow. ✨</p>
           </div>
         </section>
 
