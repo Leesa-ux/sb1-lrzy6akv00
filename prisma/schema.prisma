@@ -3,25 +3,48 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String   @id @default(cuid())
   email        String   @unique
   phone        String?
   firstName    String?
-  role         String   @default("client")
+  lastName     String?
 
-  // Legacy points field (keep for backward compatibility)
-  points       Int      @default(0)
-  rank         Int      @default(0)
+  role         String   @default("client")
 
   referralCode String   @unique
   referredBy   String?
   refCount     Int      @default(0)
-  lastRefAt    DateTime?
+
+  phoneVerified     Boolean  @default(false)
+  referralValidated Boolean  @default(false)
+  fraudScore        Int      @default(0)
+
+  waitlistClients      Int @default(0)
+  waitlistInfluencers  Int @default(0)
+  waitlistPros         Int @default(0)
+
+  appDownloads         Int @default(0)
+  validatedInfluencers Int @default(0)
+  validatedPros        Int @default(0)
+
+  earlyBird       Boolean @default(false)
+  earlyBirdBonus  Int     @default(0)
+
+  points            Int @default(0)
+  provisionalPoints Int @default(0)
+  finalPoints       Int @default(0)
+  rank              Int @default(0)
+  nextMilestone     Int @default(10)
+  lastRefAt         DateTime?
+
+  eligibleForJackpot Boolean @default(false)
+  isTopRank          Boolean @default(false)
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -29,44 +52,30 @@ model User {
   emailOpenedAt     DateTime?
   lastMilestoneSent Int?
 
-  phoneVerified     Boolean  @default(false)
-  referralValidated Boolean  @default(false)
-  fraudScore        Int      @default(0)
+  referralEventsAsReferrer ReferralEvent[] @relation("Referrer")
+  referralEventsAsReferred ReferralEvent[] @relation("Referred")
 
-  // NEW: Pre-launch referral counters (waitlist phase)
-  waitlistClients      Int @default(0)
-  waitlistInfluencers  Int @default(0)
-  waitlistPros         Int @default(0)
-
-  // NEW: Post-launch conversion counters (validation phase)
-  appDownloads         Int @default(0)
-  validatedInfluencers Int @default(0)
-  validatedPros        Int @default(0)
-
-  // NEW: Early-bird tracking
-  earlyBird       Boolean @default(false)
-  earlyBirdBonus  Int     @default(0)
-
-  // NEW: Points and ranking (dual-phase system)
-  provisionalPoints Int @default(0)  // Used during waitlist phase
-  finalPoints       Int @default(0)  // Calculated at launch
-  nextMilestone     Int @default(10) // Next tier threshold
-
-  // NEW: Prize eligibility
-  eligibleForJackpot Boolean @default(false) // true if finalPoints >= 100
-  isTopRank          Boolean @default(false) // true if rank == 1 at launch
-
-  referralEventsL1 ReferralEvent[] @relation("ActorL1")
-  referralEventsL2 ReferralEvent[] @relation("ActorL2")
+  @@index([email])
+  @@index([referralCode])
+  @@index([provisionalPoints])
+  @@index([finalPoints])
+  @@index([createdAt])
 }
 
 model ReferralEvent {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  type      String
-  actorL1Id String   @db.ObjectId
-  actorL2Id String?  @db.ObjectId
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  type           String
+  actor1Id       String
+  actor2Id       String?
+  roleAtSignup   String?
+  pointsAwarded  Int      @default(0)
+  createdAt      DateTime @default(now())
 
-  actorL1   User     @relation("ActorL1", fields: [actorL1Id], references: [id], onDelete: Cascade)
-  actorL2   User?    @relation("ActorL2", fields: [actorL2Id], references: [id], onDelete: Cascade)
+  actor1 User  @relation("Referrer", fields: [actor1Id], references: [id], onDelete: Cascade)
+  actor2 User? @relation("Referred", fields: [actor2Id], references: [id], onDelete: SetNull)
+
+  @@index([actor1Id])
+  @@index([actor2Id])
+  @@index([createdAt])
+  @@index([type])
 }
