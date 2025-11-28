@@ -428,3 +428,201 @@ Vous avez maintenant:
 ✅ **Stratégie anti-doublon** (email-first, SMS conditionnel)
 
 **Le système est prêt pour le lancement ! 🚀**
+
+---
+
+## 💼 Template Email #107 - Welcome Beauty Pro (T0)
+
+### Segment Cible
+**Brevo Segment:** `contact.ROLE == "pro"`
+
+### Sujet
+```
+Bienvenue dans la Glow List Pro ✨
+```
+
+### Corps Email (HTML/Twig)
+
+```html
+<p>Bonjour {{ contact.FIRSTNAME | default:"Beauty Pro" }} 🌸</p>
+
+<p>Bienvenue sur <strong>Afroé</strong>, la plateforme premium dédiée aux professionnel·le·s de la beauté afro-européenne.</p>
+
+<p>Ton inscription est bien enregistrée — nous sommes ravis de te compter parmi les talents qui façonnent la nouvelle génération de la beauté afro.</p>
+
+<h3>🎯 Notre mission</h3>
+<p>Rendre ton savoir-faire <strong>visible, rentable et reconnu</strong>.</p>
+
+<h3>🖤 Afroé n'est pas une simple appli : c'est un label de qualité</h3>
+
+<p>Avant toute mise en ligne, chaque prestataire est <strong>sélectionné et validé</strong> par notre équipe : portfolio, hygiène, qualité du rendu et expérience client.</p>
+
+<h3>👉 Prochaine étape</h3>
+
+<p><strong>Envoie-nous ton portfolio</strong> (photos / vidéos de réalisations) dès maintenant à <a href="mailto:pro@afroe.com">pro@afroe.com</a> ou via ton espace.</p>
+
+<p>Si ton profil correspond à nos critères, tu recevras une <strong>invitation pour un test IRL</strong> avant validation finale.</p>
+
+<h3>💼 Pendant ce temps, partage ton lien et commence à accumuler des points</h3>
+
+<p><strong>Ton lien perso :</strong><br>
+👉 <a href="{{ contact.REF_LINK }}">{{ contact.REF_LINK }}</a></p>
+
+<p>Chaque Beauty Pro que tu invites = <strong>+25 pts</strong><br>
+À 100 pts : <strong>Glow Kit + coaching + ticket Jackpot 3 500 €</strong></p>
+
+<p>À très vite,<br>
+— L'équipe Afroé 💫<br>
+<em>« Ton art, ta réussite, ton indépendance. »</em></p>
+```
+
+### SMS Welcome Beauty Pro
+
+```
+Afroé ✨ Bienvenue Beauty Pro !
+Prochaine étape : envoie ton portfolio à pro@afroe.com
+Chaque pro que tu invites = +25 pts.
+Ton lien : {{REF_LINK}}
+```
+
+---
+
+## 🎯 Template Email #108 - Activation Pro (IRL Test) (T+48h)
+
+### Segment Cible
+**Brevo Segment:** `contact.ROLE == "pro" AND contact.REF_COUNT == 0`
+
+### Timing
+**T+48h** après l'inscription si aucun parrainage
+
+### Sujet
+```
+Ton profil Afroé en revue — place au test !
+```
+
+### Corps Email (HTML/Twig)
+
+```html
+<p>Bonjour {{ contact.FIRSTNAME | default:"Beauty Pro" }},</p>
+
+<p>Ton inscription est bien reçue et ton profil est <strong>en cours d'examen</strong>.</p>
+
+<h3>✨ Chez Afroé, nous sélectionnons personnellement nos prestataires</h3>
+<p>Pour garantir un niveau de service premium à nos client·e·s.</p>
+
+<h3>Pour finaliser ta candidature :</h3>
+
+<ol>
+  <li><strong>Envoie ou complète ton portfolio professionnel</strong> (3-5 photos / vidéos)</li>
+  <li><strong>Indique ton spécialité :</strong> locks, braids, make-up, barbering, nails…</li>
+  <li><strong>Prépare-toi à une session test</strong> en présence avec notre équipe<br>
+  (Bruxelles / Anvers / Paris selon ta zone)</li>
+</ol>
+
+<p>👉 S'il est validé, ton profil sera <strong>mis en avant sur Afroé</strong> et tu pourras commencer à recevoir des réservations dès le lancement.</p>
+
+<h3>💸 Notre offre :</h3>
+
+<ul>
+  <li>✅ <strong>Aucune commission sur les 2 premiers mois</strong></li>
+  <li>✅ <strong>Abonnement Pro :</strong> 99 €/mois (administratif, visibilité, gestion, outils)</li>
+  <li>✅ <strong>Formation et support inclus</strong></li>
+</ul>
+
+<h3>🔗 Dès maintenant : mets à jour ton dossier</h3>
+
+<p><strong>Ton lien perso :</strong><br>
+👉 <a href="{{ contact.REF_LINK }}">{{ contact.REF_LINK }}</a></p>
+
+<p>En attendant, continue de partager ton lien pour accumuler des points :<br>
+Chaque Beauty Pro = <strong>+25 pts</strong> · Client = <strong>+2 pts</strong> · Influenceur = <strong>+15 pts</strong></p>
+
+<p>À très vite pour ton test,<br>
+— L'équipe Afroé 🖤</p>
+```
+
+### SMS Activation Pro (T+48h)
+
+```
+Afroé 💼 Ton profil Beauty Pro est en revue !
+Prochaine étape : test IRL (Bruxelles/Anvers/Paris).
+Complète ton portfolio → pro@afroe.com
+99€/mois · 0% commission 2 mois
+```
+
+---
+
+## 🔧 Configuration des Workflows Beauty Pro dans Brevo
+
+### Workflow #1 : Welcome Beauty Pro (immédiat)
+
+**Déclencheur :**
+- Contact ajouté OU attribut `REF_LINK` mis à jour
+- **Condition :** `contact.ROLE == "pro"`
+
+**Action :**
+- Envoyer template #107 (Welcome Beauty Pro) immédiatement
+
+**SMS (optionnel) :**
+- Si `contact.SMS` existe, envoyer SMS Welcome Beauty Pro
+
+---
+
+### Workflow #2 : Activation Pro - IRL Test (T+48h)
+
+**Déclencheur :**
+- Contact ajouté avec `ROLE == "pro"`
+
+**Délai :**
+- 48 heures
+
+**Conditions :**
+- `contact.ROLE == "pro"`
+- **ET** `contact.REF_COUNT == 0`
+
+**Action :**
+- Envoyer template #108 (Activation Pro IRL Test)
+
+**SMS (optionnel) :**
+- Si `contact.SMS` existe, envoyer SMS Activation Pro
+
+---
+
+## 📝 Variables Brevo Supplémentaires pour Beauty Pro
+
+Ces variables sont déjà synchronisées depuis MongoDB :
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `{{ contact.ROLE }}` | string | Doit être = "pro" |
+| `{{ contact.REF_COUNT }}` | number | Nombre de parrainages |
+| `{{ contact.REF_LINK }}` | string | Lien de parrainage unique |
+| `{{ contact.FIRSTNAME }}` | string | Prénom du pro |
+
+---
+
+## ✅ Checklist Beauty Pro Sequence
+
+- [ ] Template #107 (Welcome Beauty Pro) créé dans Brevo
+- [ ] Template #108 (Activation Pro IRL Test) créé dans Brevo
+- [ ] Workflow "Welcome Beauty Pro" configuré (T0, condition ROLE == "pro")
+- [ ] Workflow "Activation Pro 48h" configuré (T+48h, condition ROLE == "pro" AND REF_COUNT == 0)
+- [ ] Adresse email pro@afroe.com configurée et surveillée
+- [ ] Tests d'envoi effectués avec un contact test (ROLE = "pro")
+- [ ] SMS Beauty Pro testés
+- [ ] Synchronisation MongoDB → Brevo vérifiée pour les Beauty Pros
+
+---
+
+## 🎯 Résultat Final - Beauty Pro Sequence
+
+Vous avez maintenant :
+
+✅ **Séquence dédiée Beauty Pro** distincte des clients/influenceurs
+✅ **Email Welcome** valorisant le métier et expliquant le processus de sélection
+✅ **Email Activation (T+48h)** invitant au test IRL et présentant l'offre pro
+✅ **Messaging aligné** avec la vision Afroé : qualité, excellence, label premium
+✅ **Call-to-actions clairs** : portfolio → test IRL → validation → lancement
+✅ **Intégration fluide** avec le système de parrainage existant
+
+**La séquence Beauty Pro est prête pour le recrutement des talents ! 💼✨**

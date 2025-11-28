@@ -291,3 +291,64 @@ export async function updateUserPoints(
   await syncUserToBrevo(userId);
   await checkAndSendMilestoneEmails(userId, oldPoints, newPoints);
 }
+
+export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user || user.role !== "pro") return;
+
+  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
+
+  await sendBrevoEmail({
+    to: [{ email: user.email, name: user.firstName || undefined }],
+    templateId: EMAIL_TEMPLATE_IDS.WELCOME_BEAUTY_PRO,
+    params: {
+      FIRSTNAME: user.firstName || "Beauty Pro",
+      REF_LINK: refLink,
+      ROLE: user.role,
+      POINTS: user.points,
+    },
+  });
+
+  if (user.phone) {
+    await sendBrevoSMS({
+      phone: user.phone,
+      message: `Afroé ✨ Bienvenue Beauty Pro !\nProchaine étape : envoie ton portfolio à pro@afroe.com\nChaque pro que tu invites = +25 pts.\nTon lien : ${refLink}`,
+    });
+  }
+
+  await db.user.update({
+    where: { id: userId },
+    data: { emailSentAt: new Date() },
+  });
+}
+
+export async function sendActivationProIRLEmail(userId: string): Promise<void> {
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user || user.role !== "pro") return;
+
+  const timeSinceSignup = Date.now() - user.createdAt.getTime();
+  if (timeSinceSignup < 172800000) return;
+
+  if (user.refCount === 0) {
+    const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
+
+    await sendBrevoEmail({
+      to: [{ email: user.email, name: user.firstName || undefined }],
+      templateId: EMAIL_TEMPLATE_IDS.ACTIVATION_PRO_IRL,
+      params: {
+        FIRSTNAME: user.firstName || "Beauty Pro",
+        REF_LINK: refLink,
+        ROLE: user.role,
+        POINTS: user.points,
+        REF_COUNT: user.refCount,
+      },
+    });
+
+    if (user.phone) {
+      await sendBrevoSMS({
+        phone: user.phone,
+        message: `Afroé 💼 Ton profil Beauty Pro est en revue !\nProchaine étape : test IRL (Bruxelles/Anvers/Paris).\nComplète ton portfolio → pro@afroe.com\n99€/mois · 0% commission 2 mois`,
+      });
+    }
+  }
+}

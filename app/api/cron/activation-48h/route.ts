@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { sendActivation48hEmail } from "@/lib/automation-service";
+import { sendActivation48hEmail, sendActivationProIRLEmail } from "@/lib/automation-service";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
     const fiftyHoursAgo = new Date(Date.now() - 50 * 60 * 60 * 1000);
 
-    const users = await db.user.findMany({
+    const regularUsers = await db.user.findMany({
       where: {
         createdAt: {
           gte: fiftyHoursAgo,
@@ -24,21 +24,54 @@ export async function GET(req: NextRequest) {
         points: {
           lt: 10,
         },
+        role: {
+          not: "pro",
+        },
       },
     });
 
-    const results = await Promise.allSettled(
-      users.map((user) => sendActivation48hEmail(user.id))
+    const proUsers = await db.user.findMany({
+      where: {
+        createdAt: {
+          gte: fiftyHoursAgo,
+          lte: fortyEightHoursAgo,
+        },
+        refCount: 0,
+        role: "pro",
+      },
+    });
+
+    const regularResults = await Promise.allSettled(
+      regularUsers.map((user) => sendActivation48hEmail(user.id))
     );
 
-    const successful = results.filter((r) => r.status === "fulfilled").length;
-    const failed = results.filter((r) => r.status === "rejected").length;
+    const proResults = await Promise.allSettled(
+      proUsers.map((user) => sendActivationProIRLEmail(user.id))
+    );
+
+    const regularSuccessful = regularResults.filter((r) => r.status === "fulfilled").length;
+    const regularFailed = regularResults.filter((r) => r.status === "rejected").length;
+
+    const proSuccessful = proResults.filter((r) => r.status === "fulfilled").length;
+    const proFailed = proResults.filter((r) => r.status === "rejected").length;
 
     return NextResponse.json({
       success: true,
-      checked: users.length,
-      sent: successful,
-      failed,
+      regular: {
+        checked: regularUsers.length,
+        sent: regularSuccessful,
+        failed: regularFailed,
+      },
+      beautyPros: {
+        checked: proUsers.length,
+        sent: proSuccessful,
+        failed: proFailed,
+      },
+      total: {
+        checked: regularUsers.length + proUsers.length,
+        sent: regularSuccessful + proSuccessful,
+        failed: regularFailed + proFailed,
+      },
     });
   } catch (error) {
     console.error("Activation 48h check error:", error);
