@@ -4,8 +4,8 @@
  */
 
 "use client";
-import AfroeAlternativeLanding from "./components/AfroeAlternativeLanding";
+import AfroeWaitlistLandingV2 from "./components/AfroeWaitlistLandingV2";
 
 export default function Page() {
-  return <AfroeAlternativeLanding />;
+  return <AfroeWaitlistLandingV2 />;
 }
