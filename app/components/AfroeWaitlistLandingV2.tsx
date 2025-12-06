@@ -76,6 +76,8 @@ type SubmitState = "idle" | "loading" | "done" | "error";
 type SmsState = "idle" | "sending" | "sent" | "verifying" | "verified" | "expired" | "error";
 
 export default function AfroeWaitlistLandingV2(): JSX.Element {
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [role, setRole] = useState<RoleType>(null);
@@ -132,17 +134,20 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   }
 
   const canSubmit = useMemo(() => {
+    const nameOk = firstName.trim().length > 0 && lastName.trim().length > 0;
+    const phoneOk = phone.trim().length > 0;
     const roleOk = !!role;
     const smsOk = !consentSMS || devSkipSms || smsState === "verified";
-    return roleOk && smsOk;
-  }, [role, consentSMS, devSkipSms, smsState]);
+    return nameOk && phoneOk && roleOk && smsOk;
+  }, [firstName, lastName, phone, role, consentSMS, devSkipSms, smsState]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    if (!email || !role || !canSubmit) return;
+    if (!firstName || !lastName || !email || !phone || !role || !canSubmit) return;
     setSubmit("loading");
+    const fullName = `${firstName.trim()} ${lastName.trim()}`;
     try {
-      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, name: "", phone, role, sms: consentSMS, smsVerified: smsState === "verified" }) });
+      const res = await fetch("/api/waitlist/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, name: fullName, phone, role, sms: consentSMS, smsVerified: smsState === "verified" }) });
       if (!res.ok) throw new Error("signup failed");
       try {
         await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email, phone, role, referralCode: null, status: "subscribed", source: "landing_v2" }) });
@@ -268,6 +273,30 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
             </p>
 
             <form onSubmit={onSubmit} className="space-y-4 max-w-xl mx-auto">
+              <div className="space-y-2">
+                <p className="text-sm text-fuchsia-300 font-medium flex items-center gap-2">
+                  💫 Ton blaze complet
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Prénom"
+                    className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
+                  />
+                  <input
+                    type="text"
+                    required
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Nom"
+                    className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 gap-3">
                 <input
                   type="email"
@@ -277,13 +306,19 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   placeholder="Ton email"
                   className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
                 />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ton numéro (optionnel pour SMS)"
-                  className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
-                />
+                <div className="space-y-1">
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Ton numéro (requis pour sécurité)"
+                    className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400 w-full"
+                  />
+                  <p className="text-xs text-slate-400 pl-1">
+                    🔒 Pour protéger le crew contre la fraude et garder le programme équitable pour les vrais boss.
+                  </p>
+                </div>
               </div>
 
               {phone && (
@@ -389,7 +424,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               </button>
 
               <p className="text-xs text-slate-400 text-center">
-                On t'enverra le top départ par email{phone && consentSMS && " / SMS"}. Tu peux te désinscrire à tout moment. Zéro spam.
+                On t'enverra le top départ par email{consentSMS && " / SMS"}. Tu peux te désinscrire à tout moment. Zéro spam. Tes données sont sécurisées (RGPD).
               </p>
             </form>
           </div>
