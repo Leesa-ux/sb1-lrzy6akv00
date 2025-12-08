@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "launch:sms": "tsx scripts/send-launch-sms.ts"
+    "launch:sms": "tsx scripts/send-launch-sms.ts",
+    "import:leaderboard": "tsx scripts/importLeaderboard.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

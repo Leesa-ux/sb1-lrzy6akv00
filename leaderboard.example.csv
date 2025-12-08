@@ -1,0 +1,6 @@
+email,referrals_count,points,first_name,last_name,role,city
+john.doe@example.com,15,45,John,Doe,client,Paris
+marie.dupont@example.com,8,120,Marie,Dupont,influencer,Lyon
+alex.martin@example.com,3,75,Alex,Martin,beautypro,Marseille
+sarah.cohen@example.com,22,66,Sarah,Cohen,client,Toulouse
+lucas.bernard@example.com,12,180,Lucas,Bernard,influencer,Nice
