@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { normalizePhone, hashPhone, maskEmail, generateSmsCode, maskPhoneForLog } from '@/lib/phone-utils';
 import { createSmsRequest, getAccountByPhoneHash } from '@/lib/sms-store';
+import { getSMSTemplate } from '@/lib/sms-templates';
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
       email: email?.trim() || null,
     });
 
-    const content = `Afroe: ton code de vérification est ${code}. Valable ${Math.floor(ttl / 60)} min.`;
+    const content = getSMSTemplate("otp", undefined, { code, ttl });
 
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {

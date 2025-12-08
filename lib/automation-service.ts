@@ -13,6 +13,7 @@ import {
   type Role,
   type Milestone,
 } from "./brevo-types";
+import { getSMSTemplate } from "./sms-templates";
 
 const LAUNCH_DATE = new Date("2026-01-15T00:00:00Z");
 const IS_POST_LAUNCH = Date.now() >= LAUNCH_DATE.getTime();
@@ -126,7 +127,7 @@ export async function sendFollowupEmail(userId: string): Promise<void> {
   if (!emailOpened && user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: `Hey ! N'oublie pas de partager ton lien Afroé pour gagner des points et monter dans le classement ! 🚀`,
+      message: getSMSTemplate("followup_1h"),
     });
   }
 }
@@ -153,7 +154,7 @@ export async function sendActivation48hEmail(userId: string): Promise<void> {
     if (user.phone) {
       await sendBrevoSMS({
         phone: user.phone,
-        message: `Tu n'as pas encore partagé ton lien Afroé ? Partage-le maintenant et commence à gagner des points ! 💎`,
+        message: getSMSTemplate("activation_48h"),
       });
     }
   }
@@ -184,7 +185,7 @@ export async function sendMilestoneEmail(
   if (user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: `🎉 Bravo ! Tu as atteint le palier ${milestone} points sur Afroé ! Continue comme ça pour débloquer encore plus de récompenses !`,
+      message: getSMSTemplate("milestone", undefined, { milestone }),
     });
   }
 
@@ -214,7 +215,7 @@ export async function sendGlowEliteEmail(userId: string): Promise<void> {
   if (user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: `🌟 FÉLICITATIONS ! Tu as atteint le palier Glow Elite (200 pts) ! Des récompenses exclusives t'attendent ! Continue de partager ton lien Afroé !`,
+      message: getSMSTemplate("glow_elite"),
     });
   }
 
@@ -263,7 +264,7 @@ export async function sendInactivityReminder(userId: string): Promise<void> {
     if (user.phone) {
       await sendBrevoSMS({
         phone: user.phone,
-        message: `Hey ! Le classement Afroé bouge vite ! Partage ton lien pour ne pas te faire dépasser ! 🔥`,
+        message: getSMSTemplate("reminder_5d"),
       });
     }
   }
@@ -312,7 +313,7 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
   if (user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: `Afroé ✨ Bienvenue Beauty Pro !\nProchaine étape : envoie ton portfolio à pro@afroe.com\nChaque pro que tu invites = +25 pts.\nTon lien : ${refLink}`,
+      message: getSMSTemplate("welcome_beauty_pro", undefined, { refLink }),
     });
   }
 
@@ -347,7 +348,7 @@ export async function sendActivationProIRLEmail(userId: string): Promise<void> {
     if (user.phone) {
       await sendBrevoSMS({
         phone: user.phone,
-        message: `Afroé 💼 Ton profil Beauty Pro est en revue !\nProchaine étape : test IRL (Bruxelles/Anvers/Paris).\nComplète ton portfolio → pro@afroe.com\n99€/mois · 0% commission 2 mois`,
+        message: getSMSTemplate("activation_pro_irl"),
       });
     }
   }

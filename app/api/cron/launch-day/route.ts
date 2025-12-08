@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sendBrevoEmail, sendBrevoSMS } from "@/lib/brevo-client";
 import { EMAIL_TEMPLATE_IDS } from "@/lib/brevo-types";
+import { getSMSTemplate } from "@/lib/sms-templates";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
       .map((user) =>
         sendBrevoSMS({
           phone: user.phone!,
-          message: `🚀 C'est le JOUR J ! Afroé est lancée ! Tous les points gagnés aujourd'hui sont DOUBLÉS ! Partage ton lien maintenant ! 🔥`,
+          message: getSMSTemplate("launch_day"),
         })
       );
 
