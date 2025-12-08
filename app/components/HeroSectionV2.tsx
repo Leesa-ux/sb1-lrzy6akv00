@@ -77,14 +77,14 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           </div>
 
           {/* Image hero du crew */}
-          <div className="mt-12 max-w-5xl mx-auto">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-fuchsia-500/20 border border-white/10">
+          <div className="mt-10 max-w-3xl mx-auto px-4">
+            <div className="relative rounded-xl overflow-hidden shadow-xl shadow-fuchsia-500/10 border border-white/5">
               <img
                 src="/images/lucid_origin_hero_crew_beaut_afro__domicile_ultradetailed_edit_2.jpg"
                 alt="Professionnels de la beauté Afro au travail - Afroé"
-                className="w-full h-auto object-cover"
+                className="w-full h-auto max-h-[400px] object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
             </div>
           </div>
         </div>
