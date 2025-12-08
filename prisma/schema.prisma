@@ -65,17 +65,17 @@ model User {
 model ReferralEvent {
   id             String   @id @default(cuid())
   type           String
-  actor1Id       String
-  actor2Id       String?
+  actorL1Id      String   @map("actorL1Id")
+  actorL2Id      String?  @map("actorL2Id")
   roleAtSignup   String?
   pointsAwarded  Int      @default(0)
   createdAt      DateTime @default(now())
 
-  actor1 User  @relation("Referrer", fields: [actor1Id], references: [id], onDelete: Cascade)
-  actor2 User? @relation("Referred", fields: [actor2Id], references: [id], onDelete: SetNull)
+  actor1 User  @relation("Referrer", fields: [actorL1Id], references: [id], onDelete: Cascade)
+  actor2 User? @relation("Referred", fields: [actorL2Id], references: [id], onDelete: SetNull)
 
-  @@index([actor1Id])
-  @@index([actor2Id])
+  @@index([actorL1Id])
+  @@index([actorL2Id])
   @@index([createdAt])
   @@index([type])
 }
