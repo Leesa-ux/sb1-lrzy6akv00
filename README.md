@@ -1,84 +1,271 @@
-# Waitlist Landing Page
+# Afroé Waitlist Platform
 
-A modern waitlist landing page with SMS verification and Google Sheets integration.
+Advanced waitlist landing page with multi-tier referral system, fraud detection, and automated email campaigns. Built for the Afroé beauty services marketplace launch.
 
-## Features
+## Overview
 
-- 📱 SMS verification using Brevo or Twilio
-- 📊 Lead management with Google Sheets integration
-- 🔗 Referral system with unique codes
-- ⏰ Time-limited verification
-- 📱 Fully responsive design
+Afroé is a beauty services marketplace connecting clients with beauty professionals and influencers. This waitlist platform manages pre-launch signups with a gamified referral system featuring:
+
+- **Multi-tier referral tracking** (2-level deep)
+- **Role-based point system** (Client: 5pts, Influencer: 10pts, Beauty Pro: 15pts)
+- **Dual-phase scoring** (provisional points during waitlist + final points at launch)
+- **Early-bird rewards** (first 100 signups get bonus points)
+- **Prize eligibility** (iPhone 17 Pro for rank 1, €3,500 jackpot for 100+ points)
+- **Automated email sequences** via Brevo (welcome, milestone progress, weekly updates)
+- **Anti-fraud system** (IP tracking, device fingerprinting, rate limiting)
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React, TypeScript, TailwindCSS
+- **Backend**: Next.js API Routes
+- **Database**: Supabase (PostgreSQL)
+- **ORM**: Prisma
+- **Email**: Brevo (Sendinblue)
+- **SMS**: Brevo Transactional SMS
+- **Rate Limiting**: Upstash Redis
+
+## Architecture
+
+### Database Schema
+
+#### Core Tables
+- **User**: Main user table with 35+ columns including points, rank, referral tracking
+- **ReferralEvent**: Audit trail for all referral events with points awarded
+- **signup_metadata**: Fraud detection data (IP, device fingerprint, form timing)
+- **referral_tracking**: Per-referral fraud analysis
+- **ip_activity**: Rate limiting and abuse prevention
+
+#### Security
+- Row Level Security (RLS) enabled on all tables
+- Service role access for API routes
+- Public read limited to leaderboard view only
+- Helper function `get_user_public_profile()` for safe profile sharing
+
+### Points System
+
+**Referral Points (Dual-phase)**
+- Level 1 referrals: 5pts (client), 10pts (influencer), 15pts (beauty pro)
+- Level 2 referrals: 2pts (client), 4pts (influencer), 6pts (beauty pro)
+- Early-bird bonus: 50pts (first 100 signups)
+
+**Provisional vs Final Points**
+- `provisionalPoints`: Earned during waitlist phase
+- `finalPoints`: Calculated at launch including post-launch conversions
+- Prize eligibility based on `finalPoints` only
+
+### Anti-Fraud Features
+
+1. **IP Tracking**: Max 3 signups per IP per day
+2. **Device Fingerprinting**: Detects duplicate devices
+3. **Form Timing Analysis**: Flags submissions < 3 seconds (bots)
+4. **Temp Email Detection**: Blocks disposable email providers
+5. **Risk Scoring**: Cumulative fraud score per user
+6. **Rate Limiting**: Via Upstash Redis with sliding window
 
 ## Setup
 
-1. **Environment Variables**
-   
-   Copy `.env.example` to `.env.local` and configure your API keys:
+### 1. Environment Variables
 
-   ```bash
-   cp .env.example .env.local
-   ```
+Copy `.env.example` to `.env` and configure:
 
-2. **SMS Service Configuration (choose one)**
+```bash
+cp .env.example .env
+```
 
-   **Option A: Brevo (Sendinblue)**
-   - Sign up at [Brevo](https://www.brevo.com/)
-   - Get your API key from the dashboard
-   - Set `BREVO_API_KEY` and `BREVO_SENDER` in your `.env.local`
+Required variables:
+```env
+# Database
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
 
-   **Option B: Twilio**
-   - Sign up at [Twilio](https://www.twilio.com/)
-   - Get your Account SID, Auth Token, and phone number
-   - Set the Twilio variables in your `.env.local`
+# Brevo (Email + SMS)
+BREVO_API_KEY="xkeysib-..."
+BREVO_SENDER_EMAIL="noreply@afroe.com"
+BREVO_SENDER_NAME="Afroé"
 
-3. **Google Sheets Integration (choose one)**
+# Redis (Rate Limiting)
+UPSTASH_REDIS_REST_URL="https://..."
+UPSTASH_REDIS_REST_TOKEN="..."
 
-   **Option A: Google Apps Script (Recommended)**
-   - Create a new Google Spreadsheet
-   - Go to Extensions > Apps Script
-   - Create a script to handle POST requests and save data to your sheet
-   - Deploy as a web app and get the webhook URL
-   - Set `GOOGLE_SHEETS_WEBHOOK_URL` in your `.env.local`
+# App Config
+NEXT_PUBLIC_APP_URL="https://afroe.com"
+```
 
-   **Option B: Google Sheets API**
-   - Enable Google Sheets API in Google Cloud Console
-   - Get an API key
-   - Set `GOOGLE_SHEETS_API_KEY` and `GOOGLE_SHEETS_ID` in your `.env.local`
+### 2. Database Setup
 
-## Development
+Migrations are managed via Supabase. Applied migrations:
+1. `create_waitlist_tables.sql` - Core User and ReferralEvent tables
+2. `add_fraud_detection_fields.sql` - Anti-fraud tables
+3. `complete_user_schema.sql` - All 35 user columns
+4. `fix_lastrefat_column.sql` - Column rename fix
+5. `secure_rls_policies.sql` - RLS security hardening
+
+To apply migrations:
+```bash
+# Migrations are auto-applied via MCP Supabase tool
+# No manual action required
+```
+
+### 3. Prisma Setup
+
+Generate Prisma client:
+```bash
+npm run postinstall
+```
+
+### 4. Development
 
 ```bash
 npm run dev
 ```
 
-Add `?dev=1` to the URL to skip SMS verification during development.
+Visit `http://localhost:3000`
 
-## API Endpoints
+## API Routes
 
-- `POST /api/send-sms` - Sends SMS verification code
-- `POST /api/verify-code` - Verifies SMS code
-- `POST /api/save-lead` - Saves lead to Google Sheets
+### User Signup Flow
 
-## Google Apps Script Example
+1. **POST /api/send-otp**
+   - Sends SMS verification code
+   - Rate limited: 3 per phone per hour
+   - Returns: `{ success: true }`
 
-Here's a sample Google Apps Script code for the webhook:
+2. **POST /api/verify-otp**
+   - Verifies SMS code
+   - Creates user if valid
+   - Returns: `{ success: true, referralCode: "ABC123" }`
 
-```javascript
-function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const data = JSON.parse(e.postData.contents);
-  
-  sheet.appendRow([
-    data.timestamp,
-    data.email,
-    data.phone,
-    data.role,
-    data.referralCode,
-    data.status,
-    data.source
-  ]);
-  
-  return ContentService.createTextOutput(JSON.stringify({ok: true}));
-}
+3. **POST /api/save-lead**
+   - Saves complete user profile
+   - Triggers referral point calculation
+   - Sends welcome email
+   - Returns: `{ success: true, user: {...} }`
+
+### Referral Tracking
+
+4. **POST /api/referral-track**
+   - Tracks referral click
+   - Records IP, device, timestamp
+   - Returns: `{ success: true }`
+
+5. **POST /api/webhook/referral-completed**
+   - Called when referral converts
+   - Awards points to referrer
+   - Checks fraud flags
+   - Returns: `{ success: true, pointsAwarded: 10 }`
+
+### Email Automation
+
+6. **POST /api/signup-complete**
+   - Sends welcome email with referral link
+   - Returns: `{ success: true }`
+
+7. **POST /api/progress-email**
+   - Sends milestone progress email
+   - Triggered at: 10, 25, 50, 100 points
+   - Returns: `{ success: true }`
+
+### Cron Jobs (Automated)
+
+8. **POST /api/cron/followup-1h** - Send 1-hour follow-up
+9. **POST /api/cron/activation-48h** - Send 48-hour activation reminder
+10. **POST /api/cron/progress-weekly** - Send weekly progress updates
+11. **POST /api/cron/nightly-risk-scan** - Scan for fraud patterns
+12. **POST /api/cron/launch-day** - Send launch day notifications
+
+### Admin Endpoints
+
+13. **POST /api/admin/recalculate-final-points**
+    - Recalculates all final points
+    - Updates rank and prize eligibility
+    - Returns: `{ success: true, updated: 1234 }`
+
+14. **GET /api/leaderboard/export**
+    - Exports leaderboard as CSV
+    - Returns: CSV file download
+
+15. **GET /api/early-bird-count**
+    - Returns current early-bird count
+    - Returns: `{ count: 42, limit: 100 }`
+
+## Email Templates
+
+Brevo templates are configured via web UI. Required templates:
+
+1. **Welcome Email** (ID: 1) - Sent after signup
+2. **Milestone Progress** (ID: 2) - Sent at 10/25/50/100 points
+3. **Weekly Progress** (ID: 3) - Sent every Monday
+4. **1-Hour Follow-up** (ID: 4) - Sent if no referrals after 1h
+5. **48-Hour Activation** (ID: 5) - Sent if inactive after 48h
+6. **Launch Day** (ID: 6) - Sent on app launch
+
+See `BEAUTY_PRO_EMAIL_SEQUENCE.md` for template content.
+
+## SMS Templates
+
+SMS messages are defined in `lib/sms-templates.ts`:
+
+- Verification codes (OTP)
+- Welcome messages with referral link
+- Milestone achievements
+- Launch notifications
+
+See `SMS_TEMPLATES_GUIDE.md` for all templates.
+
+## Testing
+
+### Rate Limiter Test
+```bash
+npm run test:rate-limiter
 ```
+
+### SMS Test (Dev Mode)
+Add `?dev=1` to skip SMS verification during development.
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push to GitHub
+2. Connect to Vercel
+3. Add environment variables
+4. Deploy
+
+### Environment-Specific Config
+
+Use `vercel.json` to configure:
+- Cron jobs (weekly/daily/hourly)
+- Redirects
+- Headers
+
+## Security Considerations
+
+1. **Never expose service_role key** - Only in API routes, never client-side
+2. **RLS policies** - All tables have restrictive policies
+3. **Rate limiting** - Applied to all public endpoints
+4. **Input validation** - Email, phone, referral codes validated
+5. **SQL injection** - Protected via Prisma parameterized queries
+6. **XSS** - React auto-escapes, no `dangerouslySetInnerHTML`
+
+## Monitoring
+
+Key metrics to track:
+- Signup conversion rate (OTP sent → user created)
+- Referral conversion rate (click → signup)
+- Fraud detection hit rate
+- Email open/click rates (via Brevo)
+- Points distribution (histogram)
+- Top referrers (leaderboard)
+
+## Documentation
+
+- `QUICK_START.md` - Fast setup guide
+- `AUTOMATION_SETUP.md` - Email automation config
+- `BREVO_SETUP.md` - Brevo integration guide
+- `BEAUTY_PRO_EMAIL_SEQUENCE.md` - Email templates
+- `SMS_TEMPLATES_GUIDE.md` - SMS templates
+- `ACCESSIBILITY_EXPLAINED_SIMPLE.md` - A11y features
+
+## License
+
+Proprietary - Afroé Platform
