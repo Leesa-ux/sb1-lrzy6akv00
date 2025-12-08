@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { calculateProvisionalPoints, getNextMilestone, POINTS_CONFIG } from "./points";
+import { checkAndSendMilestoneEmails, syncUserToBrevo } from "./automation-service";
 
 /**
  * Generate a unique referral code for a user
@@ -70,6 +71,7 @@ export async function handleReferralEvent(referrerId: string, newUserRole: strin
     earlyBirdBonus: referrer.earlyBirdBonus
   };
 
+  const oldPoints = referrer.provisionalPoints;
   const provisionalPoints = calculateProvisionalPoints(updatedData);
   updates.provisionalPoints = provisionalPoints;
   updates.points = provisionalPoints; // Keep legacy points field in sync
@@ -83,6 +85,12 @@ export async function handleReferralEvent(referrerId: string, newUserRole: strin
 
   // Recalculate rank for this user
   await recalculateUserRank(referrerId);
+
+  // Sync to Brevo with updated points
+  await syncUserToBrevo(referrerId);
+
+  // Check and send milestone emails/SMS if thresholds crossed
+  await checkAndSendMilestoneEmails(referrerId, oldPoints, provisionalPoints);
 
   console.log(`✅ Referral processed: ${newUserRole} referred by user ${referrerId}, new provisional points: ${provisionalPoints}`);
 }

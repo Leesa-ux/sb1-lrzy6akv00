@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import {
   sendWelcomeEmail,
+  sendWelcomeBeautyProEmail,
   syncUserToBrevo,
 } from "@/lib/automation-service";
 import { getClientIp } from "@/lib/get-client-ip";
@@ -159,7 +160,13 @@ export async function POST(req: NextRequest) {
 
     // Sync to Brevo and send welcome email
     await syncUserToBrevo(user.id);
-    await sendWelcomeEmail(user.id);
+
+    // Send appropriate welcome email based on role
+    if (normalizedRole === "beauty_pro") {
+      await sendWelcomeBeautyProEmail(user.id);
+    } else {
+      await sendWelcomeEmail(user.id);
+    }
 
     const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
 

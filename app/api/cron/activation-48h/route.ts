@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
           lt: 10,
         },
         role: {
-          not: "pro",
+          not: "beauty_pro",
         },
       },
     });
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
           lte: fortyEightHoursAgo,
         },
         refCount: 0,
-        role: "pro",
+        role: "beauty_pro",
       },
     });
 
