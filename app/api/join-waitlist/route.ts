@@ -42,12 +42,13 @@ interface JoinWaitlistBody {
   city?: string;
   role: 'client' | 'influencer' | 'beautypro';
   referral_code?: string;
+  skillAnswerCorrect?: boolean;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: JoinWaitlistBody = await request.json();
-    const { email, phone, first_name, last_name, city, role, referral_code } = body;
+    const { email, phone, first_name, last_name, city, role, referral_code, skillAnswerCorrect } = body;
 
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
@@ -160,6 +161,7 @@ export async function POST(request: NextRequest) {
         eligibleForJackpot: false,
         isTopRank: false,
         points: earlyBirdBonus,
+        skillAnswerCorrect: skillAnswerCorrect === true,
         createdAt: new Date(),
         updatedAt: new Date()
       }

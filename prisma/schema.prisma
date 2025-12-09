@@ -23,6 +23,7 @@ model User {
   phoneVerified     Boolean  @default(false)
   referralValidated Boolean  @default(false)
   fraudScore        Int      @default(0)
+  skillAnswerCorrect Boolean @default(false)
 
   waitlistClients      Int @default(0)
   waitlistInfluencers  Int @default(0)
