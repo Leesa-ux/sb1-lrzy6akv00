@@ -13,6 +13,8 @@ interface FormData {
   last_name: string;
   city: string;
   role: 'client' | 'influencer' | 'beautypro';
+  skill_answer: string;
+  consent: boolean;
 }
 
 interface WaitlistFormProps {
@@ -26,7 +28,9 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     first_name: '',
     last_name: '',
     city: '',
-    role: 'client'
+    role: 'client',
+    skill_answer: '',
+    consent: false
   });
 
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -47,6 +51,18 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (parseInt(formData.skill_answer) !== 32) {
+      setError('La réponse à la question d\'habileté est incorrecte. (8 × 4 = ?)');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.consent) {
+      setError('Vous devez accepter la politique de confidentialité pour continuer.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch('/api/join-waitlist', {
@@ -84,9 +100,12 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [target.name]: value
     }));
   };
 
@@ -255,12 +274,45 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
           </select>
         </div>
 
+        <div className="border-t border-gray-200 pt-4">
+          <Label htmlFor="skill_answer" className="font-semibold">
+            Question d'habileté (obligatoire en Belgique) *
+          </Label>
+          <p className="text-sm text-gray-600 mb-2">Combien fait <strong>8 × 4</strong> ?</p>
+          <Input
+            id="skill_answer"
+            name="skill_answer"
+            type="number"
+            required
+            value={formData.skill_answer}
+            onChange={handleChange}
+            placeholder="Votre réponse"
+            disabled={loading}
+          />
+        </div>
+
+        <div className="flex items-start space-x-2">
+          <input
+            type="checkbox"
+            id="consent"
+            name="consent"
+            required
+            checked={formData.consent}
+            onChange={handleChange}
+            disabled={loading}
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+          />
+          <Label htmlFor="consent" className="text-sm text-gray-600 cursor-pointer">
+            J'accepte la politique de confidentialité d'Afroé et confirme que mes réponses sont exactes. *
+          </Label>
+        </div>
+
         <Button
           type="submit"
           disabled={loading}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3"
         >
-          {loading ? 'Inscription en cours...' : 'Rejoindre la waitlist'}
+          {loading ? 'Inscription en cours...' : 'Participer au concours'}
         </Button>
 
         <p className="text-xs text-gray-500 text-center">
