@@ -162,10 +162,18 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
     try {
       const res = await fetch("/api/join-waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, phone, first_name: firstName.trim(), last_name: lastName.trim(), role: role === "client" ? "client" : role === "influencer" ? "influencer" : "beautypro", skillAnswerCorrect: true }) });
       if (!res.ok) throw new Error("signup failed");
+
+      const data = await res.json();
+
       try {
-        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email, phone, role, referralCode: null, status: "subscribed", source: "landing_v2" }) });
+        await fetch("/api/save-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timestamp: new Date().toISOString(), email, phone, role, referralCode: data.referralCode, status: "subscribed", source: "landing_v2" }) });
       } catch {}
-      setSubmit("done");
+
+      if (data.success && data.referralCode) {
+        window.location.href = `/success?ref=${data.referralCode}`;
+      } else {
+        setSubmit("done");
+      }
     } catch { setSubmit("error"); }
   }
 
