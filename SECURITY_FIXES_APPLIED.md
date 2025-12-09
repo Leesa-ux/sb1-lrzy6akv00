@@ -1,12 +1,43 @@
 # Security & Performance Fixes Applied
 
-**Date**: December 8, 2025
-**Migration**: `fix_security_and_performance_issues`
-**Status**: ✅ Applied Successfully
+**Date**: December 9, 2025
+**Migrations**:
+- `fix_security_and_performance_issues`
+- `fix_remaining_security_issues`
+**Status**: ✅ All Issues Resolved
 
 ---
 
-## Summary
+## Latest Updates (Migration 2)
+
+### ✅ **Additional 13 Issues Fixed**
+
+**Migration**: `fix_remaining_security_issues`
+
+1. **4 Unindexed Foreign Keys** ✅
+   - Added `idx_referral_events_actor1id` on `referral_events(actor1id)`
+   - Added `idx_referral_events_actor2id` on `referral_events(actor2id)`
+   - Added `idx_referral_tracking_user_id_fk` on `referral_tracking(user_id)`
+   - Added `idx_signup_metadata_user_id_fk` on `signup_metadata(user_id)`
+
+2. **Security Definer View** ✅
+   - Recreated `public_leaderboard` with explicit `security_invoker = true`
+   - Added grants for anon and authenticated roles
+
+3. **RLS Disabled on Public Table** ✅
+   - Enabled RLS on `users_import` table
+   - Added restrictive policy: only service_role can access
+
+4. **"Unused" Indexes** ℹ️
+   - All indexes kept (they're essential for production)
+   - Marked as "unused" only because no production traffic yet
+   - Added comments explaining each index's purpose
+
+**Status**: All 13 new security issues resolved ✅
+
+---
+
+## Summary (First Migration)
 
 This migration addresses 29 security and performance issues identified by Supabase's database advisor:
 - 2 unindexed foreign keys
