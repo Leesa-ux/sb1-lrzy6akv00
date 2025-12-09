@@ -3,6 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { validateEmail, validatePhone, sanitizeEmail, sanitizePhone, sanitizeText } from '@/lib/validation';
 import { getClientIp } from '@/lib/get-client-ip';
 import { POINTS_CONFIG, calculateProvisionalPoints } from '@/lib/points';
+import {
+  sendClientWelcomeEmail,
+  sendInfluencerWelcomeEmail,
+  sendBeautyProWelcomeEmail,
+} from '@/lib/brevo-welcome';
 
 const prisma = new PrismaClient();
 
@@ -244,6 +249,30 @@ export async function POST(request: NextRequest) {
     //     isBlocked: false
     //   }
     // });
+
+    const refLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://afroe.studio'}?ref=${newUser.referralCode}`;
+
+    try {
+      const basePayload = {
+        email: newUser.email,
+        firstName: newUser.firstName,
+        role,
+        refLink,
+        rank: newUser.rank || 0,
+        points: newUser.provisionalPoints || 0,
+        nextMilestone: newUser.nextMilestone || 10,
+      };
+
+      if (role === 'client') {
+        await sendClientWelcomeEmail(basePayload);
+      } else if (role === 'influencer') {
+        await sendInfluencerWelcomeEmail(basePayload);
+      } else if (role === 'beautypro') {
+        await sendBeautyProWelcomeEmail(basePayload);
+      }
+    } catch (e) {
+      console.error('Erreur envoi email Welcome:', e);
+    }
 
     return NextResponse.json({
       success: true,
