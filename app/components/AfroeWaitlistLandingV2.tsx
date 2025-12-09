@@ -85,6 +85,8 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   const [submit, setSubmit] = useState<SubmitState>("idle");
   const [devSkipSms, setDevSkipSms] = useState<boolean>(false);
   const [earlyBirdSpotsLeft, setEarlyBirdSpotsLeft] = useState<number>(100);
+  const [skillAnswer, setSkillAnswer] = useState<string>("");
+  const [consentGDPR, setConsentGDPR] = useState<boolean>(false);
 
   const [smsState, setSmsState] = useState<SmsState>("idle");
   const [smsCode, setSmsCode] = useState<string>("");
@@ -144,6 +146,17 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     if (!firstName || !lastName || !email || !phone || !role || !canSubmit) return;
+
+    if (parseInt(skillAnswer) !== 32) {
+      alert('La réponse à la question d\'habileté est incorrecte. (8 × 4 = ?)');
+      return;
+    }
+
+    if (!consentGDPR) {
+      alert('Vous devez accepter la politique de confidentialité pour continuer.');
+      return;
+    }
+
     setSubmit("loading");
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     try {
@@ -415,12 +428,43 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                 </div>
               </div>
 
+              <div className="space-y-2 pt-4 border-t border-white/10">
+                <p className="text-sm text-fuchsia-300 font-medium">
+                  🧮 Question d'habileté (obligatoire en Belgique)
+                </p>
+                <p className="text-sm text-slate-300 mb-2">
+                  Combien fait <strong>8 × 4</strong> ?
+                </p>
+                <input
+                  type="number"
+                  required
+                  value={skillAnswer}
+                  onChange={(e) => setSkillAnswer(e.target.value)}
+                  placeholder="Votre réponse"
+                  className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
+                />
+              </div>
+
+              <div className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  id="consent-gdpr"
+                  required
+                  checked={consentGDPR}
+                  onChange={(e) => setConsentGDPR(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900/60 text-fuchsia-600 focus:ring-2 focus:ring-fuchsia-400"
+                />
+                <label htmlFor="consent-gdpr" className="text-xs text-slate-300 cursor-pointer">
+                  J'accepte la politique de confidentialité d'Afroé et confirme que mes réponses sont exactes. *
+                </label>
+              </div>
+
               <button
                 type="submit"
                 disabled={submit === "loading" || !canSubmit}
                 className="w-full bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl px-6 py-4 text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-[0_0_20px_rgba(217,70,239,0.4)]"
               >
-                {submit === "loading" ? "On te place dans la Glow List…" : submit === "done" ? "C'est validé — check ton email ✨" : "Prends ta place maintenant ✨"}
+                {submit === "loading" ? "On te place dans la Glow List…" : submit === "done" ? "C'est validé — check ton email ✨" : "Participer au concours ✨"}
               </button>
 
               <p className="text-xs text-slate-400 text-center">
