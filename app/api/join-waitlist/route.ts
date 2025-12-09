@@ -81,6 +81,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (skillAnswerCorrect !== true) {
+      return NextResponse.json(
+        { success: false, error: 'Réponse à la question d\'habileté incorrecte ou manquante' },
+        { status: 400 }
+      );
+    }
+
     const cleanEmail = sanitizeEmail(email);
     const cleanPhone = sanitizePhone(phone);
     const cleanFirstName = sanitizeText(first_name, 50);
