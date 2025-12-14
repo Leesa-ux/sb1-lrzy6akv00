@@ -8,36 +8,9 @@ import {
   sendInfluencerWelcomeEmail,
   sendBeautyProWelcomeEmail,
 } from '@/lib/brevo-welcome';
+import { ensureUniqueReferralCode, isValidReferralCode } from '@/lib/referral-code';
 
 const prisma = new PrismaClient();
-
-function generateReferralCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
-async function ensureUniqueReferralCode(): Promise<string> {
-  let attempts = 0;
-  const maxAttempts = 10;
-
-  while (attempts < maxAttempts) {
-    const code = generateReferralCode();
-    const existing = await prisma.user.findFirst({
-      where: { referralCode: code }
-    });
-
-    if (!existing) {
-      return code;
-    }
-    attempts++;
-  }
-
-  throw new Error('Unable to generate unique referral code');
-}
 
 interface JoinWaitlistBody {
   email: string;
@@ -122,6 +95,13 @@ export async function POST(request: NextRequest) {
 
     let referrer = null;
     if (referral_code) {
+      if (!isValidReferralCode(referral_code)) {
+        return NextResponse.json(
+          { success: false, error: 'Format de code de parrainage invalide' },
+          { status: 400 }
+        );
+      }
+
       referrer = await prisma.user.findUnique({
         where: { referralCode: referral_code }
       });
@@ -136,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     const ipAddress = getClientIp(request);
     const userAgent = request.headers.get('user-agent') || 'unknown';
-    const myReferralCode = await ensureUniqueReferralCode();
+    const myReferralCode = await ensureUniqueReferralCode(prisma);
 
     const earlyBirdCount = await prisma.user.count({
       where: { earlyBird: true }
