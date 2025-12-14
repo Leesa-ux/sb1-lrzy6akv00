@@ -2,12 +2,15 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useFeature } from "@/lib/feature-flags";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string>("");
   const [copied, setCopied] = useState(false);
+  const showConditionalShare = useFeature("conditional-share");
 
   useEffect(() => {
     const code = searchParams.get("ref");
@@ -50,7 +53,15 @@ function SuccessContent() {
             Check ton email pour confirmer ton inscription. En attendant, partage ton lien unique pour gagner des points !
           </p>
 
-          {referralCode && (
+          {showConditionalShare && !referralCode && (
+            <div className="bg-slate-900/60 border border-amber-300/20 rounded-xl p-6">
+              <p className="text-amber-300 text-sm">
+                ✨ Inscris-toi pour débloquer ton lien de parrainage.
+              </p>
+            </div>
+          )}
+
+          {(!showConditionalShare || referralCode) && referralCode && (
             <>
               <div className="bg-slate-900/60 border border-white/10 rounded-xl p-6 space-y-4">
                 <p className="text-sm text-slate-300 font-medium">Ton code de parrainage</p>
@@ -114,12 +125,20 @@ function SuccessContent() {
             </ul>
           </div>
 
-          <a
-            href="/"
-            className="inline-block mt-6 px-8 py-3 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(217,70,239,0.4)]"
-          >
-            Retour à l'accueil
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mt-6">
+            <a
+              href="/"
+              className="inline-block px-8 py-3 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(217,70,239,0.4)]"
+            >
+              Retour à l'accueil
+            </a>
+            <Link
+              href="/reglement"
+              className="text-sm text-slate-400 hover:text-white underline transition-colors"
+            >
+              Voir le règlement
+            </Link>
+          </div>
         </div>
       </div>
     </main>

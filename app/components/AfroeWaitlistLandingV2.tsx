@@ -632,6 +632,11 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs sm:text-sm text-slate-400 space-y-2">
             <p className="font-medium">🔒 Cryptage SSL 256-bit — Conforme RGPD — Zéro spam garanti.</p>
             <p>© 2025 Afroé. Toutes les données sont sécurisées et protégées. Fais briller ta beauté Afro.</p>
+            <p className="mt-2">
+              <a href="/reglement" className="underline hover:text-white transition-colors">
+                Règlement du concours
+              </a>
+            </p>
           </div>
         </footer>
       </main>

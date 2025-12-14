@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useFeature } from "@/lib/feature-flags";
+import Countdown from "./Countdown";
 
 interface HeroSectionProps {
   onCTAClick?: () => void;
@@ -11,6 +13,11 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
   onCTAClick,
   earlyBirdSpotsLeft = 100
 }) => {
+  const showNewCopy = useFeature("hero-copy");
+  const showCountdown = useFeature("countdown");
+
+  const LAUNCH_DATE = "2025-12-15T12:00:00+01:00";
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-black via-slate-950 to-black text-white pt-16 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,6 +28,14 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
               Afroé — Brussels · Liège · Anvers
             </span>
           </div>
+
+          {showNewCopy && (
+            <div className="mb-4">
+              <p className="text-sm sm:text-base md:text-lg text-amber-300 font-bold">
+                iPhone 17 Pro + 3 500 € — juste en partageant.
+              </p>
+            </div>
+          )}
 
           {/* Titre principal - ton street maintenu */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4">
@@ -37,6 +52,14 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
             Une app pensée pour les client·es, les beauty pros et la culture Afro européenne.
           </p>
 
+          {showNewCopy && (
+            <div className="mb-4">
+              <p className="text-xs sm:text-sm text-slate-400">
+                #1 = iPhone · 100 pts = tirage 3 500€
+              </p>
+            </div>
+          )}
+
           {/* Bonus lancement - style glassy neon-gold */}
           <div className="inline-flex flex-col items-center gap-2 mb-6 glassy neon-gold rounded-2xl px-6 py-4 max-w-2xl">
             <p className="text-amber-300 font-bold text-base sm:text-lg">
@@ -51,6 +74,10 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
               )}
             </p>
           </div>
+
+          {showCountdown && (
+            <Countdown targetDate={LAUNCH_DATE} className="max-w-md mx-auto mb-6" />
+          )}
 
           {/* CTA principal - effet neon-fuchsia */}
           <div className="flex flex-col items-center gap-3 mb-6">
