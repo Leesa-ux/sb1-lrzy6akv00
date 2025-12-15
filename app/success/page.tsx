@@ -4,40 +4,19 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFeature } from "@/lib/feature-flags";
+import ReferralShareCard from "@/app/components/ReferralShareCard";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
-  const [shareUrl, setShareUrl] = useState<string>("");
-  const [copied, setCopied] = useState(false);
   const showConditionalShare = useFeature("conditional-share");
 
   useEffect(() => {
     const code = searchParams.get("ref");
     if (code) {
       setReferralCode(code);
-      const url = `${window.location.origin}?ref=${code}`;
-      setShareUrl(url);
     }
   }, [searchParams]);
-
-  const copyToClipboard = async () => {
-    if (shareUrl) {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const shareOnTwitter = () => {
-    const text = encodeURIComponent("Rejoins-moi sur Afroé, la plateforme qui révolutionne la beauté Afro ! 💅✨");
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(shareUrl)}`, "_blank");
-  };
-
-  const shareOnWhatsApp = () => {
-    const text = encodeURIComponent(`Rejoins-moi sur Afroé ! ${shareUrl}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank");
-  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white font-sans flex items-center justify-center p-4">
@@ -62,49 +41,7 @@ function SuccessContent() {
           )}
 
           {(!showConditionalShare || referralCode) && referralCode && (
-            <>
-              <div className="bg-slate-900/60 border border-white/10 rounded-xl p-6 space-y-4">
-                <p className="text-sm text-slate-300 font-medium">Ton code de parrainage</p>
-                <div className="text-3xl font-bold text-amber-300 tracking-wider">
-                  {referralCode}
-                </div>
-
-                {shareUrl && (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={shareUrl}
-                      className="flex-1 bg-slate-800 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300"
-                    />
-                    <button
-                      onClick={copyToClipboard}
-                      className="px-4 py-2 bg-fuchsia-600 hover:bg-fuchsia-700 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      {copied ? "✓ Copié" : "Copier"}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-sm text-slate-300 font-medium">Partage sur les réseaux</p>
-                <div className="flex flex-wrap gap-3 justify-center">
-                  <button
-                    onClick={shareOnWhatsApp}
-                    className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors"
-                  >
-                    <span>📱</span> WhatsApp
-                  </button>
-                  <button
-                    onClick={shareOnTwitter}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors"
-                  >
-                    <span>🐦</span> Twitter
-                  </button>
-                </div>
-              </div>
-            </>
+            <ReferralShareCard refCode={referralCode} />
           )}
 
           <div className="pt-6 border-t border-white/10">
