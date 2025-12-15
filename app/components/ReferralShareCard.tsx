@@ -37,6 +37,12 @@ Rejoins le crew beauté Afro premium 🔥`;
     shareUrl
   )}`;
 
+  const facebookHref = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+    shareUrl
+  )}`;
+
+  const smsHref = `sms:?body=${encodeURIComponent(shareMessage)}`;
+
   function openInstagram() {
     copyAll();
     window.open("https://www.instagram.com/", "_blank");
@@ -86,6 +92,15 @@ Rejoins le crew beauté Afro premium 🔥`;
           🔵 LinkedIn
         </a>
 
+        <a
+          href={facebookHref}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-xl py-3 bg-white/10 text-center font-semibold hover:bg-white/15 transition-colors"
+        >
+          👍 Facebook
+        </a>
+
         <button
           onClick={openInstagram}
           className="rounded-xl py-3 bg-white/10 font-semibold hover:bg-white/15 transition-colors"
@@ -95,10 +110,17 @@ Rejoins le crew beauté Afro premium 🔥`;
 
         <button
           onClick={openTikTok}
-          className="rounded-xl py-3 bg-white/10 font-semibold sm:col-span-2 hover:bg-white/15 transition-colors"
+          className="rounded-xl py-3 bg-white/10 font-semibold hover:bg-white/15 transition-colors"
         >
           🎵 TikTok
         </button>
+
+        <a
+          href={smsHref}
+          className="rounded-xl py-3 bg-white/10 text-center font-semibold hover:bg-white/15 transition-colors sm:col-span-2"
+        >
+          💬 SMS
+        </a>
       </div>
 
       {/* Toast */}
