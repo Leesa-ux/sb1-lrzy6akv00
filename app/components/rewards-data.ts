@@ -1,22 +1,50 @@
 export const REWARDS = [
   {
-    emoji: "🎀",
-    title: "Étape 1 · 10 pts",
-    desc: "Tuto exclu + badge VIP, ton premier glow move (-10%).",
+    icon: "🔓",
+    tierName: "Glow Starters",
+    points: "10 pts",
+    positioning: "Victoire rapide",
+    benefits: [
+      "Badge Glow Starter ✨",
+      "Visibilité sur le classement d'attente",
+      "-10% sur ta 1ʳᵉ réservation"
+    ]
   },
   {
-    emoji: "✨",
-    title: "Étape 2 · 25 pts",
-    desc: "Service beauté gratos + accès VIP anticipé 🔥.",
+    icon: "🔓",
+    tierName: "Glow Circle",
+    points: "50 pts",
+    positioning: "Leader d'équipe",
+    benefits: [
+      "Accès VIP à la bêta",
+      "Mise en avant dans notre highlight Instagram",
+      "E-book : Secrets beauté ou business Afro",
+      "-20% sur la 1ʳᵉ réservation"
+    ]
   },
   {
-    emoji: "💎",
-    title: "Étape 3 · 50 pts",
-    desc: "Afroé Beauty Kit (80€+) + accessoires glam brandés.",
+    icon: "✨",
+    tierName: "Glow Icons",
+    points: "100 pts",
+    positioning: "Influenceur·euse de puissance",
+    benefits: [
+      "Glow Kit édition limitée",
+      "Appel 1:1 coaching ou image de marque",
+      "-30% sur la 1ʳᵉ réservation",
+      "🎟 Accès au tirage 3 500 €"
+    ]
   },
   {
-    emoji: "🏆",
-    title: "Étape 4 · 100 pts",
-    desc: "Place directe pour le Jackpot Afroé 3 500 € (seuls les vrais boss y accèdent).",
-  },
+    icon: "✨",
+    tierName: "Glow Elites",
+    points: "200 pts+",
+    positioning: "Bâtisseur·euse de plateforme",
+    benefits: [
+      "Invitation à l'événement de lancement Afroé",
+      "Mise en avant presse, blog ou podcast",
+      "Co-création d'un \"Glow Story\"",
+      "Coaching avec un·e expert·e beauté",
+      "-50% sur la 1ʳᵉ réservation"
+    ]
+  }
 ];

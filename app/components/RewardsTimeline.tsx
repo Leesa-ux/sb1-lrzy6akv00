@@ -9,11 +9,29 @@ export default function RewardsTimeline() {
         {REWARDS.map((r, idx) => (
           <div key={idx} className="relative flex flex-col items-center text-center">
             <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full border-2 border-zinc-700 bg-[#0f0f0f] text-2xl z-10">
-              {r.emoji}
+              {r.icon}
             </div>
-            <div className="mt-4 md:mt-6 rounded-2xl border border-zinc-800 bg-[#0f0f0f] p-4 w-full">
-              <h4 className="font-semibold text-base sm:text-lg">{r.title}</h4>
-              <p className="mt-2 text-sm text-zinc-200">{r.desc}</p>
+            <div className="mt-4 md:mt-6 rounded-2xl border border-zinc-800 bg-[#0f0f0f] p-5 w-full hover:border-zinc-700 transition-colors">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="text-2xl md:hidden">{r.icon}</span>
+                <div className="text-center">
+                  <h4 className="font-bold text-base sm:text-lg text-white">{r.tierName}</h4>
+                  <p className="text-xs text-zinc-400 font-medium">{r.points}</p>
+                </div>
+              </div>
+
+              <div className="mb-4 pb-3 border-b border-zinc-800">
+                <p className="text-sm font-medium text-[#92D14F] italic">{r.positioning}</p>
+              </div>
+
+              <ul className="space-y-2 text-left">
+                {r.benefits.map((benefit, bidx) => (
+                  <li key={bidx} className="flex items-start gap-2 text-sm text-zinc-200">
+                    <span className="text-[#8E58C7] mt-0.5 flex-shrink-0">•</span>
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         ))}
