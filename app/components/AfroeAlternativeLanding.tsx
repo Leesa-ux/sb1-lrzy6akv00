@@ -352,7 +352,7 @@ function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
           medal="🥉"
           name="Glow Starters"
           points="10 pts"
-          context="Pour tes 3 premiers parrainages"
+          context="Pour tes 5 premiers parrainages"
           benefits={[
             "Badge Glow Starter officiel",
             "Mise en avant sur le classement",

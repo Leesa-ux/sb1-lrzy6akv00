@@ -540,7 +540,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
           <div className="grid gap-6 md:grid-cols-3 mb-8">
             <div className="glassy rounded-2xl p-6 border-2 border-emerald-500/30">
               <h3 className="text-xl font-bold mb-2 text-emerald-300">Glow Starters — 10 pts</h3>
-              <p className="text-slate-200/90 mb-4 text-sm">Pour tes 3 premiers parrainages.</p>
+              <p className="text-slate-200/90 mb-4 text-sm">Pour tes 5 premiers parrainages.</p>
               <ul className="space-y-2 text-sm text-slate-200/90">
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-400">✓</span> Badge Glow Starter officiel
