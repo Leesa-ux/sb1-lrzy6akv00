@@ -138,6 +138,179 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* LocalBusiness Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "@id": "https://afroe.com/#localbusiness",
+              name: "Afroé",
+              description:
+                "Plateforme beauté-tech qui connecte les meilleurs professionnels de la beauté Afro avec des clients en Belgique et en Europe. Services à domicile : coiffure afro, maquillage, barbe, soins, ongles.",
+              url: "https://afroe.com",
+              logo: "https://afroe.com/images/afroe-logo.jpg",
+              image: "https://afroe.com/images/afroe-logo.jpg",
+              priceRange: "€€",
+              areaServed: [
+                {
+                  "@type": "Country",
+                  name: "Belgium",
+                },
+                {
+                  "@type": "Country",
+                  name: "France",
+                },
+              ],
+              serviceType: [
+                "Coiffure Afro",
+                "Maquillage",
+                "Soins de la barbe",
+                "Esthétique",
+                "Manucure et pédicure",
+              ],
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Services de beauté Afro",
+                itemListElement: [
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Coiffure Afro à domicile",
+                      description:
+                        "Services de coiffure professionnelle pour cheveux afro et texturés, réalisés à domicile par des experts.",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Maquillage professionnel",
+                      description:
+                        "Services de maquillage adaptés aux peaux noires et métisses, à domicile.",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Soins de la barbe",
+                      description:
+                        "Taille, entretien et soins de la barbe par des barbiers professionnels.",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Soins esthétiques",
+                      description:
+                        "Soins du visage et du corps adaptés aux peaux noires et métisses.",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Manucure et pédicure",
+                      description: "Services de soins des ongles à domicile.",
+                    },
+                  },
+                ],
+              },
+            }),
+          }}
+        />
+
+        {/* FAQPage Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "Où trouver un coiffeur afro en Belgique ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Afroé est la plateforme beauté-tech qui connecte les meilleurs coiffeurs afro en Belgique avec des clients. Nos professionnels se déplacent à domicile pour offrir des services de coiffure afro premium adaptés à tous les types de cheveux texturés. Inscrivez-vous sur notre liste d'attente pour être parmi les premiers à réserver.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Quels services afro sont disponibles à domicile ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Afroé propose une gamme complète de services beauté afro à domicile : coiffure afro (tresses, locks, défrisage, soins capillaires), maquillage professionnel adapté aux peaux noires et métisses, soins de la barbe, soins esthétiques du visage et du corps, ainsi que manucure et pédicure. Tous nos professionnels sont qualifiés et spécialisés dans la beauté afro-européenne.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Comment participer à la communauté Afro en Belgique ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rejoignez la communauté Afroé en vous inscrivant sur notre liste d'attente. Vous pourrez participer à des événements beauté exclusifs, découvrir les meilleurs professionnels de beauté afro en Belgique, et bénéficier d'un programme de parrainage avec des récompenses. Afroé valorise et célèbre la diversité de la beauté afro-européenne tout en créant un réseau professionnel et communautaire fort.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Pourquoi choisir Afroé pour mes besoins en beauté afro ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Afroé est la première plateforme beauté-tech spécialisée en beauté afro en Europe. Nous garantissons des professionnels qualifiés qui comprennent les spécificités des cheveux et peaux afro, des services premium à domicile pour votre confort, une approche éco-responsable, et un engagement fort envers la communauté afro-européenne. Réservez facilement en ligne et profitez d'une expérience beauté exceptionnelle.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Comment devenir professionnel partenaire sur Afroé ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Si vous êtes coiffeur, maquilleur, barbier, esthéticien ou spécialiste des ongles avec une expertise en beauté afro, vous pouvez rejoindre la communauté Afroé. Inscrivez-vous sur notre plateforme pour valoriser votre talent, gérer votre planning en toute autonomie, et développer votre clientèle. Afroé vous offre les outils pour réussir en tant que professionnel indépendant.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+
+        {/* Event Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Event",
+              "@id": "https://afroe.com/#launch-event",
+              name: "Lancement officiel d'Afroé - Plateforme beauté-tech afro-européenne",
+              description:
+                "Rejoignez-nous pour le lancement de la première plateforme beauté-tech dédiée à la communauté afro-européenne. Découvrez nos services, rencontrez des professionnels de la beauté afro, et participez à des démonstrations exclusives.",
+              eventStatus: "https://schema.org/EventScheduled",
+              eventAttendanceMode: "https://schema.org/MixedEventAttendanceMode",
+              location: {
+                "@type": "VirtualLocation",
+                url: "https://afroe.com",
+              },
+              organizer: {
+                "@type": "Organization",
+                name: "Afroé",
+                url: "https://afroe.com",
+              },
+              offers: {
+                "@type": "Offer",
+                url: "https://afroe.com/waitlist",
+                price: "0",
+                priceCurrency: "EUR",
+                availability: "https://schema.org/InStock",
+                validFrom: "2024-01-01",
+              },
+            }),
+          }}
+        />
       </head>
 
       <body className={`${inter.variable} font-sans antialiased`}>
