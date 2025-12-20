@@ -60,7 +60,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     }
 
     if (!formData.consent) {
-      setError('Vous devez accepter la politique de confidentialité pour continuer.');
+      setError('Veuillez accepter les CGU et la Politique de Confidentialité pour continuer.');
       setLoading(false);
       return;
     }
@@ -296,8 +296,28 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
             disabled={loading}
             className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
           />
-          <Label htmlFor="consent" className="text-sm text-gray-600 cursor-pointer">
-            J'accepte la politique de confidentialité d'Afroé et confirme que mes réponses sont exactes. *
+          <Label htmlFor="consent" className="text-sm text-gray-600">
+            J'accepte les{' '}
+            <a
+              href="/cgu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-700 underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Conditions Générales d'Utilisation
+            </a>
+            {' '}et la{' '}
+            <a
+              href="/confidentialite"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-700 underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Politique de Confidentialité
+            </a>
+            {' '}d'Afroé, et je confirme que les informations fournies sont exactes. *
           </Label>
         </div>
 
