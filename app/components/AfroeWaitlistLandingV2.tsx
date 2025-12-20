@@ -456,27 +456,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900/60 text-fuchsia-600 focus:ring-2 focus:ring-fuchsia-400"
                 />
                 <label htmlFor="consent-gdpr" className="text-xs text-slate-300">
-                  J'accepte les{' '}
-                  <a
-                    href="/cgu"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-fuchsia-400 hover:text-fuchsia-300 underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Conditions Générales d'Utilisation
-                  </a>
-                  {' '}et la{' '}
-                  <a
-                    href="/confidentialite"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-fuchsia-400 hover:text-fuchsia-300 underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Politique de Confidentialité
-                  </a>
-                  {' '}d'Afroé, et je confirme que les informations fournies sont exactes. *
+                  J'accepte les <a href="/cgu" target="_blank" rel="noopener noreferrer" className="text-fuchsia-400 hover:text-fuchsia-300 underline" onClick={(e) => e.stopPropagation()}>Conditions Générales d'Utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="text-fuchsia-400 hover:text-fuchsia-300 underline" onClick={(e) => e.stopPropagation()}>Politique de Confidentialité</a> d'Afroé, et je confirme que les informations fournies sont exactes. *
                 </label>
               </div>
 
