@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import HeroSectionV2 from "./HeroSectionV2";
+import { PhoneInputBelgiumDark } from "./PhoneInputBelgiumDark";
 
 function normalizeError(err: unknown): Error {
   if (err instanceof Error) return err;
@@ -327,19 +328,11 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   placeholder="Ton email"
                   className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
                 />
-                <div className="space-y-1">
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ton numéro (requis pour sécurité)"
-                    className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400 w-full"
-                  />
-                  <p className="text-xs text-slate-400 pl-1">
-                    🔒 Pour protéger le crew contre la fraude et garder le programme équitable pour les vrais boss.
-                  </p>
-                </div>
+                <PhoneInputBelgiumDark
+                  value={phone}
+                  onChange={setPhone}
+                  required={true}
+                />
               </div>
 
               {phone && (

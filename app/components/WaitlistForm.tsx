@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { PhoneInputBelgium } from '@/components/ui/phone-input-belgium';
 
 interface FormData {
   email: string;
@@ -201,19 +202,12 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
           />
         </div>
 
-        <div>
-          <Label htmlFor="phone">Téléphone *</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            required
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="+33 6 12 34 56 78"
-            disabled={loading}
-          />
-        </div>
+        <PhoneInputBelgium
+          value={formData.phone}
+          onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
+          disabled={loading}
+          required={true}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
