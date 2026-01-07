@@ -37,19 +37,21 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
             </div>
           )}
 
-          {/* Titre principal - ton street maintenu */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4">
-            Ton crew beauté Afro.{" "}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-tight">
+            Tout commence avec{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 via-violet-400 to-amber-300">
-              Pro, stylé,
-            </span>{" "}
-            chez toi.
+              Afroé.
+            </span>
+            <br />
+            Tout se confirme en beauté.
           </h1>
 
-          {/* Sous-titre - simplifié mais authentique */}
           <p className="text-base sm:text-lg md:text-xl text-slate-200/90 max-w-3xl mx-auto mb-6 leading-relaxed">
-            La beauté Afro premium, livrée à domicile ou en salon — par les meilleur·es.
-            Une app pensée pour les client·es, les beauty pros et la culture Afro européenne.
+            L'appli connecteur des soins afro-premium.
+            <br />
+            Chez toi ou en salon.
+            <br />
+            Sans compromis.
           </p>
 
           {showNewCopy && (
