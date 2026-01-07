@@ -46,12 +46,16 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
             Tout se confirme en beauté.
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl text-slate-200/90 max-w-3xl mx-auto mb-6 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-slate-200/90 max-w-3xl mx-auto mb-4 leading-relaxed">
             L'appli connecteur des soins afro-premium.
             <br />
             Chez toi ou en salon.
             <br />
             Sans compromis.
+          </p>
+
+          <p className="text-sm sm:text-base text-slate-300/80 max-w-3xl mx-auto mb-6">
+            Inscris-toi. Partage. Gagne.
           </p>
 
           {showNewCopy && (
