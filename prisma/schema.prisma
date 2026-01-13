@@ -41,7 +41,7 @@ model User {
   finalPoints       Int @default(0)
   rank              Int @default(0)
   nextMilestone     Int @default(10)
-  lastRefAt         DateTime?
+  lastRefAt         DateTime? @map("lastReferralAt")
 
   eligibleForJackpot Boolean @default(false)
   isTopRank          Boolean @default(false)

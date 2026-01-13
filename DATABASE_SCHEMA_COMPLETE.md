@@ -483,13 +483,13 @@ $$;
 
 ---
 
-## G) REFERENCED-ONLY FIELDS (INCONSISTENCIES)
+## G) FIELD MAPPINGS
 
-### Field Name Mismatch: `lastRefAt` vs `lastReferralAt`
+### Field Name Mapping: `lastRefAt` → `lastReferralAt`
 
 **Prisma Schema (schema.prisma:44):**
 ```prisma
-lastRefAt DateTime?
+lastRefAt DateTime? @map("lastReferralAt")
 ```
 
 **Migration SQL (20251128203420_complete_user_schema.sql:163):**
@@ -497,10 +497,10 @@ lastRefAt DateTime?
 ALTER TABLE "User" ADD COLUMN "lastReferralAt" TIMESTAMPTZ;
 ```
 
-**Status:** ⚠️ **INCONSISTENCY DETECTED**
-- Prisma expects: `lastRefAt`
-- Database has: `lastReferralAt`
-- **Resolution needed:** Either rename DB column or update Prisma schema
+**Status:** ✅ **RESOLVED**
+- Prisma field: `lastRefAt` (code-level)
+- Database column: `lastReferralAt` (DB-level)
+- Mapping: `@map("lastReferralAt")` directive connects them
 
 **Used in:**
 - `lib/referrals.ts` - Updates timestamp on referral
@@ -657,8 +657,8 @@ CREATE POLICY "service_full" ON "ReferralEvent" FOR ALL TO service_role USING (t
 
 ## K) SCHEMA HEALTH WARNINGS
 
-1. ⚠️ **FIELD NAME MISMATCH**: `lastRefAt` (Prisma) vs `lastReferralAt` (DB)
-2. ⚠️ **INCONSISTENT FK TARGET**: Some migrations reference `auth.users`, others reference `User` table
+1. ✓ **FIELD NAME MAPPING RESOLVED**: `lastRefAt` (Prisma) correctly maps to `lastReferralAt` (DB) via `@map` directive
+2. ⚠️ **INCONSISTENT FK TARGET**: Some migrations reference `auth.users`, others reference `User` table (resolved in later migrations)
 3. ✓ **RLS SECURE**: All tables have proper RLS with service role access
 4. ✓ **INDEXES COMPLETE**: All foreign keys have covering indexes
 5. ✓ **NO CASCADE DELETES ON USER DATA**: Referral events cascade appropriately
