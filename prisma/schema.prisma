@@ -25,6 +25,10 @@ model User {
   fraudScore        Int      @default(0)
   skillAnswerCorrect Boolean @default(false)
 
+  consentGdpr Boolean   @default(false)
+  consentSms  Boolean   @default(true)
+  consentAt   DateTime?
+
   waitlistClients      Int @default(0)
   waitlistInfluencers  Int @default(0)
   waitlistPros         Int @default(0)

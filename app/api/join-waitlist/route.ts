@@ -21,12 +21,14 @@ interface JoinWaitlistBody {
   role: 'client' | 'influencer' | 'beautypro';
   referral_code?: string;
   skillAnswerCorrect?: boolean;
+  consentGdpr?: boolean;
+  consentSms?: boolean;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: JoinWaitlistBody = await request.json();
-    const { email, phone, first_name, last_name, city, role, referral_code, skillAnswerCorrect } = body;
+    const { email, phone, first_name, last_name, city, role, referral_code, skillAnswerCorrect, consentGdpr, consentSms } = body;
 
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
@@ -154,6 +156,9 @@ export async function POST(request: NextRequest) {
         isTopRank: false,
         points: earlyBirdBonus,
         skillAnswerCorrect: skillAnswerCorrect === true,
+        consentGdpr: consentGdpr === true,
+        consentSms: consentSms !== false,
+        consentAt: (consentGdpr === true || consentSms !== undefined) ? new Date() : undefined,
         createdAt: new Date(),
         updatedAt: new Date()
       }
