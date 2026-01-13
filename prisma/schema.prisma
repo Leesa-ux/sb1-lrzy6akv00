@@ -70,6 +70,7 @@ model ReferralEvent {
   actorL2Id      String?  @map("actorL2Id")
   roleAtSignup   String?
   pointsAwarded  Int      @default(0)
+  idempotencyKey String   @unique
   createdAt      DateTime @default(now())
 
   actor1 User  @relation("Referrer", fields: [actorL1Id], references: [id], onDelete: Cascade)

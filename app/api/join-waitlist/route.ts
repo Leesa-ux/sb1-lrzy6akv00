@@ -205,6 +205,8 @@ export async function POST(request: NextRequest) {
         }
       });
 
+      const idempotencyKey = `${referrer.id}_${newUser.id}_waitlist_signup`;
+
       await prisma.referralEvent.create({
         data: {
           id: `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -213,6 +215,7 @@ export async function POST(request: NextRequest) {
           type: 'waitlist_signup',
           roleAtSignup: role,
           pointsAwarded: pointsAwarded,
+          idempotencyKey: idempotencyKey,
           createdAt: new Date()
         }
       });
