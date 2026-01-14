@@ -489,7 +489,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                 <li className="flex items-start gap-3">
                   <span className="text-2xl">✨</span>
                   <div>
-                    <span className="font-semibold">Cliente</span> : +5 pts (inscription waitlist)
+                    <span className="font-semibold">Client.e</span> : +5 pts (inscription waitlist)
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -513,7 +513,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                 <li className="flex items-start gap-3">
                   <span className="text-2xl">✨</span>
                   <div>
-                    <span className="font-semibold">Cliente</span> : +10 pts (téléchargement app)
+                    <span className="font-semibold">Client.e</span> : +10 pts (téléchargement app)
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
