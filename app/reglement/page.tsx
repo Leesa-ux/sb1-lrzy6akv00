@@ -98,7 +98,7 @@ export default function ReglementPage() {
               <ul className="list-disc list-inside space-y-2">
                 <li>Seuls les participants ayant ≥ 100 points provisoires valides participent</li>
                 <li>Le tirage sera effectué via un générateur aléatoire certifié</li>
-                <li>Le gagnant sera contacté par email et SMS dans les 7 jours suivant le tirage</li>
+                <li>Le gagnant sera contacté par email et SMS dans les 30 jours suivant le tirage</li>
                 <li>En cas de non-réponse sous 15 jours, un nouveau tirage sera effectué</li>
               </ul>
             </section>
