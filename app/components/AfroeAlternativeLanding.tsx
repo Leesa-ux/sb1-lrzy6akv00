@@ -356,7 +356,7 @@ function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
           benefits={[
             "Badge Glow Starter officiel",
             "Mise en avant sur le classement",
-            "-10% sur ta 1ère réservation"
+            "-20% sur ta 1ère réservation"
           ]}
           tagline="Crédibilité instantanée. Gain rapide. 🎯"
           borderColor="border-amber-300/20"
@@ -369,7 +369,7 @@ function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
           context="Rassemble ton équipe — 15+ parrainages"
           benefits={[
             "Accès anticipé VIP à la bêta d'Afroé",
-            "Shoutout IG dans 'Glow Ambassadors'",
+            "Beauty e-book 1",
             "Invitation au Glow Circle privé",
             "-20% sur ta 1ère réservation"
           ]}
@@ -394,7 +394,7 @@ function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
           context="Pour les glow-getters sérieux"
           benefits={[
             "Glow Kit édition limitée",
-            "Session stratégie 1-on-1",
+            "Beauty e-book 2",
             "-20% sur ta 1ère réservation"
           ]}
           tagline="Visibilité premium + support pour élever ta marque personnelle."
@@ -411,7 +411,7 @@ function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
             {
               title: "Ton choix de session",
               items: [
-                "Session stratégie 1-on-1 OU",
+                "Beauty e-book 2 OU",
                 "Consultation Personal Brand (1h)"
               ]
             }

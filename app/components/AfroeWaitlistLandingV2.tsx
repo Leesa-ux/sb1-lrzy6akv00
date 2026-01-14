@@ -549,7 +549,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   <span className="text-emerald-400">✓</span> Mise en avant sur le classement
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-400">✓</span> -10% sur ta 1ère réservation
+                  <span className="text-emerald-400">✓</span> -20% sur ta 1ère réservation
                 </li>
               </ul>
             </div>
@@ -562,7 +562,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   <span className="text-sky-400">✓</span> Accès VIP à la bêta Afroé
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-sky-400">✓</span> Shoutout IG dans "Glow Ambassadors"
+                  <span className="text-sky-400">✓</span> Beauty e-book 1
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-sky-400">✓</span> -20% sur ta 1ère réservation
@@ -578,7 +578,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   <span className="text-violet-400">✓</span> Glow Kit édition limitée
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-violet-400">✓</span> Session stratégie 1-on-1
+                  <span className="text-violet-400">✓</span> Beauty e-book 2
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-violet-400">✓</span> -20% sur ta 1ère réservation
