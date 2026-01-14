@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { Copy, Check } from "lucide-react";
+import PostSignupShareBar from "@/components/PostSignupShareBar";
 
 interface GlowListSuccessScreenProps {
   referralCode: string;
@@ -12,17 +13,12 @@ export default function GlowListSuccessScreen({
   referralCode,
   firstName,
 }: GlowListSuccessScreenProps) {
-  const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
   const shareUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
     return `${window.location.origin}/?ref=${referralCode}`;
   }, [referralCode]);
-
-  const shareMessage = useMemo(() => {
-    return `✨ Rejoins Afroé, la plateforme beauté afro qui change tout ! ${shareUrl}`;
-  }, [shareUrl]);
 
   async function copyLink() {
     try {
@@ -34,52 +30,9 @@ export default function GlowListSuccessScreen({
     }
   }
 
-  async function copyFallback() {
-    try {
-      await navigator.clipboard.writeText(shareMessage);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Erreur copie:", err);
-    }
-  }
-
-  function shareWhatsApp() {
-    const url = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
-    window.open(url, "_blank");
-  }
-
-  function shareInstagram() {
-    copyLink();
-    window.open("https://www.instagram.com/", "_blank");
-  }
-
-  function shareTikTok() {
-    copyLink();
-    window.open("https://www.tiktok.com/upload", "_blank");
-  }
-
-  function shareSnapchat() {
-    copyLink();
-    window.open("https://www.snapchat.com/", "_blank");
-  }
-
-  function shareLinkedIn() {
-    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-      shareUrl
-    )}`;
-    window.open(url, "_blank");
-  }
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-3">
-          <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-            🚀 Partage ton lien & grimpe dans le classement
-          </h1>
-        </div>
-
+      <div className="w-full max-w-2xl space-y-6">
         <div className="glassy neon-fuchsia rounded-2xl p-6 space-y-6">
           <div className="text-center space-y-2">
             <div className="text-4xl">🎉</div>
@@ -102,6 +55,7 @@ export default function GlowListSuccessScreen({
               <button
                 onClick={copyLink}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
+                aria-label="Copier le lien de parrainage"
               >
                 {linkCopied ? (
                   <>
@@ -118,75 +72,14 @@ export default function GlowListSuccessScreen({
             </div>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-base font-semibold text-center">
-              ⚡ Partage en 1 clic
-            </h3>
-
-            <div className="space-y-2">
-              <button
-                onClick={shareWhatsApp}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-              >
-                <span className="text-xl">🟢</span>
-                Partager sur WhatsApp
-              </button>
-
-              <button
-                onClick={shareInstagram}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:brightness-110 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-              >
-                <span className="text-xl">📸</span>
-                Partager en story Instagram
-              </button>
-
-              <button
-                onClick={shareTikTok}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-black via-cyan-500 to-pink-500 hover:brightness-110 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-              >
-                <span className="text-xl">🎵</span>
-                Partager sur TikTok
-              </button>
-
-              <button
-                onClick={shareSnapchat}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-500 hover:to-yellow-400 text-black font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-              >
-                <span className="text-xl">👻</span>
-                Partager sur Snapchat
-              </button>
-
-              <button
-                onClick={shareLinkedIn}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-              >
-                <span className="text-xl">💼</span>
-                Partager sur LinkedIn
-              </button>
-
-              <button
-                onClick={copyFallback}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-5 h-5" />
-                    Message copié !
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-5 h-5" />
-                    Copier mon lien
-                  </>
-                )}
-              </button>
-            </div>
-
-            <p className="text-xs text-center text-slate-400 pt-2">
-              Chaque partage te rapporte des points.
-              <br />
-              Plus tu partages, plus tu te rapproches des récompenses.
-            </p>
+          <div className="border-t border-slate-700/50 pt-6">
+            <PostSignupShareBar
+              referralLink={shareUrl}
+              onCopied={() => {
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
+            />
           </div>
 
           <div className="bg-gradient-to-br from-fuchsia-900/30 to-amber-900/30 border border-fuchsia-400/20 rounded-xl p-4 space-y-3">
