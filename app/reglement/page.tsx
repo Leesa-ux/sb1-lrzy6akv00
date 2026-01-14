@@ -59,6 +59,7 @@ export default function ReglementPage() {
                   <h3 className="text-xl font-bold mb-2 text-blue-300">🎁 Autres récompenses</h3>
                   <ul className="list-disc list-inside space-y-1 text-sm">
                     <li>Glow Kits exclusifs (selon milestones)</li>
+                    <li>2 e-books Beauté (selon milestones)</li>
                     <li>Accès VIP à l'app Afroé</li>
                     <li>Réductions et avantages réservés aux membres de la waitlist</li>
                   </ul>
