@@ -68,16 +68,35 @@ export default function ReglementPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">4. Système de points</h2>
-              <ul className="list-disc list-inside space-y-2">
-                <li><strong>+50 points</strong> : bonus early bird (100 premiers inscrits)</li>
-                <li><strong>+2 points</strong> : par client invité via votre lien</li>
-                <li><strong>+15 points</strong> : par influenceur invité</li>
-                <li><strong>+25 points</strong> : par beauty pro invité</li>
-              </ul>
-              <p className="mt-4 text-sm text-slate-400">
-                Les points provisoires sont attribués automatiquement. Les points finaux seront calculés après validation manuelle et contrôle anti-fraude.
-              </p>
+              <h2 className="text-2xl font-bold mb-4 text-white">4. Système de points (version propre et complète)</h2>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 text-blue-300">Avant le lancement (phase waitlist — points provisoires)</h3>
+                  <ul className="list-disc list-inside space-y-2">
+                    <li><strong>+50 points</strong> : bonus Early Bird (100 premiers inscrits)</li>
+                    <li><strong>+5 points</strong> : par Client.e inscrit(e) sur la waitlist via votre lien</li>
+                    <li><strong>+15 points</strong> : par Influenceur·euse (&gt; 2 000 followers) inscrit(e) via votre lien</li>
+                    <li><strong>+25 points</strong> : par Beauty Pro inscrit(e) sur la waitlist via votre lien</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 text-fuchsia-300">Après le lancement (app live — points finaux)</h3>
+                  <ul className="list-disc list-inside space-y-2">
+                    <li><strong>+10 points</strong> : par Client.e qui télécharge l'app via votre lien</li>
+                    <li><strong>+50 points</strong> : par Influenceur·euse (&gt; 2 000 followers) validé(e) après contrôle</li>
+                    <li><strong>+100 points</strong> : par Beauty Pro dont l'inscription est validée après contrôle</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 text-amber-300">Règles de calcul & validation</h3>
+                  <p className="text-slate-200/90 leading-relaxed">
+                    Les points provisoires sont attribués automatiquement pendant la phase waitlist. Les points finaux sont calculés après validation (contrôle anti-fraude et vérifications). Afroé se réserve le droit d'annuler des points ou d'exclure des participations frauduleuses.
+                  </p>
+                </div>
+              </div>
             </section>
 
             <section>

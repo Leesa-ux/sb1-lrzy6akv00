@@ -153,7 +153,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
               <strong>Partage ce lien</strong> avec tes amis pour gagner des points:
             </p>
             <ul className="text-left list-disc list-inside space-y-1">
-              <li>Client: +2 points</li>
+              <li>Client: +5 points</li>
               <li>Influenceur: +15 points</li>
               <li>Beauty Pro: +25 points</li>
             </ul>
