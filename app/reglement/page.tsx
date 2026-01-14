@@ -117,7 +117,7 @@ export default function ReglementPage() {
               <h2 className="text-2xl font-bold mb-4 text-white">8. Données personnelles</h2>
               <p className="leading-relaxed">
                 Les données collectées (nom, email, téléphone) sont utilisées uniquement dans le cadre du concours et de la communication autour d'Afroé.
-                Elles sont traitées conformément au RGPD. Les participants peuvent demander la suppression de leurs données à tout moment en contactant <strong>contact@afroe.com</strong>.
+                Elles sont traitées conformément au RGPD. Les participants peuvent demander la suppression de leurs données à tout moment en contactant <strong>contact@afroe.studio</strong>.
               </p>
             </section>
 
@@ -135,7 +135,7 @@ export default function ReglementPage() {
                 Pour toute question concernant le règlement ou le concours, contactez-nous :
               </p>
               <p className="mt-2">
-                <strong>Email :</strong> <a href="mailto:contact@afroe.com" className="text-fuchsia-400 hover:underline">contact@afroe.com</a>
+                <strong>Email :</strong> <a href="mailto:contact@afroe.studio" className="text-fuchsia-400 hover:underline">contact@afroe.studio</a>
               </p>
             </section>
 
