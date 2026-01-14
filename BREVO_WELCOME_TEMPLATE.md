@@ -49,11 +49,11 @@ Le template reçoit automatiquement ces variables :
   <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0;">
     <p style="font-size: 16px; margin: 0 0 12px 0;">🎯 <strong>En tant que cliente</strong> :</p>
     <ul style="margin: 0; line-height: 1.8;">
-      <li><strong>+2 pts</strong> pour chaque ami·e qui s'inscrit via ton lien <strong>avant le lancement</strong></li>
+      <li><strong>+5 pts</strong> pour chaque ami·e qui s'inscrit via ton lien <strong>avant le lancement</strong></li>
       <li>À partir de l'app : <strong>+10 pts</strong> par téléchargement + compte utilisé</li>
     </ul>
     <p style="margin: 12px 0 0 0;">
-      💡 <strong>Objectif rapide</strong> : vise 10 pts (5 ami·e·s) pour débloquer le badge Glow Starter et <strong>-10% sur ta 1ère réservation</strong>.
+      💡 <strong>Objectif rapide</strong> : vise 10 pts (2 parrainages validés) pour débloquer le badge Glow Starter et <strong>-10% sur ta 1ère réservation</strong>.
     </p>
   </div>
 
@@ -122,7 +122,7 @@ Le template reçoit automatiquement ces variables :
 ## Résumé des Points par Rôle
 
 ### Avant le lancement (Waitlist)
-- **Client** : +2 pts par inscription
+- **Client** : +5 pts par inscription
 - **Influenceur** : +15 pts par inscription
 - **Beauty Pro** : +25 pts par inscription
 

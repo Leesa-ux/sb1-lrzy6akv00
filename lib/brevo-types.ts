@@ -59,7 +59,7 @@ export const EMAIL_TEMPLATE_IDS = {
 
 export const POINT_RULES = {
   PRE_LAUNCH: {
-    client: 2,
+    client: 5,
     influencer: 15,
     pro: 25,
   },

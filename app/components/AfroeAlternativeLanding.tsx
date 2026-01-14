@@ -1333,7 +1333,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                     <ul className="mt-1 text-[11px] text-slate-300 space-y-1 list-disc list-inside">
                       <li>Partage ton lien unique.</li>
                       <li className="font-bold italic ml-3">Avant le lancement :</li>
-                      <li className="ml-6">+2 pts pour un·e client·e</li>
+                      <li className="ml-6">+5 pts pour un·e client·e</li>
                       <li className="ml-6">+15 pts pour un·e influenceur·euse</li>
                       <li className="ml-6">+25 pts pour un·e Beauty Pro</li>
                       <li className="font-bold italic ml-3">Après le lancement :</li>

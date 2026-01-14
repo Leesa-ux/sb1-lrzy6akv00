@@ -5,6 +5,7 @@ export const REWARDS_CONFIG = {
     {
       name: 'Glow Starters',
       points: 10,
+      condition: '2 parrainages validés',
       perks: [
         'Badge Glow Starter officiel',
         'Mise en avant dans le classement waitlist',

@@ -7,7 +7,7 @@
  * POINTS SYSTEM:
  *
  * BEFORE LAUNCH (Waitlist Phase):
- * - Client           → +2 pts  (inscription waitlist via referral)
+ * - Client           → +5 pts  (inscription waitlist via referral)
  * - Influencer       → +15 pts (inscription waitlist, ≥ 2k followers)
  * - Beauty Pro       → +25 pts (inscription waitlist)
  *
@@ -45,7 +45,7 @@ export interface UserPointsData {
  *
  * Formula:
  *   provisionalPoints =
- *     (waitlistClients * 2) +
+ *     (waitlistClients * 5) +
  *     (waitlistInfluencers * 15) +
  *     (waitlistPros * 25) +
  *     earlyBirdBonus
@@ -54,7 +54,7 @@ export interface UserPointsData {
  * @returns Provisional points for pre-launch phase
  */
 export function calculateProvisionalPoints(user: UserPointsData): number {
-  const clientPoints = user.waitlistClients * 2;
+  const clientPoints = user.waitlistClients * 5;
   const influencerPoints = user.waitlistInfluencers * 15;
   const proPoints = user.waitlistPros * 25;
   const bonus = user.earlyBirdBonus;
@@ -88,7 +88,7 @@ export function calculateFinalPoints(user: UserPointsData): number {
 /**
  * Get the next milestone threshold for a given points total.
  * Milestones correspond to reward tiers:
- * - 10 pts  → Glow Starters
+ * - 10 pts  → Glow Starters (2 parrainages validés)
  * - 50 pts  → Glow Circle Insiders
  * - 100 pts → Glow Icons
  * - 200 pts → Glow Elites (secret tier)
@@ -178,7 +178,7 @@ export function getTierByPoints(points: number): { name: string; tier: number } 
 export const POINTS_CONFIG = {
   // Pre-launch (waitlist) points
   WAITLIST: {
-    CLIENT: 2,
+    CLIENT: 5,
     INFLUENCER: 15,
     BEAUTY_PRO: 25,
   },

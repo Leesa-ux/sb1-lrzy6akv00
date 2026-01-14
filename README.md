@@ -7,7 +7,7 @@ Advanced waitlist landing page with multi-tier referral system, fraud detection,
 Afroé is a beauty services marketplace connecting clients with beauty professionals and influencers. This waitlist platform manages pre-launch signups with a gamified referral system featuring:
 
 - **Multi-tier referral tracking** (2-level deep)
-- **Role-based point system** (Client: 5pts, Influencer: 10pts, Beauty Pro: 15pts)
+- **Role-based point system** (Client: 5pts waitlist / 10pts app, Influencer: 15pts / 50pts, Beauty Pro: 25pts / 100pts)
 - **Dual-phase scoring** (provisional points during waitlist + final points at launch)
 - **Early-bird rewards** (first 100 signups get bonus points)
 - **Prize eligibility** (iPhone 17 Pro for rank 1, €3,500 jackpot for 100+ points)
@@ -44,8 +44,8 @@ Afroé is a beauty services marketplace connecting clients with beauty professio
 ### Points System
 
 **Referral Points (Dual-phase)**
-- Level 1 referrals: 5pts (client), 10pts (influencer), 15pts (beauty pro)
-- Level 2 referrals: 2pts (client), 4pts (influencer), 6pts (beauty pro)
+- Pre-launch (waitlist): 5pts (client), 15pts (influencer), 25pts (beauty pro)
+- Post-launch (app): 10pts (client), 50pts (influencer), 100pts (beauty pro)
 - Early-bird bonus: 50pts (first 100 signups)
 
 **Provisional vs Final Points**

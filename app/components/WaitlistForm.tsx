@@ -262,7 +262,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
             disabled={loading}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option value="client">Client (2 pts/referral)</option>
+            <option value="client">Client (5 pts/referral)</option>
             <option value="influencer">Influenceur (15 pts/referral)</option>
             <option value="beautypro">Beauty Pro (25 pts/referral)</option>
           </select>
