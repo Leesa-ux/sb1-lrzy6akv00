@@ -32,9 +32,9 @@ export default function ReglementPage() {
             <section>
               <h2 className="text-2xl font-bold mb-4 text-white">2. Dates et durée</h2>
               <ul className="list-disc list-inside space-y-2">
-                <li>Date de début : <span className="font-semibold">1er novembre 2024</span></li>
-                <li>Date de fin : <span className="font-semibold">15 décembre 2025 à 23h59 (CET)</span></li>
-                <li>Tirage au sort : dans les 7 jours suivant la clôture</li>
+                <li>Date de début : <span className="font-semibold">15 janvier 2026</span></li>
+                <li>Date de fin : <span className="font-semibold">1 mars 2026 à 23h59 (CET)</span></li>
+                <li>Tirage au sort : dans les 30 jours suivant la clôture</li>
               </ul>
             </section>
 
