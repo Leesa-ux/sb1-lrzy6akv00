@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
+export const dynamic = 'force-dynamic';
+
 const EARLY_BIRD_LIMIT = 100;
 
 export async function GET(req: NextRequest) {
