@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { db as prisma } from '@/lib/db';
 import { validateEmail, validatePhone, sanitizeEmail, sanitizePhone, sanitizeText } from '@/lib/validation';
 import { getClientIp } from '@/lib/get-client-ip';
 import { POINTS_CONFIG, calculateProvisionalPoints } from '@/lib/points';
@@ -9,8 +9,6 @@ import {
   sendBeautyProWelcomeEmail,
 } from '@/lib/brevo-welcome';
 import { ensureUniqueReferralCode, isValidReferralCode } from '@/lib/referral-code';
-
-const prisma = new PrismaClient();
 
 interface JoinWaitlistBody {
   email: string;
@@ -27,6 +25,18 @@ interface JoinWaitlistBody {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('[YOUR-PASSWORD]')) {
+      console.error('[join-waitlist] DATABASE_URL is not configured properly');
+      console.error('[join-waitlist] Current DATABASE_URL:', process.env.DATABASE_URL?.substring(0, 50) + '...');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Configuration de la base de données manquante. Veuillez contacter l\'administrateur.'
+        },
+        { status: 500 }
+      );
+    }
+
     const body: JoinWaitlistBody = await request.json();
     const { email, phone, first_name, last_name, city, role, referral_code, skillAnswerCorrect, consentGdpr, consentSms } = body;
 
@@ -282,15 +292,31 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[join-waitlist] Error:', error);
 
+    if (error instanceof Error) {
+      console.error('[join-waitlist] Error name:', error.name);
+      console.error('[join-waitlist] Error message:', error.message);
+      console.error('[join-waitlist] Error stack:', error.stack);
+    }
+
+    const isDatabaseError = error instanceof Error && (
+      error.message.includes('database') ||
+      error.message.includes('Prisma') ||
+      error.message.includes('authentication') ||
+      error.message.includes('connection')
+    );
+
+    if (isDatabaseError) {
+      console.error('[join-waitlist] DATABASE CONNECTION ERROR - Check DATABASE_URL in .env');
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Erreur lors de l\'inscription'
+        error: error instanceof Error ? error.message : 'Erreur lors de l\'inscription',
+        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

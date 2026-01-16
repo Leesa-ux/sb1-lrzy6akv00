@@ -9,7 +9,8 @@
     "lint": "next lint",
     "postinstall": "prisma generate",
     "launch:sms": "tsx scripts/send-launch-sms.ts",
-    "import:leaderboard": "tsx scripts/importLeaderboard.ts"
+    "import:leaderboard": "tsx scripts/importLeaderboard.ts",
+    "test:db": "tsx scripts/test-db-connection.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db as prisma } from '@/lib/db';
 
 interface LeaderboardEntry {
   rank: number;
@@ -73,6 +71,14 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[leaderboard] Error:', error);
 
+    if (error instanceof Error) {
+      console.error('[leaderboard] Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
+
     return NextResponse.json(
       {
         success: false,
@@ -80,7 +86,5 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
