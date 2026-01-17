@@ -328,11 +328,16 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   placeholder="Ton email"
                   className="bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
                 />
-                <PhoneInputBelgiumDark
-                  value={phone}
-                  onChange={setPhone}
-                  required={true}
-                />
+                <div>
+                  <label htmlFor="phone" className="text-sm font-medium text-slate-300 mb-1.5 block">
+                    Ton téléphone <span className="text-rose-400">*</span>
+                  </label>
+                  <PhoneInputBelgiumDark
+                    value={phone}
+                    onChange={setPhone}
+                    required={true}
+                  />
+                </div>
               </div>
 
               {phone && (

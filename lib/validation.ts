@@ -26,20 +26,30 @@ export function validateEmail(email: string): ValidationResult {
 
 export function validatePhone(phone: string): ValidationResult {
   const cleaned = phone.replace(/[^\d+]/g, '');
-  
+
   if (!cleaned) {
     return { isValid: false, error: 'Téléphone requis' };
   }
-  
-  if (cleaned.length < 8 || cleaned.length > 16) {
-    return { isValid: false, error: 'Téléphone doit contenir 8-16 chiffres' };
+
+  if (!cleaned.startsWith('+32')) {
+    return { isValid: false, error: 'Numéro invalide. Exemple : +32 471 12 34 56' };
   }
-  
-  const phoneRegex = /^\+?[1-9]\d{7,14}$/;
-  if (!phoneRegex.test(cleaned)) {
-    return { isValid: false, error: 'Format téléphone invalide' };
+
+  const digitsAfterPrefix = cleaned.substring(3);
+
+  if (!digitsAfterPrefix.startsWith('4')) {
+    return { isValid: false, error: 'Numéro invalide. Exemple : +32 471 12 34 56' };
   }
-  
+
+  if (digitsAfterPrefix.length !== 9) {
+    return { isValid: false, error: 'Numéro invalide. Exemple : +32 471 12 34 56' };
+  }
+
+  const belgianMobileRegex = /^\+324\d{8}$/;
+  if (!belgianMobileRegex.test(cleaned)) {
+    return { isValid: false, error: 'Numéro invalide. Exemple : +32 471 12 34 56' };
+  }
+
   return { isValid: true };
 }
 
