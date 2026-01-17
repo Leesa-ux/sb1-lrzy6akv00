@@ -269,3 +269,4 @@ Key metrics to track:
 ## License
 
 Proprietary - Afroé Platform
+Deployment trigger
