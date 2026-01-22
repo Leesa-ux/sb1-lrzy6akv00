@@ -17,6 +17,16 @@
 
 ## 🎯 System Overview
 
+
+The Afroé Waitlist Automation System manages a role-based referral contest with SMS verification, point attribution, and automated email/SMS journeys.
+
+A referral is considered **valid only when the referred person completes a waitlist signup and selects a role** (Client·e, Influenceur·euse, or Beauty Pro).
+
+No points are granted for:
+- link clicks
+- partial submissions
+- unverified phone numbers
+  
 The Afroé automation system manages the complete user journey from signup to launch, including:
 
 - **Phase 1**: Instant activation (welcome, follow-up, 48h activation)
@@ -118,17 +128,21 @@ model User {
 
 | Role | Points per Referral |
 |------|---------------------|
-| Client·e | +2 points |
-| Influenceur·euse | +15 points |
-| Pro | +25 points |
+| Client.e — +5 pts (inscription waitlist)
+
+Influenceur.euse — +15 pts (inscription)
+
+Pro — +25 pts (inscription)
 
 ### Post-Launch Points (After January 15, 2026)
 
 | Role | Points per Referral |
 |------|---------------------|
-| Client·e | +10 points |
-| Influenceur·euse | +50 points |
-| Pro | +100 points |
+| Client.e — +10 pts (téléchargement app)
+
+Influenceur.euse — +50 pts (éligible)
+
+Pro — +100 pts (validé)
 
 ### Launch Day Bonus
 
@@ -140,9 +154,9 @@ Example: A Pro referring another Pro on launch day earns **200 points** (100 x 2
 
 | Points | Badge | Benefits |
 |--------|-------|----------|
-| **10** | Glow Starter | Badge + Featured spot + -10% discount |
-| **50** | Glow Circle Insider | VIP access + IG shoutout + Private circle + -20% discount |
-| **100** | Glow Icon | Glow Kit + 1h coaching + Jackpot ticket (€3,500) + -20% discount |
+| **10** | Glow Starter | Badge + Featured spot + -20% discount |
+| **50** | Glow Circle Insider | VIP access Afroé Beta + Beauty e-book1 + -20% discount |
+| **100** | Glow Icon | Glow Kit + Beauty e-book2 + -20% discount |
 | **200** | Glow Elite | IRL event invite + Press feature + Co-creation + -50% discount |
 
 ---
