@@ -49,6 +49,18 @@ export async function POST(req: NextRequest) {
     }
 
     if (userId) {
+      const existingUser = await db.user.findUnique({
+        where: { id: userId },
+        select: { id: true, referredBy: true, phoneVerified: true, role: true }
+      });
+
+      if (!existingUser) {
+        return NextResponse.json(
+          { ok: false, error: "User not found" },
+          { status: 404 }
+        );
+      }
+
       const user = await db.user.update({
         where: { id: userId },
         data: {
@@ -58,6 +70,7 @@ export async function POST(req: NextRequest) {
       });
 
       // CRITICAL: Award referral points ONLY after phone verification
+      // IDEMPOTENCY: Create ReferralEvent FIRST before incrementing points
       if (user.referredBy && user.phoneVerified) {
         const referrer = await db.user.findUnique({
           where: { referralCode: user.referredBy }
@@ -85,34 +98,6 @@ export async function POST(req: NextRequest) {
               break;
           }
 
-          const updatedReferrer = await db.user.update({
-            where: { id: referrer.id },
-            data: {
-              refCount: { increment: 1 },
-              [counterField]: { increment: 1 },
-              lastRefAt: new Date()
-            }
-          });
-
-          const newProvisionalPoints = calculateProvisionalPoints({
-            waitlistClients: updatedReferrer.waitlistClients,
-            waitlistInfluencers: updatedReferrer.waitlistInfluencers,
-            waitlistPros: updatedReferrer.waitlistPros,
-            appDownloads: updatedReferrer.appDownloads,
-            validatedInfluencers: updatedReferrer.validatedInfluencers,
-            validatedPros: updatedReferrer.validatedPros,
-            earlyBirdBonus: updatedReferrer.earlyBirdBonus
-          });
-
-          await db.user.update({
-            where: { id: referrer.id },
-            data: {
-              provisionalPoints: newProvisionalPoints,
-              points: newProvisionalPoints
-            }
-          });
-
-          // Create referral event (with idempotency)
           const idempotencyKey = `${referrer.id}_${user.id}_waitlist_signup`;
 
           try {
@@ -129,27 +114,53 @@ export async function POST(req: NextRequest) {
               }
             });
 
+            console.log(`✅ ReferralEvent created successfully for user ${user.id}`);
+
+            const updatedReferrer = await db.user.update({
+              where: { id: referrer.id },
+              data: {
+                refCount: { increment: 1 },
+                [counterField]: { increment: 1 },
+                lastRefAt: new Date()
+              }
+            });
+
+            const newProvisionalPoints = calculateProvisionalPoints({
+              waitlistClients: updatedReferrer.waitlistClients,
+              waitlistInfluencers: updatedReferrer.waitlistInfluencers,
+              waitlistPros: updatedReferrer.waitlistPros,
+              appDownloads: updatedReferrer.appDownloads,
+              validatedInfluencers: updatedReferrer.validatedInfluencers,
+              validatedPros: updatedReferrer.validatedPros,
+              earlyBirdBonus: updatedReferrer.earlyBirdBonus
+            });
+
+            await db.user.update({
+              where: { id: referrer.id },
+              data: {
+                provisionalPoints: newProvisionalPoints,
+                points: newProvisionalPoints
+              }
+            });
+
             console.log(`✅ Referral points awarded: ${pointsAwarded} pts to ${referrer.id} for referring ${user.role} user ${user.id}`);
+
+            try {
+              const { syncUserToBrevo, checkAndSendMilestoneEmails } = await import('@/lib/automation-service');
+              await syncUserToBrevo(referrer.id);
+
+              const oldPoints = referrer.provisionalPoints;
+              await checkAndSendMilestoneEmails(referrer.id, oldPoints, newProvisionalPoints);
+            } catch (error) {
+              console.error('Error syncing to Brevo or sending milestone emails:', error);
+            }
+
           } catch (err: any) {
-            // Idempotency key violation - already processed
             if (err.code === 'P2002') {
-              console.log(`⚠️ Referral already processed: ${idempotencyKey}`);
+              console.log(`⚠️ Referral already processed (duplicate actorL2Id or idempotencyKey): ${idempotencyKey}`);
             } else {
               throw err;
             }
-          }
-
-          // Sync to Brevo with updated points
-          try {
-            const { syncUserToBrevo, checkAndSendMilestoneEmails } = await import('@/lib/automation-service');
-            await syncUserToBrevo(referrer.id);
-
-            // Check and send milestone emails/SMS if thresholds crossed
-            const oldPoints = referrer.provisionalPoints;
-            await checkAndSendMilestoneEmails(referrer.id, oldPoints, newProvisionalPoints);
-          } catch (error) {
-            console.error('Error syncing to Brevo or sending milestone emails:', error);
-            // Don't fail the verification if automation fails
           }
         }
       }
