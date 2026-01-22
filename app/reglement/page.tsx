@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { POINTS_CONFIG } from '@/lib/points';
 
 export default function ReglementPage() {
   return (
@@ -49,7 +50,7 @@ export default function ReglementPage() {
 
                 <div className="glassy neon-fuchsia rounded-xl p-4">
                   <h3 className="text-xl font-bold mb-2 text-fuchsia-300">💰 Tirage au sort pour 3 500 €</h3>
-                  <p>Tous les participants ayant <strong>≥ 100 points provisoires</strong> entrent dans le tirage au sort pour gagner 3 500 € en cash.</p>
+                  <p>Tous les participants ayant <strong>≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} points provisoires</strong> entrent dans le tirage au sort pour gagner 3 500 € en cash.</p>
                   <p className="mt-2 text-sm text-slate-300">
                     Le tirage sera effectué de manière aléatoire et équitable parmi les participants éligibles.
                   </p>
@@ -74,19 +75,19 @@ export default function ReglementPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-3 text-blue-300">Avant le lancement (phase waitlist — points provisoires)</h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li><strong>+50 points</strong> : bonus Early Bird (100 premiers inscrits)</li>
-                    <li><strong>+5 points</strong> : par Client.e inscrit(e) sur la waitlist via votre lien</li>
-                    <li><strong>+15 points</strong> : par Influenceur·euse (&gt; 2 000 followers) inscrit(e) via votre lien</li>
-                    <li><strong>+25 points</strong> : par Beauty Pro inscrit(e) sur la waitlist via votre lien</li>
+                    <li><strong>+{POINTS_CONFIG.EARLY_BIRD_BONUS} points</strong> : bonus Early Bird ({POINTS_CONFIG.EARLY_BIRD_LIMIT} premiers inscrits)</li>
+                    <li><strong>+{POINTS_CONFIG.WAITLIST.CLIENT} points</strong> : par Client.e inscrit(e) sur la waitlist via votre lien</li>
+                    <li><strong>+{POINTS_CONFIG.WAITLIST.INFLUENCER} points</strong> : par Influenceur·euse (&gt; 2 000 followers) inscrit(e) via votre lien</li>
+                    <li><strong>+{POINTS_CONFIG.WAITLIST.BEAUTY_PRO} points</strong> : par Beauty Pro inscrit(e) sur la waitlist via votre lien</li>
                   </ul>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-semibold mb-3 text-fuchsia-300">Après le lancement (app live — points finaux)</h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li><strong>+10 points</strong> : par Client.e qui télécharge l'app via votre lien</li>
-                    <li><strong>+50 points</strong> : par Influenceur·euse (&gt; 2 000 followers) validé(e) après contrôle</li>
-                    <li><strong>+100 points</strong> : par Beauty Pro dont l'inscription est validée après contrôle</li>
+                    <li><strong>+{POINTS_CONFIG.LAUNCH.APP_DOWNLOAD} points</strong> : par Client.e qui télécharge l'app via votre lien</li>
+                    <li><strong>+{POINTS_CONFIG.LAUNCH.VALIDATED_INFLUENCER} points</strong> : par Influenceur·euse (&gt; 2 000 followers) validé(e) après contrôle</li>
+                    <li><strong>+{POINTS_CONFIG.LAUNCH.VALIDATED_PRO} points</strong> : par Beauty Pro dont l'inscription est validée après contrôle</li>
                   </ul>
                 </div>
 
@@ -115,7 +116,7 @@ export default function ReglementPage() {
                 Le tirage au sort pour le prix de 3 500 € sera effectué de manière transparente et équitable :
               </p>
               <ul className="list-disc list-inside space-y-2">
-                <li>Seuls les participants ayant ≥ 100 points provisoires valides participent</li>
+                <li>Seuls les participants ayant ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} points provisoires valides participent</li>
                 <li>Le tirage sera effectué via un générateur aléatoire certifié</li>
                 <li>Le gagnant sera contacté par email et SMS dans les 30 jours suivant le tirage</li>
                 <li>En cas de non-réponse sous 15 jours, un nouveau tirage sera effectué</li>

@@ -3,6 +3,7 @@
 import React from "react";
 import { useFeature } from "@/lib/feature-flags";
 import Countdown from "./Countdown";
+import { POINTS_CONFIG } from "@/lib/points";
 
 interface HeroSectionProps {
   onCTAClick?: () => void;
@@ -11,7 +12,7 @@ interface HeroSectionProps {
 
 const HeroSectionV2: React.FC<HeroSectionProps> = ({
   onCTAClick,
-  earlyBirdSpotsLeft = 100
+  earlyBirdSpotsLeft = POINTS_CONFIG.EARLY_BIRD_LIMIT
 }) => {
   const showNewCopy = useFeature("hero-copy");
   const showCountdown = useFeature("countdown");
@@ -69,10 +70,10 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           {/* Bonus lancement - style glassy neon-gold */}
           <div className="inline-flex flex-col items-center gap-2 mb-6 glassy neon-gold rounded-2xl px-6 py-4 max-w-2xl">
             <p className="text-amber-300 font-bold text-base sm:text-lg">
-              🏆 iPhone 17 Pro pour le rang #1 + 3 500 € (tirage ≥ 100 pts)
+              🏆 iPhone 17 Pro pour le rang #1 + 3 500 € (tirage ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} pts)
             </p>
             <p className="text-rose-200/90 text-sm sm:text-base">
-              Les <span className="font-semibold">100 premiers inscrits</span> : +50 pts offerts.
+              Les <span className="font-semibold">{POINTS_CONFIG.EARLY_BIRD_LIMIT} premiers inscrits</span> : +{POINTS_CONFIG.EARLY_BIRD_BONUS} pts offerts.
               {earlyBirdSpotsLeft > 0 && (
                 <span className="ml-2 text-amber-300 font-bold">
                   {earlyBirdSpotsLeft} places restantes 🔥

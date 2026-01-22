@@ -196,3 +196,59 @@ export const POINTS_CONFIG = {
   // Jackpot threshold
   JACKPOT_THRESHOLD: 100,
 } as const;
+
+/**
+ * Prelaunch cutoff date (Brussels time: March 1, 2026 at 00:00 = UTC Feb 28, 2026 at 23:00)
+ * Brussels is UTC+1 at this date, so we use the UTC equivalent to avoid timezone issues.
+ */
+export const PRELAUNCH_END_UTC = "2026-02-28T23:00:00.000Z";
+
+/**
+ * Type definition for user roles
+ */
+export type UserRole = "client" | "influencer" | "beautypro";
+
+/**
+ * Check if current date is still in prelaunch phase
+ * @param now - Optional date to check (defaults to current time)
+ * @returns true if still in prelaunch phase, false if launch has occurred
+ */
+export function isPrelaunch(now: Date = new Date()): boolean {
+  const cutoff = new Date(PRELAUNCH_END_UTC);
+  return now < cutoff;
+}
+
+/**
+ * Get points awarded for referring a user based on the referred user's role
+ * @param referredRole - Role of the newly referred user
+ * @param isLaunched - Whether the app has launched (defaults to checking current date)
+ * @returns Points to award to the referrer
+ */
+export function pointsForReferredRole(
+  referredRole: UserRole,
+  isLaunched: boolean = !isPrelaunch()
+): number {
+  if (isLaunched) {
+    switch (referredRole) {
+      case "client":
+        return POINTS_CONFIG.LAUNCH.APP_DOWNLOAD;
+      case "influencer":
+        return POINTS_CONFIG.LAUNCH.VALIDATED_INFLUENCER;
+      case "beautypro":
+        return POINTS_CONFIG.LAUNCH.VALIDATED_PRO;
+      default:
+        return 0;
+    }
+  } else {
+    switch (referredRole) {
+      case "client":
+        return POINTS_CONFIG.WAITLIST.CLIENT;
+      case "influencer":
+        return POINTS_CONFIG.WAITLIST.INFLUENCER;
+      case "beautypro":
+        return POINTS_CONFIG.WAITLIST.BEAUTY_PRO;
+      default:
+        return 0;
+    }
+  }
+}

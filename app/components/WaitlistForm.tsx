@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PhoneInputBelgium } from '@/components/ui/phone-input-belgium';
+import { POINTS_CONFIG } from '@/lib/points';
 
 interface FormData {
   email: string;
@@ -153,9 +154,9 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
               <strong>Partage ce lien</strong> avec tes amis pour gagner des points:
             </p>
             <ul className="text-left list-disc list-inside space-y-1">
-              <li>Client: +5 points</li>
-              <li>Influenceur: +15 points</li>
-              <li>Beauty Pro: +25 points</li>
+              <li>Client: +{POINTS_CONFIG.WAITLIST.CLIENT} points</li>
+              <li>Influenceur: +{POINTS_CONFIG.WAITLIST.INFLUENCER} points</li>
+              <li>Beauty Pro: +{POINTS_CONFIG.WAITLIST.BEAUTY_PRO} points</li>
             </ul>
           </div>
         </div>
