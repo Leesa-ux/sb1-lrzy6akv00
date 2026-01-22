@@ -69,7 +69,7 @@ Bienvenue sur la Glow List ✨ Ton lien est prêt
 **Client·e:**
 ```
 Afroé ✨ Bienvenue sur la Glow List !
-Ami·e = +5 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts.
+Client = +5 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts (après vérification).
 À 10 pts : badge + mise en avant + -10%.
 Ton lien : {{REF_LINK}}
 ```

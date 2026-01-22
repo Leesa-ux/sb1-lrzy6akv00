@@ -174,67 +174,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    if (referrer) {
-      let pointsAwarded = 0;
-      let counterField: 'waitlistClients' | 'waitlistInfluencers' | 'waitlistPros';
-
-      switch (role) {
-        case 'client':
-          pointsAwarded = POINTS_CONFIG.WAITLIST.CLIENT;
-          counterField = 'waitlistClients';
-          break;
-        case 'influencer':
-          pointsAwarded = POINTS_CONFIG.WAITLIST.INFLUENCER;
-          counterField = 'waitlistInfluencers';
-          break;
-        case 'beautypro':
-          pointsAwarded = POINTS_CONFIG.WAITLIST.BEAUTY_PRO;
-          counterField = 'waitlistPros';
-          break;
-      }
-
-      const updatedReferrer = await prisma.user.update({
-        where: { id: referrer.id },
-        data: {
-          refCount: { increment: 1 },
-          [counterField]: { increment: 1 },
-          lastRefAt: new Date()
-        }
-      });
-
-      const newProvisionalPoints = calculateProvisionalPoints({
-        waitlistClients: updatedReferrer.waitlistClients,
-        waitlistInfluencers: updatedReferrer.waitlistInfluencers,
-        waitlistPros: updatedReferrer.waitlistPros,
-        appDownloads: updatedReferrer.appDownloads,
-        validatedInfluencers: updatedReferrer.validatedInfluencers,
-        validatedPros: updatedReferrer.validatedPros,
-        earlyBirdBonus: updatedReferrer.earlyBirdBonus
-      });
-
-      await prisma.user.update({
-        where: { id: referrer.id },
-        data: {
-          provisionalPoints: newProvisionalPoints,
-          points: newProvisionalPoints
-        }
-      });
-
-      const idempotencyKey = `${referrer.id}_${newUser.id}_waitlist_signup`;
-
-      await prisma.referralEvent.create({
-        data: {
-          id: `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          actorL1Id: referrer.id,
-          actorL2Id: newUser.id,
-          type: 'waitlist_signup',
-          roleAtSignup: role,
-          pointsAwarded: pointsAwarded,
-          idempotencyKey: idempotencyKey,
-          createdAt: new Date()
-        }
-      });
-    }
+    // Referral points are NOT awarded until phone verification is complete
+    // This prevents fraud and ensures only verified users count toward referrer's points
 
     // TODO: Add signup_metadata model to Prisma schema to enable fraud tracking
     // await prisma.signupMetadata.create({
