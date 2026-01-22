@@ -101,64 +101,59 @@ export async function POST(req: NextRequest) {
           const idempotencyKey = `${referrer.id}_${user.id}_waitlist_signup`;
 
           try {
-            await db.referralEvent.create({
-              data: {
-                id: `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                actorL1Id: referrer.id,
-                actorL2Id: user.id,
-                type: 'waitlist_signup',
-                roleAtSignup: user.role,
-                pointsAwarded: pointsAwarded,
-                idempotencyKey: idempotencyKey,
-                createdAt: new Date()
-              }
+            // ATOMIC TRANSACTION: Create event + increment points in single transaction
+            // If any step fails, entire transaction rolls back (no partial credit)
+            const updatedReferrer = await db.$transaction(async (tx) => {
+              // Step 1: Create ReferralEvent (idempotency check via unique constraint)
+              await tx.referralEvent.create({
+                data: {
+                  id: `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  actorL1Id: referrer.id,
+                  actorL2Id: user.id,
+                  type: 'waitlist_signup',
+                  roleAtSignup: user.role,
+                  pointsAwarded: pointsAwarded,
+                  idempotencyKey: idempotencyKey,
+                  createdAt: new Date()
+                }
+              });
+
+              // Step 2: Atomically increment all counters + points in ONE update
+              // This prevents race conditions and ensures consistency
+              const updated = await tx.user.update({
+                where: { id: referrer.id },
+                data: {
+                  refCount: { increment: 1 },
+                  [counterField]: { increment: 1 },
+                  provisionalPoints: { increment: pointsAwarded },
+                  points: { increment: pointsAwarded },
+                  lastRefAt: new Date()
+                }
+              });
+
+              return updated;
             });
 
-            console.log(`✅ ReferralEvent created successfully for user ${user.id}`);
+            console.log(`✅ Referral transaction complete: ${pointsAwarded} pts awarded to ${referrer.id} for referring ${user.role} user ${user.id}`);
+            console.log(`   New totals: ${updatedReferrer.refCount} referrals, ${updatedReferrer.provisionalPoints} points`);
 
-            const updatedReferrer = await db.user.update({
-              where: { id: referrer.id },
-              data: {
-                refCount: { increment: 1 },
-                [counterField]: { increment: 1 },
-                lastRefAt: new Date()
-              }
-            });
-
-            const newProvisionalPoints = calculateProvisionalPoints({
-              waitlistClients: updatedReferrer.waitlistClients,
-              waitlistInfluencers: updatedReferrer.waitlistInfluencers,
-              waitlistPros: updatedReferrer.waitlistPros,
-              appDownloads: updatedReferrer.appDownloads,
-              validatedInfluencers: updatedReferrer.validatedInfluencers,
-              validatedPros: updatedReferrer.validatedPros,
-              earlyBirdBonus: updatedReferrer.earlyBirdBonus
-            });
-
-            await db.user.update({
-              where: { id: referrer.id },
-              data: {
-                provisionalPoints: newProvisionalPoints,
-                points: newProvisionalPoints
-              }
-            });
-
-            console.log(`✅ Referral points awarded: ${pointsAwarded} pts to ${referrer.id} for referring ${user.role} user ${user.id}`);
-
+            // Non-blocking automation (outside transaction)
             try {
               const { syncUserToBrevo, checkAndSendMilestoneEmails } = await import('@/lib/automation-service');
               await syncUserToBrevo(referrer.id);
 
               const oldPoints = referrer.provisionalPoints;
-              await checkAndSendMilestoneEmails(referrer.id, oldPoints, newProvisionalPoints);
+              const newPoints = updatedReferrer.provisionalPoints;
+              await checkAndSendMilestoneEmails(referrer.id, oldPoints, newPoints);
             } catch (error) {
-              console.error('Error syncing to Brevo or sending milestone emails:', error);
+              console.error('⚠️ Error syncing to Brevo or sending milestone emails:', error);
             }
 
           } catch (err: any) {
             if (err.code === 'P2002') {
-              console.log(`⚠️ Referral already processed (duplicate actorL2Id or idempotencyKey): ${idempotencyKey}`);
+              console.log(`⚠️ Referral already processed (duplicate detected): ${idempotencyKey}`);
             } else {
+              console.error('❌ Referral transaction failed:', err);
               throw err;
             }
           }
