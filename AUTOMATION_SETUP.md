@@ -17,30 +17,43 @@
 
 ## 🎯 System Overview
 
-
 The Afroé Waitlist Automation System manages a role-based referral contest with SMS verification, point attribution, and automated email/SMS journeys.
 
-A referral is considered **valid only when the referred person completes a waitlist signup and selects a role** (Client·e, Influenceur·euse, or Beauty Pro).
+### Campaign Timeline
+- **Start Date**: January 15, 2026
+- **End Date**: March 1, 2026 (00:00 Brussels time)
+- **Duration**: ~6 weeks
 
-No points are granted for:
-- link clicks
-- partial submissions
-- unverified phone numbers
-  
-The Afroé automation system manages the complete user journey from signup to launch, including:
+### Referral Validation Rules
+
+A referral counts **ONLY** when the referred person completes ALL of these steps:
+1. ✅ Completes waitlist signup
+2. ✅ Selects a role (Client·e, Influenceur·euse, or Beauty Pro)
+3. ✅ Verifies their phone number via OTP
+
+**No points are awarded for**:
+- Partial submissions (email only, no role selected)
+- Unverified phone numbers
+- Invalid or duplicate phone numbers
+
+### User Journey Phases
+
+The automation system manages the complete journey from signup to launch:
 
 - **Phase 1**: Instant activation (welcome, follow-up, 48h activation)
 - **Phase 2**: Growth milestones (10, 50, 100, 200 points)
 - **Phase 3**: Anti-churn (5-day inactivity reminders)
-- **Phase 4**: Launch day (email + SMS with 2x bonus)
+- **Phase 4**: Launch day (email + SMS with post-launch point values)
 
 ### Key Features
 
-- ✅ Role-based point system (client, pro, influencer)
+- ✅ Role-based point system (client, influencer, beauty pro)
+- ✅ OTP-based phone verification for referral validation
+- ✅ Atomic transaction-based point crediting (no partial failures)
 - ✅ Automated email & SMS sequences
 - ✅ Milestone tracking and rewards
 - ✅ Leaderboard ranking system
-- ✅ Launch day 2x points multiplier
+- ✅ Pre-launch to post-launch point transition
 - ✅ Smart anti-duplicate messaging
 - ✅ Brevo integration for email/SMS
 
@@ -124,31 +137,27 @@ model User {
 
 ## 💰 Point System
 
-### Pre-Launch Points (Before January 15, 2026)
+### Pre-Launch Points (Before March 1, 2026 00:00 Brussels)
 
-| Role | Points per Referral |
-|------|---------------------|
-| Client.e — +5 pts (inscription waitlist)
+Points are awarded when a referred person completes waitlist signup, selects their role, and verifies their phone via OTP:
 
-Influenceur.euse — +15 pts (inscription)
+| Role | Points per Successful Referral |
+|------|-------------------------------|
+| **Client·e** | +5 pts |
+| **Influenceur·euse** | +15 pts |
+| **Beauty Pro** | +25 pts |
 
-Pro — +25 pts (inscription)
+### Post-Launch Points (After March 1, 2026 00:00 Brussels)
 
-### Post-Launch Points (After January 15, 2026)
+After the app launches, point values increase significantly:
 
-| Role | Points per Referral |
-|------|---------------------|
-| Client.e — +10 pts (téléchargement app)
+| Role | Points per Successful Referral |
+|------|-------------------------------|
+| **Client·e** | +10 pts (app download confirmed) |
+| **Influenceur·euse** | +50 pts (eligible) |
+| **Beauty Pro** | +100 pts (validated) |
 
-Influenceur.euse — +50 pts (éligible)
-
-Pro — +100 pts (validé)
-
-### Launch Day Bonus
-
-**All points earned on January 15, 2026 are DOUBLED (x2)**
-
-Example: A Pro referring another Pro on launch day earns **200 points** (100 x 2)
+**Note**: The transition from pre-launch to post-launch points happens automatically at midnight Brussels time on March 1, 2026.
 
 ### Milestone Rewards
 
@@ -227,36 +236,29 @@ Example: A Pro referring another Pro on launch day earns **200 points** (100 x 2
 
 ### 4. Referral Completed
 
-**Trigger**: API call when new user signs up with referral code
+**Trigger**: Automatic when a referred user completes OTP verification
 
-**Endpoint**: `POST /api/webhook/referral-completed`
+**Endpoint**: Internal processing in `/api/verify-otp/route.ts`
 
-**Request Body**:
-```json
-{
-  "referrerId": "user_mongodb_id",
-  "referralCode": "ABC123XYZ",
-  "isLaunchDay": false
-}
-```
+**Validation**: Points awarded ONLY when:
+- Referred user completes waitlist signup
+- Referred user selects a role (client, influencer, or beautypro)
+- Referred user verifies phone via OTP
 
-**Actions**:
-1. Calculate points based on role and launch status
-2. Update referrer's points, refCount, lastRefAt
-3. Recalculate ALL user ranks (sort by points desc)
-4. Sync updated data to Brevo
-5. Check if points crossed any milestone (10, 50, 100, 200)
-6. **IF milestone crossed** → Send milestone email + SMS
+**Actions** (within atomic transaction):
+1. Create ReferralEvent record (idempotency protection)
+2. Calculate points based on referred user's role and pre/post-launch period
+3. Atomically increment referrer's:
+   - `refCount` (+1)
+   - Role-specific counter (`waitlistClients`, `waitlistInfluencers`, or `waitlistPros`)
+   - `provisionalPoints` (by calculated points)
+   - `points` (by calculated points)
+4. Update `lastRefAt` timestamp
+5. Sync updated data to Brevo
+6. Check if points crossed any milestone (10, 50, 100, 200)
+7. **IF milestone crossed** → Send milestone email + SMS
 
-**Response**:
-```json
-{
-  "success": true,
-  "pointsAdded": 2,
-  "newTotal": 12,
-  "rank": 45
-}
-```
+**Transaction Safety**: All updates happen in a single database transaction. If any step fails, no partial credit is awarded.
 
 ---
 
@@ -303,20 +305,22 @@ Example: A Pro referring another Pro on launch day earns **200 points** (100 x 2
 
 ### 7. Launch Day
 
-**Trigger**: Manual cron trigger on January 15, 2026
+**Trigger**: Manual cron trigger on March 1, 2026
 
 **Endpoint**: `GET /api/cron/launch-day`
 
 **Actions**:
 1. Send launch email to ALL users (Template #106)
 2. Send launch SMS to ALL users with phone numbers
-3. Enable 2x point multiplier for the day
-4. Switch to post-launch point values
+3. Switch to post-launch point values automatically at 00:00 Brussels time
+4. Announce app availability
 
-**Email**: Launch announcement + 2x bonus notification + new point values
-**SMS**: "🚀 C'est le JOUR J ! Tous les points sont DOUBLÉS !"
+**Email**: Launch announcement + new higher point values + app download links
+**SMS**: "🚀 C'est le JOUR J ! Télécharge Afroé maintenant et gagne plus de points !"
 
-**Schedule**: Manual trigger (one-time event)
+**Schedule**: Manual trigger (one-time event on March 1, 2026)
+
+**Note**: Post-launch point values (10/50/100) activate automatically at midnight. The cron is for announcing the launch, not switching point values.
 
 ---
 
@@ -344,26 +348,25 @@ Response:
 }
 ```
 
-### Referral Completion
+### OTP Verification (Triggers Referral Credit)
 
 ```bash
-POST /api/webhook/referral-completed
+POST /api/verify-otp
 Content-Type: application/json
 
 {
-  "referrerId": "mongodb_user_id",
-  "referralCode": "ABC123XYZ",
-  "isLaunchDay": false
+  "phone": "+32412345678",
+  "code": "123456"
 }
 
 Response:
 {
   "success": true,
-  "pointsAdded": 2,
-  "newTotal": 12,
-  "rank": 45
+  "message": "Phone verified successfully"
 }
 ```
+
+**Note**: When OTP verification succeeds, referral points are automatically credited in an atomic transaction if the user was referred by someone.
 
 ### Cron Jobs
 
@@ -472,28 +475,27 @@ vercel env add NEXT_PUBLIC_APP_URL
 ### Step 5: Test End-to-End
 
 ```bash
-# Test signup
-curl -X POST https://afroe.com/api/signup-complete \
+# Test OTP send
+curl -X POST https://afroe.com/api/send-otp \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "test@example.com",
-    "phone": "+33612345678",
-    "firstName": "Test",
-    "role": "client"
+    "phone": "+32412345678"
   }'
 
-# Test referral
-curl -X POST https://afroe.com/api/webhook/referral-completed \
+# Test OTP verification (triggers referral credit automatically)
+curl -X POST https://afroe.com/api/verify-otp \
   -H "Content-Type: application/json" \
   -d '{
-    "referrerId": "USER_ID_FROM_MONGODB",
-    "isLaunchDay": false
+    "phone": "+32412345678",
+    "code": "123456"
   }'
 
 # Test cron (from Vercel only)
 curl https://afroe.com/api/cron/inactivity-check \
   -H "Authorization: Bearer ${CRON_SECRET}"
 ```
+
+**Note**: Referral points are credited automatically inside the `/api/verify-otp` endpoint when a user verifies their phone. No separate webhook call is needed.
 
 ---
 
@@ -517,21 +519,26 @@ curl -X POST http://localhost:3000/api/signup-complete \
 
 ### Test Scenarios
 
-1. **Signup Flow**
-   - Create user with all 3 roles (client, pro, influencer)
-   - Verify email template shows correct points for each role
-   - Verify SMS message is role-specific
+1. **Signup Flow with OTP**
+   - Submit waitlist form with email, phone, and role (client, pro, influencer)
+   - Verify OTP SMS sent to phone number
+   - Submit OTP verification
+   - Verify welcome email sent with correct points for role
+   - Verify referral link is included
 
 2. **Referral Flow**
-   - Create 2 users
-   - Call referral-completed endpoint
-   - Verify points added correctly
-   - Verify rank updated
+   - User A signs up and gets referral code
+   - User B signs up using User A's referral code
+   - User B completes role selection and OTP verification
+   - Verify User A's points incremented correctly (5/15/25 based on role)
+   - Verify User A's `refCount` incremented
+   - Verify transaction is atomic (no partial credit on failure)
 
 3. **Milestone Flow**
-   - Add points to user to cross milestone
-   - Verify milestone email sent
+   - Create referrals to cross milestone (10, 50, 100, or 200 points)
+   - Verify milestone email sent automatically
    - Verify no duplicate milestone emails
+   - Verify `lastMilestoneSent` updated correctly
 
 4. **Inactivity Flow**
    - Create user with `lastRefAt` 6 days ago
@@ -622,6 +629,7 @@ For issues or questions:
 
 ## ✅ Launch Checklist
 
+### Pre-Campaign (Before January 15, 2026)
 - [ ] MongoDB database is set up and accessible
 - [ ] Brevo account configured with API key
 - [ ] All 6 email templates created in Brevo (IDs: 101-106)
@@ -630,13 +638,20 @@ For issues or questions:
 - [ ] Generate secure `CRON_SECRET`
 - [ ] Run `npx prisma generate`
 - [ ] Deploy to Vercel
-- [ ] Test signup flow end-to-end
+- [ ] Test signup flow end-to-end with OTP verification
 - [ ] Verify cron jobs are scheduled
 - [ ] Test all 3 user roles (client, pro, influencer)
+- [ ] Verify referral points awarded correctly after OTP verification
 - [ ] Verify milestone emails work correctly
 - [ ] Monitor Brevo dashboard for delivery rates
 - [ ] Set up alerts for failed cron jobs
-- [ ] Document launch day procedure for 2x bonus activation
+
+### Launch Day (March 1, 2026)
+- [ ] Trigger launch day cron job manually at 00:00 Brussels time
+- [ ] Verify post-launch point values (10/50/100) are active
+- [ ] Monitor email/SMS delivery for launch announcements
+- [ ] Track app download conversions
+- [ ] Monitor leaderboard for sudden point changes
 
 ---
 
