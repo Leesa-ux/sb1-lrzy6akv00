@@ -25,3 +25,29 @@ export async function GET(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ data });
 }
+
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+  const body = await req.json().catch(() => ({}));
+  const supabase = supabaseAdmin();
+
+  const allowed = new Set(["incomplete","preselected","in_evaluation","approved","rejected","needs_improvement"]);
+  if (body.status && !allowed.has(body.status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
+
+  const patch: any = {};
+  if (body.status) patch.status = body.status;
+  if (typeof body.internal_notes === "string") patch.internal_notes = body.internal_notes;
+  if (typeof body.next_action === "string") patch.next_action = body.next_action;
+  if (body.reapply_eligible_at) patch.reapply_eligible_at = body.reapply_eligible_at;
+
+  const { data, error } = await supabase
+    .from("pro_applications")
+    .update(patch)
+    .eq("id", params.id)
+    .select("id,status,next_action")
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true, data });
+}

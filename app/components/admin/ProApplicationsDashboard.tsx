@@ -17,7 +17,7 @@ type Application = {
   next_action: string | null;
 };
 
-const STATUSES = ["pending", "reviewing", "interview", "approved", "rejected"];
+const STATUSES = ["incomplete", "preselected", "in_evaluation", "approved", "rejected", "needs_improvement"];
 const CITIES = ["Bruxelles", "Anvers", "Liège", "Gand", "Charleroi", "Autre"];
 
 export function ProApplicationsDashboard() {
@@ -56,10 +56,10 @@ export function ProApplicationsDashboard() {
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch("/api/admin/pro-applications", {
+      const res = await fetch(`/api/admin/pro-applications/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
+        body: JSON.stringify({ status: newStatus }),
       });
 
       if (!res.ok) {
@@ -70,17 +70,24 @@ export function ProApplicationsDashboard() {
 
       toast.success("Status updated");
       fetchApplications();
+      if (selectedApp?.id === id) {
+        fetchFullDetails(selectedApp);
+      }
     } catch (e: any) {
       toast.error(e.message);
     }
   };
 
-  const handleNotesUpdate = async (id: string, next_action: string) => {
+  const handleNotesUpdate = async (id: string, next_action: string, internal_notes?: string) => {
     try {
-      const res = await fetch("/api/admin/pro-applications", {
+      const body: any = {};
+      if (next_action !== undefined) body.next_action = next_action;
+      if (internal_notes !== undefined) body.internal_notes = internal_notes;
+
+      const res = await fetch(`/api/admin/pro-applications/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, next_action }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -91,6 +98,9 @@ export function ProApplicationsDashboard() {
 
       toast.success("Notes updated");
       fetchApplications();
+      if (selectedApp?.id === id) {
+        fetchFullDetails(selectedApp);
+      }
     } catch (e: any) {
       toast.error(e.message);
     }
@@ -116,11 +126,12 @@ export function ProApplicationsDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "reviewing": return "bg-blue-100 text-blue-800";
-      case "interview": return "bg-purple-100 text-purple-800";
+      case "incomplete": return "bg-gray-100 text-gray-800";
+      case "preselected": return "bg-blue-100 text-blue-800";
+      case "in_evaluation": return "bg-yellow-100 text-yellow-800";
       case "approved": return "bg-green-100 text-green-800";
       case "rejected": return "bg-red-100 text-red-800";
+      case "needs_improvement": return "bg-orange-100 text-orange-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -238,17 +249,32 @@ export function ProApplicationsDashboard() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-700">Next Action / Notes</label>
+                      <label className="text-xs font-medium text-gray-700">Next Action</label>
                       <textarea
                         defaultValue={fullDetails.next_action || ""}
                         onBlur={(e) => {
                           if (e.target.value !== fullDetails.next_action) {
-                            handleNotesUpdate(fullDetails.id, e.target.value);
+                            handleNotesUpdate(fullDetails.id, e.target.value, undefined);
                           }
                         }}
                         className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-                        rows={4}
+                        rows={2}
                         placeholder="Schedule interview, request documents, etc."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Internal Notes</label>
+                      <textarea
+                        defaultValue={fullDetails.internal_notes || ""}
+                        onBlur={(e) => {
+                          if (e.target.value !== fullDetails.internal_notes) {
+                            handleNotesUpdate(fullDetails.id, undefined as any, e.target.value);
+                          }
+                        }}
+                        className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                        rows={3}
+                        placeholder="Private admin notes (not visible to applicant)..."
                       />
                     </div>
 
