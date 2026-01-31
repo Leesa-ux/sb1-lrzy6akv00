@@ -1,0 +1,14 @@
+import { AmbassadorApplicationForm } from "@/components/ambassadors/AmbassadorApplicationForm";
+
+export default function Page() {
+  return (
+    <div className="mx-auto max-w-xl p-6 space-y-4">
+      <h1 className="text-2xl font-semibold">Afroé Ambassadors</h1>
+      <p className="text-sm text-muted-foreground">
+        2,000+ followers. Barter package: services + in-app visibility (no cash).
+      </p>
+
+      <AmbassadorApplicationForm />
+    </div>
+  );
+}
