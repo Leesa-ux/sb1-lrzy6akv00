@@ -8,11 +8,12 @@ import { Badge } from '@/components/ui/badge';
 interface LeaderboardEntry {
   rank: number;
   firstName: string;
-  city?: string;
+  emailMasked?: string;
   role: string;
   referralsCount: number;
   points: number;
   earlyBird: boolean;
+  tier: string;
 }
 
 interface LeaderboardResponse {
@@ -88,6 +89,40 @@ export default function LeaderboardPage() {
     if (rank === 2) return '🥈';
     if (rank === 3) return '🥉';
     return '';
+  };
+
+  const getTierColor = (tier: string) => {
+    switch (tier) {
+      case 'Legend':
+        return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white';
+      case 'Elite Influencer':
+        return 'bg-gradient-to-r from-purple-500 to-pink-500 text-white';
+      case 'Top Glower':
+        return 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white';
+      case 'Rising Star':
+        return 'bg-gradient-to-r from-green-400 to-emerald-500 text-white';
+      case 'Glow Starter':
+        return 'bg-gray-200 text-gray-700';
+      default:
+        return 'bg-gray-200 text-gray-700';
+    }
+  };
+
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case 'Legend':
+        return '👑';
+      case 'Elite Influencer':
+        return '💎';
+      case 'Top Glower':
+        return '✨';
+      case 'Rising Star':
+        return '⭐';
+      case 'Glow Starter':
+        return '🌱';
+      default:
+        return '🏷';
+    }
   };
 
   return (
@@ -198,7 +233,7 @@ export default function LeaderboardPage() {
                         </div>
 
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <span className="font-semibold text-gray-900">
                               {entry.firstName}
                             </span>
@@ -207,13 +242,16 @@ export default function LeaderboardPage() {
                                 ⚡ Early Bird
                               </Badge>
                             )}
+                            <Badge className={`text-xs font-bold ${getTierColor(entry.tier)}`}>
+                              {getTierIcon(entry.tier)} {entry.tier}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
                             <Badge className={getRoleBadgeColor(entry.role)}>
                               {getRoleLabel(entry.role)}
                             </Badge>
-                            {entry.city && (
-                              <span className="text-xs">📍 {entry.city}</span>
+                            {entry.emailMasked && (
+                              <span className="text-xs text-gray-500">{entry.emailMasked}</span>
                             )}
                           </div>
                         </div>
@@ -235,24 +273,59 @@ export default function LeaderboardPage() {
           </Card>
         )}
 
-        <div className="mt-8 text-center">
+        <div className="mt-8 space-y-4">
+          <Card className="bg-gradient-to-r from-blue-50 to-cyan-50">
+            <CardContent className="py-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                🏆 Niveaux de Classement
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
+                <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-2xl mb-1">🌱</div>
+                  <div className="font-semibold text-xs mb-1">Glow Starter</div>
+                  <div className="text-xs text-gray-600">0-19 points</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-2xl mb-1">⭐</div>
+                  <div className="font-semibold text-xs mb-1">Rising Star</div>
+                  <div className="text-xs text-gray-600">20-49 points</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-2xl mb-1">✨</div>
+                  <div className="font-semibold text-xs mb-1">Top Glower</div>
+                  <div className="text-xs text-gray-600">50-99 points</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-2xl mb-1">💎</div>
+                  <div className="font-semibold text-xs mb-1">Elite Influencer</div>
+                  <div className="text-xs text-gray-600">100-199 points</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-2xl mb-1">👑</div>
+                  <div className="font-semibold text-xs mb-1">Legend</div>
+                  <div className="text-xs text-gray-600">200+ points</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="bg-gradient-to-r from-purple-100 to-pink-100">
             <CardContent className="py-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
                 🎁 Récompenses
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-white/50 rounded p-3">
+                <div className="bg-white/50 rounded p-3 text-center">
                   <div className="text-2xl mb-1">🥇</div>
                   <div className="font-semibold">Rang 1</div>
                   <div className="text-xs text-gray-600">iPhone 17 Pro</div>
                 </div>
-                <div className="bg-white/50 rounded p-3">
+                <div className="bg-white/50 rounded p-3 text-center">
                   <div className="text-2xl mb-1">💰</div>
                   <div className="font-semibold">100+ points</div>
                   <div className="text-xs text-gray-600">Jackpot €3,500</div>
                 </div>
-                <div className="bg-white/50 rounded p-3">
+                <div className="bg-white/50 rounded p-3 text-center">
                   <div className="text-2xl mb-1">⚡</div>
                   <div className="font-semibold">Early Birds</div>
                   <div className="text-xs text-gray-600">+50 points bonus</div>
