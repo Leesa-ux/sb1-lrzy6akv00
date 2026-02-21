@@ -8,7 +8,8 @@ import {
   sendInfluencerWelcomeEmail,
   sendBeautyProWelcomeEmail,
 } from '@/lib/brevo-welcome';
-import { ensureUniqueReferralCode, isValidReferralCode } from '@/lib/referral-code';
+import { ensureUniqueReferralCode, isValidReferralCode, getReferralLink } from '@/lib/referral-code';
+import { upsertBrevoContact } from '@/lib/brevo-client';
 
 interface JoinWaitlistBody {
   email: string;
@@ -189,9 +190,29 @@ export async function POST(request: NextRequest) {
     //   }
     // });
 
-    const refLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://afroe.studio'}?ref=${newUser.referralCode}`;
+    const refLink = getReferralLink(newUser.referralCode);
 
     try {
+      // Map role for Brevo (beautypro -> pro)
+      const brevoRole = role === 'beautypro' ? 'pro' : role;
+
+      // First, upsert the contact with all attributes including REFERRAL_CODE and REFERRAL_LINK
+      await upsertBrevoContact({
+        email: newUser.email,
+        firstName: newUser.firstName || undefined,
+        phone: newUser.phone || undefined,
+        attributes: {
+          LASTNAME: newUser.lastName || "",
+          REFERRAL_CODE: newUser.referralCode.toUpperCase(),
+          REFERRAL_LINK: refLink,
+          ROLE: brevoRole,
+          CITY: cleanCity || "",
+          POINTS: newUser.provisionalPoints || 0,
+          RANK: newUser.rank || 0,
+        } as any
+      });
+
+      // Then send the welcome email
       const basePayload = {
         email: newUser.email,
         firstName: newUser.firstName,
