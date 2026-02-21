@@ -13,7 +13,8 @@ type Platform = "instagram" | "tiktok" | "youtube" | "other";
 type Niche = "hair" | "nails" | "skincare" | "lifestyle" | "other";
 
 type FormValues = {
-  full_name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   platform: Platform;
   handle?: string;
@@ -85,7 +86,7 @@ export function AmbassadorApplicationForm() {
       }
 
       const formData = new FormData();
-      formData.append("full_name", values.full_name.trim());
+      formData.append("full_name", `${values.first_name.trim()} ${values.last_name.trim()}`);
       formData.append("email", values.email.trim());
       formData.append("platform", values.platform);
       if (values.handle) formData.append("handle", values.handle.trim());
@@ -125,15 +126,28 @@ export function AmbassadorApplicationForm() {
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      <div className="space-y-2">
-        <Label>Nom complet</Label>
-        <Input
-          placeholder="Votre nom"
-          {...register("full_name", { required: "Requis" })}
-        />
-        {errors.full_name && (
-          <p className="text-sm text-red-500">{errors.full_name.message}</p>
-        )}
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label>Prénom</Label>
+          <Input
+            placeholder="Votre prénom"
+            {...register("first_name", { required: "Requis" })}
+          />
+          {errors.first_name && (
+            <p className="text-sm text-red-500">{errors.first_name.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Nom</Label>
+          <Input
+            placeholder="Votre nom"
+            {...register("last_name", { required: "Requis" })}
+          />
+          {errors.last_name && (
+            <p className="text-sm text-red-500">{errors.last_name.message}</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
