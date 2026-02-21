@@ -49,6 +49,11 @@ export async function POST(req: Request) {
       );
     }
 
+    // Split full_name into first and last name for Brevo
+    const nameParts = full_name.trim().split(" ");
+    const first_name = nameParts[0] || "";
+    const last_name = nameParts.slice(1).join(" ") || "";
+
     const supabase = supabaseAdmin();
     let media_path: string | null = null;
 
@@ -115,6 +120,46 @@ export async function POST(req: Request) {
         { error: "Failed to save application" },
         { status: 500 }
       );
+    }
+
+    // Add to Brevo with FIRSTNAME and LASTNAME attributes
+    try {
+      const BREVO_API_KEY = process.env.BREVO_API_KEY;
+      const BREVO_API_URL = "https://api.brevo.com/v3";
+
+      if (BREVO_API_KEY) {
+        const response = await fetch(`${BREVO_API_URL}/contacts`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": BREVO_API_KEY,
+          },
+          body: JSON.stringify({
+            email,
+            attributes: {
+              FIRSTNAME: first_name,
+              LASTNAME: last_name,
+              PLATFORM: platform,
+              HANDLE: handle || "",
+              PROFILE_URL: profile_url,
+              FOLLOWERS: followers_count,
+              CITY: city || "",
+              NICHE: niche || "",
+              APP_TYPE: "ambassador",
+            },
+            listIds: [10], // Ambassador list ID - adjust as needed
+            updateEnabled: true,
+          }),
+        });
+
+        if (!response.ok && response.status !== 400) {
+          const error = await response.text();
+          console.error("Brevo API error:", error);
+        }
+      }
+    } catch (brevoError) {
+      console.error("Brevo integration failed (non-critical):", brevoError);
+      // Continue even if Brevo fails - the application is already saved
     }
 
     return NextResponse.json({
