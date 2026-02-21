@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { generateReferralCode, getReferralLink } from "@/lib/referral-code";
 
 export const runtime = "nodejs";
 
@@ -56,6 +57,7 @@ export async function POST(req: Request) {
 
     const supabase = supabaseAdmin();
     let media_path: string | null = null;
+    let referral_code: string | null = null;
 
     if (mediaFile && mediaFile.size > 0) {
       if (mediaFile.size > MAX_FILE_SIZE) {
@@ -95,34 +97,69 @@ export async function POST(req: Request) {
       }
     }
 
-    const { data, error } = await supabase
-      .from("ambassador_applications")
-      .insert({
-        full_name,
-        email,
-        platform,
-        handle: handle || null,
-        profile_url,
-        followers_count: followers_count || 0,
-        city: city || null,
-        niche: niche || null,
-        notes: notes || null,
-        media_path,
-        consent,
-        status: "pending",
-      })
-      .select("id")
-      .single();
+    // Generate unique referral code with retry logic
+    const MAX_ATTEMPTS = 10;
+    let insertSuccess = false;
+    let data: any = null;
+    let error: any = null;
 
-    if (error) {
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      referral_code = generateReferralCode().toUpperCase();
+
+      const result = await supabase
+        .from("ambassador_applications")
+        .insert({
+          full_name,
+          email,
+          platform,
+          handle: handle || null,
+          profile_url,
+          followers_count: followers_count || 0,
+          city: city || null,
+          niche: niche || null,
+          notes: notes || null,
+          media_path,
+          consent,
+          status: "pending",
+          referral_code,
+        })
+        .select("id")
+        .single();
+
+      if (!result.error) {
+        data = result.data;
+        insertSuccess = true;
+        break;
+      }
+
+      // Check if it's a duplicate referral code error
+      const isDuplicateCode = result.error.message?.toLowerCase().includes("referral_code") ||
+                              result.error.code === "23505";
+
+      if (!isDuplicateCode) {
+        // If it's not a duplicate code error, don't retry
+        error = result.error;
+        break;
+      }
+
+      // If it's the last attempt and still failing
+      if (attempt === MAX_ATTEMPTS - 1) {
+        error = new Error("Unable to generate unique referral code after 10 attempts");
+      }
+    }
+
+    if (error || !insertSuccess) {
       console.error("Database error:", error);
       return NextResponse.json(
-        { error: "Failed to save application" },
+        { error: error?.message || "Failed to save application" },
         { status: 500 }
       );
     }
 
-    // Add to Brevo with FIRSTNAME and LASTNAME attributes
+    // Generate referral link
+    const referral_link = getReferralLink(referral_code!);
+
+    // Add to Brevo with FIRSTNAME, LASTNAME, REFERRAL_CODE, and REFERRAL_LINK
     try {
       const BREVO_API_KEY = process.env.BREVO_API_KEY;
       const BREVO_API_URL = "https://api.brevo.com/v3";
@@ -139,6 +176,8 @@ export async function POST(req: Request) {
             attributes: {
               FIRSTNAME: first_name,
               LASTNAME: last_name,
+              REFERRAL_CODE: referral_code,
+              REFERRAL_LINK: referral_link,
               PLATFORM: platform,
               HANDLE: handle || "",
               PROFILE_URL: profile_url,
