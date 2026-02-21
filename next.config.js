@@ -4,7 +4,7 @@ const nextConfig = {
   webpack: (config, { dev, isServer }) => {
     // Disable webpack cache completely to prevent corruption
     config.cache = false;
-    
+
     // Optimize bundle splitting for production
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
@@ -24,8 +24,17 @@ const nextConfig = {
         },
       };
     }
-    
+
     return config;
+  },
+  async redirects() {
+    return [
+      {
+        source: '/pro-vetting-start',
+        destination: '/beauty-pro/apply',
+        permanent: true,
+      },
+    ];
   },
   poweredByHeader: false,
   compress: true,
@@ -34,7 +43,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { 
+  images: {
     unoptimized: true,
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
