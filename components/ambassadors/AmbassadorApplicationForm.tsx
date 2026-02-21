@@ -68,18 +68,18 @@ export function AmbassadorApplicationForm() {
       setLoading(true);
 
       if (!isValidUrl(values.profile_url)) {
-        toast.error("Profile URL is not valid.");
+        toast.error("L'URL du profil n'est pas valide.");
         return;
       }
 
       const file = values.media?.[0];
       if (file) {
         if (file.size > MAX_BYTES) {
-          toast.error(`File too large. Max ${MAX_MB}MB.`);
+          toast.error(`Fichier trop volumineux. Max ${MAX_MB} Mo.`);
           return;
         }
         if (!ALLOWED_MIME.has(file.type)) {
-          toast.error("Invalid file type. Use PDF, PNG, or JPG.");
+          toast.error("Type de fichier invalide. Utilisez PDF, PNG ou JPG.");
           return;
         }
       }
@@ -105,7 +105,7 @@ export function AmbassadorApplicationForm() {
       const json = await res.json();
 
       if (!res.ok) {
-        toast.error(json.error || "Failed to submit application");
+        toast.error(json.error || "Échec de l'envoi de la candidature");
         return;
       }
 
@@ -117,7 +117,7 @@ export function AmbassadorApplicationForm() {
         niche: "other",
       });
     } catch (e: any) {
-      toast.error(e?.message || "Unexpected error");
+      toast.error(e?.message || "Erreur inattendue");
     } finally {
       setLoading(false);
     }
@@ -126,10 +126,10 @@ export function AmbassadorApplicationForm() {
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
-        <Label>Full name</Label>
+        <Label>Nom complet</Label>
         <Input
-          placeholder="Your name"
-          {...register("full_name", { required: "Required" })}
+          placeholder="Votre nom"
+          {...register("full_name", { required: "Requis" })}
         />
         {errors.full_name && (
           <p className="text-sm text-red-500">{errors.full_name.message}</p>
@@ -139,12 +139,12 @@ export function AmbassadorApplicationForm() {
       <div className="space-y-2">
         <Label>Email</Label>
         <Input
-          placeholder="you@email.com"
+          placeholder="vous@email.com"
           {...register("email", {
-            required: "Required",
+            required: "Requis",
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Invalid email",
+              message: "Email invalide",
             },
           })}
         />
@@ -155,15 +155,15 @@ export function AmbassadorApplicationForm() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label>Platform</Label>
+          <Label>Plateforme</Label>
           <select
             className="h-10 w-full rounded-md border bg-background px-3 text-sm"
-            {...register("platform", { required: "Required" })}
+            {...register("platform", { required: "Requis" })}
           >
             <option value="instagram">Instagram</option>
             <option value="tiktok">TikTok</option>
             <option value="youtube">YouTube</option>
-            <option value="other">Other</option>
+            <option value="other">Autre</option>
           </select>
           {errors.platform && (
             <p className="text-sm text-red-500">{errors.platform.message}</p>
@@ -171,18 +171,18 @@ export function AmbassadorApplicationForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Handle (optional)</Label>
-          <Input placeholder="@yourhandle" {...register("handle")} />
+          <Label>Pseudo (optionnel)</Label>
+          <Input placeholder="@votrepseudo" {...register("handle")} />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Profile URL</Label>
+        <Label>URL du profil</Label>
         <Input
           placeholder="https://instagram.com/..."
           {...register("profile_url", {
-            required: "Required",
-            validate: (v) => isValidUrl(v) || "Invalid URL",
+            required: "Requis",
+            validate: (v) => isValidUrl(v) || "URL invalide",
           })}
         />
         {errors.profile_url && (
@@ -192,14 +192,14 @@ export function AmbassadorApplicationForm() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label>Followers count</Label>
+          <Label>Nombre d'abonnés</Label>
           <Input
             type="number"
             placeholder="2000"
             {...register("followers_count", {
               valueAsNumber: true,
-              min: { value: 0, message: "Must be >= 0" },
-              required: "Required",
+              min: { value: 0, message: "Doit être >= 0" },
+              required: "Requis",
             })}
           />
           {errors.followers_count && (
@@ -210,42 +210,42 @@ export function AmbassadorApplicationForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Niche (optional)</Label>
+          <Label>Niche (optionnel)</Label>
           <select
             className="h-10 w-full rounded-md border bg-background px-3 text-sm"
             {...register("niche")}
           >
-            <option value="hair">Hair</option>
-            <option value="nails">Nails</option>
-            <option value="skincare">Skincare</option>
-            <option value="lifestyle">Lifestyle</option>
-            <option value="other">Other</option>
+            <option value="hair">Cheveux</option>
+            <option value="nails">Ongles</option>
+            <option value="skincare">Soins de la peau</option>
+            <option value="lifestyle">Style de vie</option>
+            <option value="other">Autre</option>
           </select>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>City (optional)</Label>
-        <Input placeholder="Brussels / Antwerp / ..." {...register("city")} />
+        <Label>Ville (optionnel)</Label>
+        <Input placeholder="Bruxelles / Anvers / ..." {...register("city")} />
       </div>
 
       <div className="space-y-2">
-        <Label>Media kit / analytics (PDF/PNG/JPG, max 5MB)</Label>
+        <Label>Kit média / statistiques (PDF/PNG/JPG, max 5 Mo)</Label>
         <Input
           type="file"
           accept=".pdf,image/png,image/jpeg"
           {...register("media")}
         />
         <p className="text-xs text-muted-foreground">
-          Optional. If you upload, keep it under {MAX_MB}MB.
+          Optionnel. Si vous téléchargez, gardez-le sous {MAX_MB} Mo.
         </p>
       </div>
 
       <div className="space-y-2">
-        <Label>Notes (optional)</Label>
+        <Label>Notes (optionnel)</Label>
         <textarea
           className="min-h-[90px] w-full rounded-md border bg-background px-3 py-2 text-sm"
-          placeholder="Tell us what you do, your audience, past collabs..."
+          placeholder="Parlez-nous de votre activité, votre audience, vos collaborations passées..."
           {...register("notes")}
         />
       </div>
@@ -256,15 +256,15 @@ export function AmbassadorApplicationForm() {
           onCheckedChange={(v) => setValue("consent", Boolean(v))}
         />
         <div className="text-sm">
-          I agree to be contacted by Afroé about this ambassador partnership.
+          J'accepte d'être contacté par Afroé concernant ce partenariat ambassadeur.
           {!consent && (
-            <div className="text-xs text-muted-foreground mt-1">Required.</div>
+            <div className="text-xs text-muted-foreground mt-1">Requis.</div>
           )}
         </div>
       </div>
 
       <Button type="submit" disabled={loading || !consent}>
-        {loading ? "Submitting..." : "Apply as Ambassador"}
+        {loading ? "Envoi en cours..." : "Postuler comme ambassadeur"}
       </Button>
     </form>
   );

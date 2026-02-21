@@ -1,11 +1,19 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 export default function ProVettingStartPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/beauty-pro/apply");
+  }, [router]);
+
   return (
-    <div>
-      <meta httpEquiv="refresh" content="0; url=/beauty-pro/apply" />
-      <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'system-ui, sans-serif' }}>
-        <h1>Redirecting...</h1>
-        <p>If you are not redirected automatically, <a href="/beauty-pro/apply" style={{ color: '#0070f3', textDecoration: 'underline' }}>click here</a>.</p>
-      </div>
+    <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'system-ui, sans-serif' }}>
+      <h1>Redirection...</h1>
+      <p>Si vous n'êtes pas redirigé automatiquement, <a href="/beauty-pro/apply" style={{ color: '#0070f3', textDecoration: 'underline' }}>cliquez ici</a>.</p>
     </div>
   );
 }
