@@ -85,7 +85,6 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   const [consentSMS, setConsentSMS] = useState<boolean>(true);
   const [submit, setSubmit] = useState<SubmitState>("idle");
   const [devSkipSms, setDevSkipSms] = useState<boolean>(false);
-  const [earlyBirdSpotsLeft, setEarlyBirdSpotsLeft] = useState<number>(100);
   const [skillAnswer, setSkillAnswer] = useState<string>("");
   const [consentGDPR, setConsentGDPR] = useState<boolean>(false);
 
@@ -98,21 +97,6 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
 
   useEffect(() => {
     try { const sp = new URLSearchParams(window.location.search); setDevSkipSms(sp.get("dev") === "1"); } catch {}
-  }, []);
-
-  // Fetch early bird spots left
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/early-bird-count", { cache: "no-store" });
-        if (res.ok && mounted) {
-          const data = await res.json() as { spotsLeft: number };
-          setEarlyBirdSpotsLeft(data.spotsLeft);
-        }
-      } catch {}
-    })();
-    return () => { mounted = false; };
   }, []);
 
   async function sendSmsCode(): Promise<void> {
@@ -189,7 +173,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
     <ErrorBoundary>
       <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white font-sans">
         {/* HERO */}
-        <HeroSectionV2 onCTAClick={handleHeroCTA} earlyBirdSpotsLeft={earlyBirdSpotsLeft} />
+        <HeroSectionV2 onCTAClick={handleHeroCTA} />
 
         {/* SECTION — Pourquoi rejoindre ? */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

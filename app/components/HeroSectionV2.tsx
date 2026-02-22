@@ -7,12 +7,10 @@ import { POINTS_CONFIG } from "@/lib/points";
 
 interface HeroSectionProps {
   onCTAClick?: () => void;
-  earlyBirdSpotsLeft?: number;
 }
 
 const HeroSectionV2: React.FC<HeroSectionProps> = ({
-  onCTAClick,
-  earlyBirdSpotsLeft = POINTS_CONFIG.EARLY_BIRD_LIMIT
+  onCTAClick
 }) => {
   const showNewCopy = useFeature("hero-copy");
   const showCountdown = useFeature("countdown");
@@ -74,11 +72,6 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
             </p>
             <p className="text-rose-200/90 text-sm sm:text-base">
               Les <span className="font-semibold">{POINTS_CONFIG.EARLY_BIRD_LIMIT} premiers inscrits</span> : +{POINTS_CONFIG.EARLY_BIRD_BONUS} pts offerts.
-              {earlyBirdSpotsLeft > 0 && (
-                <span className="ml-2 text-amber-300 font-bold">
-                  {earlyBirdSpotsLeft} places restantes 🔥
-                </span>
-              )}
             </p>
           </div>
 
