@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     if (!consent_missions || !consent_messages || !consent_phone) {
       return NextResponse.json(
-        { error: "All consents are required" },
+        { error: "Tous les consentements sont requis" },
         { status: 400 }
       );
     }
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     const portfolioFiles = formData.getAll("portfolio") as File[];
     if (portfolioFiles.length < 1 || portfolioFiles.length > 3) {
       return NextResponse.json(
-        { error: "Upload 1 to 3 portfolio photos" },
+        { error: "Téléchargez 1 à 3 photos de portfolio" },
         { status: 400 }
       );
     }
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 
       if (uploadError) {
         return NextResponse.json(
-          { error: `Upload failed: ${uploadError.message}` },
+          { error: `Échec du téléchargement: ${uploadError.message}` },
           { status: 500 }
         );
       }

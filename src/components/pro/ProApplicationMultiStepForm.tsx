@@ -94,7 +94,7 @@ export function ProApplicationMultiStepForm() {
 
       const files = values.portfolio?.length ? Array.from(values.portfolio) : [];
       if (files.length < 1 || files.length > 3) {
-        toast.error("Upload 1 to 3 portfolio photos.");
+        toast.error("Téléchargez 1 à 3 photos de portfolio.");
         return;
       }
 
@@ -102,7 +102,7 @@ export function ProApplicationMultiStepForm() {
       const maxBytes = maxMb * 1024 * 1024;
       for (const f of files) {
         if (f.size > maxBytes) {
-          toast.error(`Each photo must be <= ${maxMb}MB (MVP limit).`);
+          toast.error(`Chaque photo doit être <= ${maxMb}Mo.`);
           return;
         }
       }
@@ -142,14 +142,14 @@ export function ProApplicationMultiStepForm() {
 
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json?.error || "Submission failed");
+        toast.error(json?.error || "Échec de l'envoi de la candidature");
         return;
       }
 
       toast.success("Candidature envoyée. Afroé vous contactera bientôt.");
       setStep(1);
     } catch (e: any) {
-      toast.error(e?.message || "Unexpected error");
+      toast.error(e?.message || "Erreur inattendue");
     } finally {
       setLoading(false);
     }
@@ -188,14 +188,14 @@ export function ProApplicationMultiStepForm() {
               <div>
                 <label className="text-sm font-medium">Prénom</label>
                 <input className="mt-1 w-full rounded-md border p-2"
-                  {...register("first_name", { required: "Required" })}
+                  {...register("first_name", { required: "Requis" })}
                 />
                 {errors.first_name && <p className="text-xs text-red-600">{errors.first_name.message}</p>}
               </div>
               <div>
                 <label className="text-sm font-medium">Nom</label>
                 <input className="mt-1 w-full rounded-md border p-2"
-                  {...register("last_name", { required: "Required" })}
+                  {...register("last_name", { required: "Requis" })}
                 />
                 {errors.last_name && <p className="text-xs text-red-600">{errors.last_name.message}</p>}
               </div>
@@ -205,14 +205,14 @@ export function ProApplicationMultiStepForm() {
               <div>
                 <label className="text-sm font-medium">Email</label>
                 <input className="mt-1 w-full rounded-md border p-2" type="email"
-                  {...register("email", { required: "Required" })}
+                  {...register("email", { required: "Requis" })}
                 />
                 {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
               </div>
               <div>
                 <label className="text-sm font-medium">Téléphone</label>
                 <input className="mt-1 w-full rounded-md border p-2" placeholder="+32 487 123 456"
-                  {...register("phone", { required: "Required" })}
+                  {...register("phone", { required: "Requis" })}
                 />
                 {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
               </div>
@@ -221,21 +221,21 @@ export function ProApplicationMultiStepForm() {
             <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <label className="text-sm font-medium">Ville</label>
-                <select className="mt-1 w-full rounded-md border p-2" {...register("city", { required: "Required" })}>
+                <select className="mt-1 w-full rounded-md border p-2" {...register("city", { required: "Requis" })}>
                   {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-sm font-medium">Code postal</label>
                 <input className="mt-1 w-full rounded-md border p-2" placeholder="1000"
-                  {...register("postal_code", { required: "Required", pattern: { value: /^[0-9]{4}$/, message: "4 digits" } })}
+                  {...register("postal_code", { required: "Requis", pattern: { value: /^[0-9]{4}$/, message: "4 chiffres requis" } })}
                 />
                 {errors.postal_code && <p className="text-xs text-red-600">{errors.postal_code.message}</p>}
               </div>
               <div>
                 <label className="text-sm font-medium">Date de naissance</label>
                 <input className="mt-1 w-full rounded-md border p-2" type="date"
-                  {...register("date_of_birth", { required: "Required" })}
+                  {...register("date_of_birth", { required: "Requis" })}
                 />
               </div>
             </div>
@@ -243,7 +243,7 @@ export function ProApplicationMultiStepForm() {
             <div>
               <label className="text-sm font-medium">Adresse complète</label>
               <input className="mt-1 w-full rounded-md border p-2"
-                {...register("address", { required: "Required" })}
+                {...register("address", { required: "Requis" })}
               />
               {errors.address && <p className="text-xs text-red-600">{errors.address.message}</p>}
             </div>
@@ -252,13 +252,13 @@ export function ProApplicationMultiStepForm() {
               <div>
                 <label className="text-sm font-medium">Contact d'urgence (nom)</label>
                 <input className="mt-1 w-full rounded-md border p-2"
-                  {...register("emergency_contact_name", { required: "Required" })}
+                  {...register("emergency_contact_name", { required: "Requis" })}
                 />
               </div>
               <div>
                 <label className="text-sm font-medium">Contact d'urgence (téléphone)</label>
                 <input className="mt-1 w-full rounded-md border p-2"
-                  {...register("emergency_contact_phone", { required: "Required" })}
+                  {...register("emergency_contact_phone", { required: "Requis" })}
                 />
               </div>
             </div>
@@ -299,14 +299,14 @@ export function ProApplicationMultiStepForm() {
                   </button>
                 ))}
               </div>
-              <input type="hidden" {...register("certifications", { validate: (v) => (v && v.length ? true : "Pick at least one") })} />
+              <input type="hidden" {...register("certifications", { validate: (v) => (v && v.length ? true : "Choisissez au moins un") })} />
               {errors.certifications && <p className="text-xs text-red-600">{String(errors.certifications.message)}</p>}
             </div>
 
             <div>
               <label className="text-sm font-medium">Portfolio (Instagram / site web)</label>
               <input className="mt-1 w-full rounded-md border p-2" placeholder="https://instagram.com/..."
-                {...register("portfolio_url", { required: "Required" })}
+                {...register("portfolio_url", { required: "Requis" })}
               />
               {errors.portfolio_url && <p className="text-xs text-red-600">{errors.portfolio_url.message}</p>}
             </div>
@@ -319,10 +319,10 @@ export function ProApplicationMultiStepForm() {
                 accept="image/png,image/jpeg,image/webp"
                 multiple
                 {...register("portfolio", {
-                  required: "Required",
+                  required: "Requis",
                   validate: (files) => {
                     const count = files?.length || 0;
-                    if (count < 1 || count > 3) return "Upload 1 to 3 photos";
+                    if (count < 1 || count > 3) return "Téléchargez 1 à 3 photos";
                     return true;
                   }
                 })}
@@ -375,7 +375,7 @@ export function ProApplicationMultiStepForm() {
               </label>
 
               {!consentAll && (
-                <p className="text-xs text-red-600">All three consents are required.</p>
+                <p className="text-xs text-red-600">Les trois consentements sont requis.</p>
               )}
             </div>
           </div>

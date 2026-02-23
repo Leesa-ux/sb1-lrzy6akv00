@@ -31,7 +31,7 @@ const nextConfig = {
     return [
       {
         source: '/pro-vetting-start',
-        destination: '/beauty-pro/apply',
+        destination: '/pro/apply',
         permanent: true,
       },
     ];
