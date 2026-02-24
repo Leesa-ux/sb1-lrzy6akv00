@@ -28,13 +28,7 @@ const nextConfig = {
     return config;
   },
   async redirects() {
-    return [
-      {
-        source: '/pro-vetting-start',
-        destination: '/pro/apply',
-        permanent: true,
-      },
-    ];
+    return [];
   },
   poweredByHeader: false,
   compress: true,
