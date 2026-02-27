@@ -112,6 +112,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Add to Brevo with FIRSTNAME attribute
+    if (process.env.BREVO_API_KEY) {
+      try {
+        await fetch("https://api.brevo.com/v3/contacts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": process.env.BREVO_API_KEY,
+          },
+          body: JSON.stringify({
+            email,
+            attributes: {
+              FIRSTNAME: first_name,
+              LASTNAME: last_name,
+              PHONE: phone,
+              ROLE: "beautypro",
+            },
+            listIds: [parseInt(process.env.BREVO_BEAUTY_PRO_LIST_ID || "0")],
+            updateEnabled: true,
+          }),
+        });
+      } catch (brevoError) {
+        console.error("Brevo contact creation failed:", brevoError);
+      }
+    }
+
     return NextResponse.json({ success: true, data });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
