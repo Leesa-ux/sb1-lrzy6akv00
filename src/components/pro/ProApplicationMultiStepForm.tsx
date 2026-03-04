@@ -14,10 +14,8 @@ type FormValues = {
   phone: string;
   city: string;
   postal_code: string;
-  address: string;
+  address?: string; // Optional
   date_of_birth: string;
-  emergency_contact_name: string;
-  emergency_contact_phone: string;
 
   // Section 2
   work_authorized: "yes" | "no";
@@ -100,8 +98,8 @@ export function ProApplicationMultiStepForm() {
   const validateStep = async (s: number) => {
     if (s === 1) {
       return trigger([
-        "first_name","last_name","email","phone","city","postal_code","address",
-        "date_of_birth","emergency_contact_name","emergency_contact_phone",
+        "first_name","last_name","email","phone","city","postal_code",
+        "date_of_birth",
       ]);
     }
     if (s === 2) {
@@ -153,10 +151,8 @@ export function ProApplicationMultiStepForm() {
       fd.append("phone", values.phone);
       fd.append("city", values.city);
       fd.append("postal_code", values.postal_code);
-      fd.append("address", values.address);
+      if (values.address) fd.append("address", values.address);
       fd.append("date_of_birth", values.date_of_birth);
-      fd.append("emergency_contact_name", values.emergency_contact_name);
-      fd.append("emergency_contact_phone", values.emergency_contact_phone);
 
       fd.append("work_authorized", values.work_authorized === "yes" ? "true" : "false");
       (values.certifications || []).forEach((c) => fd.append("certifications", c));
@@ -228,15 +224,15 @@ export function ProApplicationMultiStepForm() {
 
   return (
     <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm">
-      <h1 className="text-xl font-semibold">Afroé PRO – Formulaire de Candidature</h1>
+      <h1 className="text-xl font-semibold text-[#1A1A1A]">Afroé PRO – Formulaire de Candidature</h1>
       <p className="mt-1 text-sm text-gray-600">Formulaire multi-étapes. 3 photos max. Données sécurisées.</p>
 
       <div className="mt-6 flex items-center gap-2">
         {[1,2,3].map(n => (
-          <div key={n} className={`h-2 flex-1 rounded-full ${n <= step ? "bg-black" : "bg-gray-200"}`} />
+          <div key={n} className={`h-2 flex-1 rounded-full ${n <= step ? "bg-[#6D28D9]" : "bg-gray-200"}`} />
         ))}
       </div>
-      <div className="mt-2 text-xs text-gray-500">Étape {step}/3</div>
+      <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
       <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
@@ -312,26 +308,10 @@ export function ProApplicationMultiStepForm() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">Adresse complète</label>
-              <input className="mt-1 w-full rounded-md border p-2"
-                {...register("address", { required: "Requis" })}
+              <label className="text-sm font-medium">Adresse complète (optionnel)</label>
+              <input className="mt-1 w-full rounded-md border p-3"
+                {...register("address")}
               />
-              {errors.address && <p className="text-xs text-red-600">{errors.address.message}</p>}
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="text-sm font-medium">Contact d'urgence (nom)</label>
-                <input className="mt-1 w-full rounded-md border p-2"
-                  {...register("emergency_contact_name", { required: "Requis" })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Contact d'urgence (téléphone)</label>
-                <input className="mt-1 w-full rounded-md border p-2"
-                  {...register("emergency_contact_phone", { required: "Requis" })}
-                />
-              </div>
             </div>
           </div>
         )}

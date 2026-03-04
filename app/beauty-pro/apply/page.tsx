@@ -99,14 +99,6 @@ export default function BeautyProApplyPage() {
             </div>
 
             <ProApplicationMultiStepForm />
-
-            <div className="mt-8 rounded-lg border bg-neutral-50 p-6 text-center">
-              <p className="text-sm text-neutral-600">
-                <span className="font-medium text-neutral-900">Confidentialité garantie.</span>{" "}
-                Vos données sont traitées de manière sécurisée et confidentielle.
-                Nous vous contacterons sous 48-72h après examen de votre candidature.
-              </p>
-            </div>
           </div>
         </main>
       </div>
