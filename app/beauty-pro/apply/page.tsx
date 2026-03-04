@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, FileText, Shield, GraduationCap, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { Layout, Scales, GraduationCap, CalendarCheck, CurrencyCircleDollar } from "phosphor-react";
 import Image from "next/image";
 import { ProApplicationMultiStepForm } from "@/src/components/pro/ProApplicationMultiStepForm";
 
@@ -45,34 +46,54 @@ export default function BeautyProApplyPage() {
               </p>
             </div>
 
-            <div className="mb-12 grid gap-6 md:grid-cols-3">
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
-                <div className="mb-3 inline-flex rounded-lg bg-neutral-100 p-3">
-                  <FileText className="h-6 w-6 text-neutral-900" />
+            <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+              <div className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="mb-3 inline-flex rounded-lg bg-violet-50 p-3">
+                  <Layout weight="light" className="h-6 w-6 text-violet-600" />
                 </div>
                 <h3 className="font-semibold text-neutral-900">Dashboard Intégré</h3>
                 <p className="mt-2 text-sm text-neutral-600">
-                  Gérez votre compta et TVA en un clic
+                  Gérez votre compta et TVA en un clic.
                 </p>
               </div>
 
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
-                <div className="mb-3 inline-flex rounded-lg bg-neutral-100 p-3">
-                  <Shield className="h-6 w-6 text-neutral-900" />
+              <div className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="mb-3 inline-flex rounded-lg bg-violet-50 p-3">
+                  <Scales weight="light" className="h-6 w-6 text-violet-600" />
                 </div>
                 <h3 className="font-semibold text-neutral-900">Support Juridique</h3>
                 <p className="mt-2 text-sm text-neutral-600">
-                  Développez votre business en toute sécurité
+                  Développez votre business en toute sécurité.
                 </p>
               </div>
 
-              <div className="rounded-xl border bg-white p-6 shadow-sm">
-                <div className="mb-3 inline-flex rounded-lg bg-neutral-100 p-3">
-                  <GraduationCap className="h-6 w-6 text-neutral-900" />
+              <div className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="mb-3 inline-flex rounded-lg bg-violet-50 p-3">
+                  <GraduationCap weight="light" className="h-6 w-6 text-violet-600" />
                 </div>
                 <h3 className="font-semibold text-neutral-900">Formations Academy</h3>
                 <p className="mt-2 text-sm text-neutral-600">
-                  Maîtrisez l'accueil de luxe et les nouvelles techniques
+                  Maîtrisez l'accueil de luxe et les techniques.
+                </p>
+              </div>
+
+              <div className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="mb-3 inline-flex rounded-lg bg-violet-50 p-3">
+                  <CalendarCheck weight="light" className="h-6 w-6 text-violet-600" />
+                </div>
+                <h3 className="font-semibold text-neutral-900">Missions Flexibles</h3>
+                <p className="mt-2 text-sm text-neutral-600">
+                  Choisissez vos missions selon vos dispos.
+                </p>
+              </div>
+
+              <div className="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="mb-3 inline-flex rounded-lg bg-violet-50 p-3">
+                  <CurrencyCircleDollar weight="light" className="h-6 w-6 text-violet-600" />
+                </div>
+                <h3 className="font-semibold text-neutral-900">Réseau & Paiement</h3>
+                <p className="mt-2 text-sm text-neutral-600">
+                  Clientèle premium et paiements sécurisés.
                 </p>
               </div>
             </div>
@@ -153,46 +174,74 @@ export default function BeautyProApplyPage() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12 lg:gap-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
             <div className="text-center">
               <div className="mb-6 flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
-                  <FileText className="w-7 h-7 text-neutral-900" />
+                <div className="w-16 h-16 rounded-full bg-violet-50 flex items-center justify-center">
+                  <Layout weight="light" className="w-7 h-7 text-violet-600" />
                 </div>
               </div>
-              <h3 className="text-xl font-medium text-neutral-900 mb-4">
+              <h3 className="text-lg font-medium text-neutral-900 mb-3">
                 Dashboard Intégré
               </h3>
-              <p className="text-neutral-600 leading-relaxed">
-                Gérez votre compta et TVA en un clic. Tous vos outils administratifs centralisés sur une plateforme intuitive.
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Gérez votre compta et TVA en un clic.
               </p>
             </div>
 
             <div className="text-center">
               <div className="mb-6 flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
-                  <Shield className="w-7 h-7 text-neutral-900" />
+                <div className="w-16 h-16 rounded-full bg-violet-50 flex items-center justify-center">
+                  <Scales weight="light" className="w-7 h-7 text-violet-600" />
                 </div>
               </div>
-              <h3 className="text-xl font-medium text-neutral-900 mb-4">
+              <h3 className="text-lg font-medium text-neutral-900 mb-3">
                 Support Juridique
               </h3>
-              <p className="text-neutral-600 leading-relaxed">
-                Développez votre business en toute sécurité avec l'accompagnement de nos experts juridiques et fiscaux.
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Développez votre business en toute sécurité.
               </p>
             </div>
 
             <div className="text-center">
               <div className="mb-6 flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
-                  <GraduationCap className="w-7 h-7 text-neutral-900" />
+                <div className="w-16 h-16 rounded-full bg-violet-50 flex items-center justify-center">
+                  <GraduationCap weight="light" className="w-7 h-7 text-violet-600" />
                 </div>
               </div>
-              <h3 className="text-xl font-medium text-neutral-900 mb-4">
+              <h3 className="text-lg font-medium text-neutral-900 mb-3">
                 Formations Academy
               </h3>
-              <p className="text-neutral-600 leading-relaxed">
-                Maîtrisez l'accueil de luxe et les nouvelles techniques. Formation continue pour exceller dans votre art.
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Maîtrisez l'accueil de luxe et les techniques.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mb-6 flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-violet-50 flex items-center justify-center">
+                  <CalendarCheck weight="light" className="w-7 h-7 text-violet-600" />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-neutral-900 mb-3">
+                Missions Flexibles
+              </h3>
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Choisissez vos missions selon vos dispos.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mb-6 flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-violet-50 flex items-center justify-center">
+                  <CurrencyCircleDollar weight="light" className="w-7 h-7 text-violet-600" />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-neutral-900 mb-3">
+                Réseau & Paiement
+              </h3>
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Clientèle premium et paiements sécurisés.
               </p>
             </div>
           </div>
@@ -210,16 +259,15 @@ export default function BeautyProApplyPage() {
             </h2>
           </div>
 
-          <div className="space-y-24">
+          <div className="space-y-20">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
-                <div className="text-7xl font-light text-neutral-200 mb-4">01</div>
+                <div className="text-8xl font-extralight text-violet-100 mb-4">01</div>
                 <h3 className="text-3xl font-medium text-neutral-900 mb-6">
                   Candidature Digitale
                 </h3>
                 <p className="text-lg text-neutral-600 leading-relaxed mb-8">
-                  Remplissez votre questionnaire en ligne et soumettez votre portfolio.
-                  Un processus simple et rapide qui met en valeur votre talent et votre expérience.
+                  Remplissez votre questionnaire et soumettez votre portfolio.
                 </p>
                 <button
                   onClick={() => setShowForm(true)}
@@ -255,26 +303,24 @@ export default function BeautyProApplyPage() {
                 </div>
               </div>
               <div>
-                <div className="text-7xl font-light text-neutral-200 mb-4">02</div>
+                <div className="text-8xl font-extralight text-violet-100 mb-4">02</div>
                 <h3 className="text-3xl font-medium text-neutral-900 mb-6">
                   Entretien de Vision
                 </h3>
                 <p className="text-lg text-neutral-600 leading-relaxed">
-                  Un échange de 20 minutes en visioconférence pour discuter de votre vision,
-                  vos aspirations et comment Afroé peut vous aider à atteindre vos objectifs professionnels.
+                  Un échange de 20 minutes pour discuter de votre vision du service.
                 </p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
-                <div className="text-7xl font-light text-neutral-200 mb-4">03</div>
+                <div className="text-8xl font-extralight text-violet-100 mb-4">03</div>
                 <h3 className="text-3xl font-medium text-neutral-900 mb-6">
                   Session Technique
                 </h3>
                 <p className="text-lg text-neutral-600 leading-relaxed">
                   Démontrez votre talent lors d'une session en conditions réelles à Bruxelles.
-                  Une opportunité de montrer votre savoir-faire technique et votre approche client.
                 </p>
               </div>
               <div className="order-1 md:order-2">
@@ -310,6 +356,23 @@ export default function BeautyProApplyPage() {
             Postuler maintenant
             <ArrowRight className="w-5 h-5" />
           </button>
+        </div>
+      </section>
+
+      <section className="py-16 px-6 bg-neutral-50 border-t border-neutral-200">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+              <span className="text-xl">🔒</span>
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-neutral-900 mb-3">
+            Confidentialité garantie
+          </h3>
+          <p className="text-neutral-600 leading-relaxed">
+            Vos données sont traitées de manière sécurisée et confidentielle.
+            Nous vous contacterons sous 72 heures après examen de votre candidature.
+          </p>
         </div>
       </section>
 
