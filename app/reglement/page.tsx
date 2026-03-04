@@ -35,7 +35,7 @@ export default function ReglementPage() {
               <ul className="list-disc list-inside space-y-2">
                 <li>Date de début : <span className="font-semibold">01 février 2026 (CET)</span></li>
                 <li>Date de fin : <span className="font-semibold">20 mars 2026 à 23h59 (CET – heure de Belgique)</span></li>
-                <li>Tirage au sort (lot 3 500 €) : dans les 30 jours suivant la clôture</li>
+                <li>Tirage au sort (lot 2 000 €) : dans les 30 jours suivant la clôture</li>
               </ul>
             </section>
 
@@ -50,8 +50,8 @@ export default function ReglementPage() {
                 </div>
 
                 <div className="glassy neon-fuchsia rounded-xl p-4">
-                  <h3 className="text-xl font-bold mb-2 text-fuchsia-300">💰 Tirage au sort pour 3 500 €</h3>
-                  <p className="mb-2">Tous les participants ayant <strong>≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} points provisoires valides</strong> à la clôture entrent dans le tirage au sort pour gagner 3 500 € (cash).</p>
+                  <h3 className="text-xl font-bold mb-2 text-fuchsia-300">💰 Tirage au sort pour 2 000 €</h3>
+                  <p className="mb-2">Tous les participants ayant <strong>≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} points provisoires valides</strong> à la clôture entrent dans le tirage au sort pour gagner 2 000 € (cash).</p>
                   <p className="text-sm text-slate-300">
                     Le tirage sera effectué de manière aléatoire et équitable parmi les participants éligibles.
                   </p>
@@ -129,7 +129,7 @@ export default function ReglementPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-white">6. Méthode de tirage au sort (lot 3 500 €)</h2>
+              <h2 className="text-2xl font-bold mb-4 text-white">6. Méthode de tirage au sort (lot 2 000 €)</h2>
               <ul className="list-disc list-inside space-y-2">
                 <li>Seuls les participants ayant ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} points provisoires valides à la clôture participent.</li>
                 <li>Le tirage est réalisé via un outil de sélection aléatoire et consigné (date/heure/paramètres) afin d'assurer la traçabilité.</li>

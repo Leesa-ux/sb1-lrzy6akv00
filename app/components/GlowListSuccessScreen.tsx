@@ -89,7 +89,7 @@ export default function GlowListSuccessScreen({
             </h4>
             <div className="space-y-2 text-center">
               <p className="text-sm font-semibold text-amber-300">
-                🎁 iPhone 17 Pro ou 3 500 € cash
+                🎁 iPhone 17 Pro ou 2 000 € cash
               </p>
               <p className="text-xs text-slate-300">
                 ⏱️ Classement mis à jour en temps réel

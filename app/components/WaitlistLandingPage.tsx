@@ -170,7 +170,7 @@ export default function WaitlistLandingPage() {
                 <span className="text-sm font-medium tracking-wide">Barbe • Maquillage • Ongles • Coiffure • Soins</span>
               </div>
               <div className="p-5 text-xs text-zinc-300 leading-relaxed space-y-3">
-                <p className="text-fuchsia-400 font-semibold">🎁 Jusqu'à 3500€ de récompenses</p>
+                <p className="text-fuchsia-400 font-semibold">🎁 Jusqu'à 2000€ de récompenses</p>
                 <p>Invite, monte de niveau, et débloque des cadeaux exclusifs.</p>
                 <p className="text-amber-300 text-[10px]">Partage ton lien unique • Grimpe dans le classement • Gagne des prix</p>
               </div>

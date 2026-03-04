@@ -198,7 +198,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               <div className="text-3xl mb-3">🎁</div>
               <h3 className="text-xl font-bold mb-2">Récompenses exclusives</h3>
               <p className="text-slate-200/90 leading-relaxed">
-                iPhone 17 Pro pour le #1, 3 500 € cash (tirage), Glow Kits, réductions et avantages VIP réservés aux membres de la waitlist.
+                iPhone 17 Pro pour le #1, 2 000 € cash (tirage), Glow Kits, réductions et avantages VIP réservés aux membres de la waitlist.
               </p>
             </div>
 
@@ -262,7 +262,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               <div className="text-violet-300 text-5xl font-bold mb-4">3</div>
               <h3 className="text-xl font-bold mb-3">Tu débloques des récompenses</h3>
               <p className="text-slate-200/90 leading-relaxed">
-                Badges, kits, accès VIP, coaching, tirage pour 3 500 € + iPhone 17 Pro pour le rang #1 au lancement.
+                Badges, kits, accès VIP, coaching, tirage pour 2 000 € + iPhone 17 Pro pour le rang #1 au lancement.
               </p>
             </div>
           </div>
@@ -275,7 +275,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               Prends ta place sur la Glow List maintenant
             </h2>
             <p className="text-sm sm:text-base text-slate-200/90 mb-6 text-center">
-              Inscris-toi, reçois ton lien unique et commence à gagner des points. Chaque partage peut te rapprocher de l'iPhone 17 Pro ou des 3 500 € cash.
+              Inscris-toi, reçois ton lien unique et commence à gagner des points. Chaque partage peut te rapprocher de l'iPhone 17 Pro ou des 2 000 € cash.
             </p>
 
             <form onSubmit={onSubmit} className="space-y-4 max-w-xl mx-auto">
@@ -445,7 +445,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900/60 text-fuchsia-600 focus:ring-2 focus:ring-fuchsia-400"
                 />
                 <label htmlFor="consent-gdpr" className="text-xs text-slate-300">
-                  J'accepte les <a href="/cgu" target="_blank" rel="noopener noreferrer" className="text-fuchsia-400 hover:text-fuchsia-300 underline" onClick={(e) => e.stopPropagation()}>Conditions Générales d'Utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="text-fuchsia-400 hover:text-fuchsia-300 underline" onClick={(e) => e.stopPropagation()}>Politique de Confidentialité</a> d'Afroé, et je confirme que les informations fournies sont exactes. *
+                  J'accepte les <a href="/cgu" target="_blank" rel="noopener noreferrer" className="text-fuchsia-400 hover:text-fuchsia-300 underline" onClick={(e) => e.stopPropagation()}>Conditions Générales d'Utilisation</a> et la <a href="/confidentialite" target=\"_blank" rel="noopener noreferrer\" className="text-fuchsia-400 hover:text-fuchsia-300 underline\" onClick={(e) => e.stopPropagation()}>Politique de Confidentialité</a> d'Afroé, et je confirme que les informations fournies sont exactes. *
                 </label>
               </div>
 
@@ -593,7 +593,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               <li className="flex items-start gap-3">
                 <span className="text-3xl">🏆</span>
                 <div>
-                  <span className="font-bold text-amber-300">3 500 €</span> — tirage au sort pour tout·e participant·e avec <span className="font-semibold">100 pts ou plus</span>
+                  <span className="font-bold text-amber-300">2 000 €</span> — tirage au sort pour tout·e participant·e avec <span className="font-semibold">100 pts ou plus</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">

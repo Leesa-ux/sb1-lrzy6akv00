@@ -26,7 +26,7 @@ export default function AfroeLandingNew() {
             <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-1 text-sm text-yellow-400">
               <span>🏆</span>
               <span>
-                Jusqu&apos;à <span className="font-semibold">3 500 €</span> à gagner
+                Jusqu&apos;à <span className="font-semibold">2 000 €</span> à gagner
               </span>
             </div>
 

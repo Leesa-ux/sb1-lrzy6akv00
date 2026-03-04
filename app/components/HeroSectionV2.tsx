@@ -31,7 +31,7 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           {showNewCopy && (
             <div className="mb-4">
               <p className="text-sm sm:text-base md:text-lg text-amber-300 font-bold">
-                iPhone 17 Pro + 3 500 € — juste en partageant.
+                iPhone 17 Pro + 2 000 € — juste en partageant.
               </p>
             </div>
           )}
@@ -60,7 +60,7 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           {showNewCopy && (
             <div className="mb-4">
               <p className="text-xs sm:text-sm text-slate-400">
-                #1 = iPhone · 100 pts = tirage 3 500€
+                #1 = iPhone · 100 pts = tirage 2 000€
               </p>
             </div>
           )}
@@ -68,7 +68,7 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           {/* Bonus lancement - style glassy neon-gold */}
           <div className="inline-flex flex-col items-center gap-2 mb-6 glassy neon-gold rounded-2xl px-6 py-4 max-w-2xl">
             <p className="text-amber-300 font-bold text-base sm:text-lg">
-              🏆 iPhone 17 Pro pour le rang #1 + 3 500 € (tirage ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} pts)
+              🏆 iPhone 17 Pro pour le rang #1 + 2 000 € (tirage ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} pts)
             </p>
             <p className="text-rose-200/90 text-sm sm:text-base">
               Les <span className="font-semibold">{POINTS_CONFIG.EARLY_BIRD_LIMIT} premiers inscrits</span> : +{POINTS_CONFIG.EARLY_BIRD_BONUS} pts offerts.

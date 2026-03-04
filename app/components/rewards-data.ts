@@ -31,7 +31,7 @@ export const REWARDS = [
       "Glow Kit édition limitée",
       "Appel 1:1 coaching ou image de marque",
       "-30% sur la 1ʳᵉ réservation",
-      "🎟 Accès au tirage 3 500 €"
+      "🎟 Accès au tirage 2 000 €"
     ]
   },
   {

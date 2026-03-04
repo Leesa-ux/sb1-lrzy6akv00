@@ -1,6 +1,6 @@
 export const REWARDS_CONFIG = {
   headline:
-    'Le/La #1 du classement remporte 3 500 €. Des récompenses sont débloquées à chaque étape.',
+    'Le/La #1 du classement remporte 2 000 €. Des récompenses sont débloquées à chaque étape.',
   tiers: [
     {
       name: 'Glow Starters',
@@ -45,7 +45,7 @@ export const REWARDS_CONFIG = {
   ],
   grandPrize: {
     iphone: 'iPhone 17 Pro pour le rang #1 au lancement',
-    cashDraw: { amount: 3500, condition: 'Tirage au sort parmi tous les participants avec 100 pts ou plus' }
+    cashDraw: { amount: 2000, condition: 'Tirage au sort parmi tous les participants avec 100 pts ou plus' }
   },
   rules: {
     influencerMinFollowers: 2000,

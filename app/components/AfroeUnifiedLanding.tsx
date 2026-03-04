@@ -172,8 +172,8 @@ function PrizeBanner(): JSX.Element {
       <div className="flex items-center gap-3">
         <span className="text-amber-300 text-xl">🏆</span>
         <div>
-          <div className="text-sm md:text-base font-semibold">Jusqu'à <span className="text-amber-300">3 500 €</span> à gagner</div>
-          <div className="text-[12px] text-slate-200/90">Le/La #1 du classement remporte 3 500 €. Des récompenses sont débloquées à chaque étape.</div>
+          <div className="text-sm md:text-base font-semibold">Jusqu'à <span className="text-amber-300">2 000 €</span> à gagner</div>
+          <div className="text-[12px] text-slate-200/90">Le/La #1 du classement remporte 2 000 €. Des récompenses sont débloquées à chaque étape.</div>
         </div>
       </div>
     </div>
@@ -184,12 +184,12 @@ function Rewards(): JSX.Element {
   return (
     <div id="recompenses" className="glassy rounded-2xl p-5 text-white">
       <h3 className="font-semibold mb-1">Récompenses par étapes</h3>
-      <p className="text-[12px] text-slate-300 mb-4">Gagne du statut, des avantages et vise le Grand Prix de <span className="text-amber-300">3 500 €</span>.</p>
+      <p className="text-[12px] text-slate-300 mb-4">Gagne du statut, des avantages et vise le Grand Prix de <span className="text-amber-300">2 000 €</span>.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 1</div><div className="text-2xl font-bold">10 pts</div><div className="text-[11px] text-slate-400">Badge Glow Starter & mise en avant waitlist</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 2</div><div className="text-2xl font-bold">50 pts</div><div className="text-[11px] text-slate-400">Accès anticipé (VIP) + shoutout IG</div></div>
         <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Étape 3</div><div className="text-2xl font-bold">100 pts</div><div className="text-[11px] text-slate-400">Glow Kit édition limitée</div></div>
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold"><div className="text-slate-300">Grand Prix</div><div className="text-2xl font-bold text-amber-300">3 500 €</div><div className="text-[11px] text-slate-200">#1 du classement au lancement</div></div>
+        <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3 neon-gold"><div className="text-slate-300">Grand Prix</div><div className="text-2xl font-bold text-amber-300">2 000 €</div><div className="text-[11px] text-slate-200">#1 du classement au lancement</div></div>
       </div>
       <ul className="mt-4 text-[11px] text-slate-400 space-y-1 list-disc list-inside">
         <li>Points validés au lancement (téléchargements clients, inscriptions pros, influenceurs éligibles).</li>
@@ -461,7 +461,7 @@ export default function AfroeUnifiedLanding(): JSX.Element {
                   <span className="text-[11px] inline-flex items-center gap-1 text-amber-300 bg-amber-400/10 border border-amber-300/30 px-2 py-0.5 rounded-md">⚠️ dès le lancement prévu mi‑décembre</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="text-xs text-slate-200/90 bg-amber-400/10 border border-amber-300/30 text-amber-300 px-2 py-1 rounded-lg">Objectif : 3 500 €</div>
+                  <div className="text-xs text-slate-200/90 bg-amber-400/10 border border-amber-300/30 text-amber-300 px-2 py-1 rounded-lg">Objectif : 2 000 €</div>
                   <Countdown />
                 </div>
               </div>

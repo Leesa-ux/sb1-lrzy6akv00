@@ -34,10 +34,10 @@ export const SMS_TEMPLATES: Record<
       `Afroé ✨ Bienvenue sur la Glow List !\nClient = +5 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts (après vérification).\nÀ 10 pts : badge + mise en avant + -10%.\nTon lien : ${vars.refLink}`,
 
     influencer: (vars: SMSVariables) =>
-      `Afroé ✨ Bienvenue sur la Glow List !\nClient = +5 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts (après vérification).\nVise 50–100 pts pour les rewards + Jackpot 3 500 €.\nTon lien : ${vars.refLink}`,
+      `Afroé ✨ Bienvenue sur la Glow List !\nClient = +5 pts · Influenceur ≥2k = +15 pts · Pro = +25 pts (après vérification).\nVise 50–100 pts pour les rewards + Jackpot 2 000 €.\nTon lien : ${vars.refLink}`,
 
     pro: (vars: SMSVariables) =>
-      `Afroé ✨ Bienvenue Beauty Pro !\nPro = +25 pts · Client = +5 pts · Influenceur ≥2k = +15 pts (après vérification).\nÀ 100 pts : Glow Kit + 1h coaching + Jackpot 3 500 €.\nTon lien : ${vars.refLink}`,
+      `Afroé ✨ Bienvenue Beauty Pro !\nPro = +25 pts · Client = +5 pts · Influenceur ≥2k = +15 pts (après vérification).\nÀ 100 pts : Glow Kit + 1h coaching + Jackpot 2 000 €.\nTon lien : ${vars.refLink}`,
   },
 
   followup_1h: `Hey ! N'oublie pas de partager ton lien Afroé pour gagner des points et monter dans le classement ! 🚀`,
