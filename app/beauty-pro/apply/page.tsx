@@ -42,7 +42,7 @@ export default function BeautyProApplyPage() {
               <p className="mt-4 text-lg text-neutral-600 max-w-2xl mx-auto">
                 Complétez ce formulaire en 3 étapes pour rejoindre notre plateforme.
                 Nous recherchons des professionnels passionnés et qualifiés dans les domaines
-                de la coiffure, l'esthétique, la manucure et le maquillage.
+                de la coiffure, l'esthétique, le grooming, la manucure et le maquillage.
               </p>
             </div>
 
@@ -73,7 +73,7 @@ export default function BeautyProApplyPage() {
                 </div>
                 <h3 className="font-semibold text-neutral-900">Formations Academy</h3>
                 <p className="mt-2 text-sm text-neutral-600">
-                  Maîtrisez l'accueil de luxe et les techniques.
+                  Maîtrisez la gestion clients et les techniques beauté prémium.
                 </p>
               </div>
 
@@ -135,7 +135,7 @@ export default function BeautyProApplyPage() {
 
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-8 tracking-tight leading-tight">
-            Rejoignez le réseau d'élite
+            Rejoignez le réseau prémium
             <br />
             <span className="font-normal">de la beauté Afro</span>
           </h1>
@@ -162,7 +162,7 @@ export default function BeautyProApplyPage() {
               Les Avantages
             </p>
             <h2 className="text-4xl md:text-5xl font-light text-neutral-900 mb-6">
-              Devenir un <span className="font-normal">Afroé Pro</span>
+              Devenir un.e <span className="font-normal">Afroé Pro</span>
             </h2>
           </div>
 
@@ -205,7 +205,7 @@ export default function BeautyProApplyPage() {
                 Formations Academy
               </h3>
               <p className="text-sm text-neutral-600 leading-relaxed">
-                Maîtrisez l'accueil de luxe et les techniques.
+                Maîtrisez la gestion clients et les techniques beauté premium.
               </p>
             </div>
 
