@@ -1,14 +1,19 @@
 import { AmbassadorApplicationForm } from "@/components/ambassadors/AmbassadorApplicationForm";
 
-export default function Page() {
+export default function AmbassadorApplyPage() {
   return (
-    <div className="mx-auto max-w-xl p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Ambassadeurs Afroé</h1>
-      <p className="text-sm text-muted-foreground">
-        2 000+ abonnés. Package troc : services + visibilité dans l'appli (pas de paiement en espèces).
-      </p>
+    <div className="min-h-screen bg-neutral-50">
+      <header className="border-b bg-white py-6">
+        <div className="mx-auto max-w-7xl px-4">
+          <h1 className="text-xl font-bold text-neutral-900">Programme Ambassadeur</h1>
+        </div>
+      </header>
 
-      <AmbassadorApplicationForm />
+      <main className="py-12 px-4 sm:px-6 lg:px-8 overflow-visible">
+        <div className="mx-auto max-w-3xl h-auto">
+          <AmbassadorApplicationForm />
+        </div>
+      </main>
     </div>
   );
 }
