@@ -114,9 +114,10 @@ export function ProApplicationMultiStepForm() {
   };
 
   const next = async () => {
-    const ok = await validateStep(step);
-    if (!ok) return;
-    setStep((p) => Math.min(3, p + 1));
+    if (await validateStep(step)) {
+      setStep((p) => Math.min(3, p + 1));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const back = () => setStep((p) => Math.max(1, p - 1));
@@ -492,12 +493,12 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-6 border-t mt-6">
+        <div className="sticky bottom-0 z-10 mt-8 flex items-center justify-between border-t bg-white py-4">
           <button
             type="button"
             onClick={back}
             disabled={step === 1 || loading}
-            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
             Retour
           </button>
@@ -507,7 +508,7 @@ export function ProApplicationMultiStepForm() {
               type="button"
               onClick={next}
               disabled={loading}
-              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 transition-colors"
+              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6]"
             >
               Continuer
             </button>
@@ -515,9 +516,9 @@ export function ProApplicationMultiStepForm() {
             <button
               type="submit"
               disabled={loading || !consentAll}
-              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 transition-colors"
+              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6]"
             >
-              {loading ? "Envoi..." : "Soumettre ma candidature"}
+              {loading ? "Envoi..." : "Soumettre"}
             </button>
           )}
         </div>
