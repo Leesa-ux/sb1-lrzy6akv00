@@ -277,9 +277,40 @@ export function AmbassadorApplicationForm() {
         </div>
       </div>
 
-      <Button type="submit" disabled={loading || !consent}>
-        {loading ? "Envoi en cours..." : "Postuler comme ambassadeur"}
-      </Button>
+      <div className="mt-12 rounded-2xl border border-violet-100 bg-violet-50/50 p-6 sm:p-8">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-neutral-900">
+            L'Alliance Afroé | <span className="text-violet-600">Formalisez votre statut</span>
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-neutral-600 italic">
+            "Chez Afroé, la transparence est le socle de notre collaboration. Pour activer pleinement vos avantages — commissions, accès VIP et dotations exclusives — nous avons défini un cadre simple et sécurisé."
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
+              Étape clé
+            </div>
+            <h3 className="text-sm font-semibold text-neutral-900">Confirmation de vos informations</h3>
+          </div>
+
+          <p className="text-sm text-neutral-600 ml-8">
+            Remplissez le formulaire ci-dessus pour confirmer vos coordonnées officielles.
+            <span className="font-medium text-neutral-900"> Après lecture de votre profil</span>, notre équipe vous fera parvenir votre contrat de collaboration digitale par e-mail pour une signature électronique rapide et sécurisée.
+          </p>
+
+          <div className="pt-4 ml-8">
+            <Button
+              type="submit"
+              disabled={loading || !consent}
+              className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white px-8 py-6 h-auto text-base font-bold shadow-lg shadow-violet-200 transition-all hover:scale-[1.02]"
+            >
+              {loading ? "Envoi en cours..." : "DEMANDER MON CONTRAT AFROÉ"}
+            </Button>
+          </div>
+        </div>
+      </div>
     </form>
   );
 }
