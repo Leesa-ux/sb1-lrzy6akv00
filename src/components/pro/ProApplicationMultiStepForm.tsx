@@ -501,39 +501,44 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="sticky bottom-0 z-50 mt-8 flex items-center justify-between border-t bg-white py-4 -mx-6 px-6 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log('Back button clicked! Step:', step, 'Disabled:', step === 1 || loading);
-              back();
-            }}
-            disabled={step === 1 || loading}
-            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            title={step === 1 ? 'Déjà à la première étape' : 'Retour à l\'étape précédente'}
-          >
-            Retour
-          </button>
-
-          {step < 3 ? (
+        <div className="sticky bottom-0 z-50 mt-8 w-full border-t bg-white py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between w-full gap-4">
             <button
               type="button"
-              onClick={next}
-              disabled={loading}
-              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Back button clicked! Step:', step, 'Disabled:', step === 1 || loading);
+                back();
+              }}
+              disabled={step === 1 || loading}
+              className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+              title={step === 1 ? 'Déjà à la première étape' : 'Retour à l\'étape précédente'}
             >
-              Continuer
+              Retour
             </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading || !consentAll}
-              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? "Envoi..." : "Soumettre"}
-            </button>
-          )}
+
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  console.log('Continuer button clicked! Step:', step);
+                  next();
+                }}
+                disabled={loading}
+                className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+              >
+                Continuer
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading || !consentAll}
+                className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+              >
+                {loading ? "Envoi..." : "Soumettre"}
+              </button>
+            )}
+          </div>
         </div>
       </form>
 
