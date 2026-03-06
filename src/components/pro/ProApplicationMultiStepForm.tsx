@@ -84,25 +84,12 @@ export function ProApplicationMultiStepForm() {
   });
 
   const certs = watch("certifications");
-  const postalCode = watch("postal_code");
   const consentAll = watch("consent_missions") && watch("consent_messages") && watch("consent_phone");
-
-  // Auto-complétion du code postal
-  React.useEffect(() => {
-    if (postalCode && postalCode.length === 4) {
-      const commune = BELGIAN_COMMUNES[postalCode];
-      if (commune) {
-        setValue("city", commune);
-      } else {
-        setValue("city", "");
-      }
-    }
-  }, [postalCode, setValue]);
 
   const validateStep = async (s: number) => {
     if (s === 1) {
       return trigger([
-        "first_name","last_name","email","phone","city","postal_code",
+        "first_name","last_name","email","phone","postal_code",
         "date_of_birth",
       ]);
     }
@@ -297,12 +284,11 @@ export function ProApplicationMultiStepForm() {
                 {errors.postal_code && <p className="text-xs text-red-600">{errors.postal_code.message}</p>}
               </div>
               <div>
-                <label className="text-sm font-medium text-[#1A1A1A]">Commune</label>
+                <label className="text-sm font-medium text-[#1A1A1A]">Commune / Ville</label>
                 <input
-                  className="mt-1 w-full rounded-md border border-gray-100 bg-gray-50 p-3 text-gray-600 cursor-not-allowed outline-none"
-                  placeholder="Se remplit automatiquement..."
-                  readOnly
-                  {...register("city", { required: "Requis" })}
+                  className="mt-1 w-full rounded-md border border-gray-200 p-3 focus:border-[#6D28D9] focus:ring-1 focus:ring-[#6D28D9] outline-none transition-all"
+                  placeholder="Bruxelles, Liège, etc."
+                  {...register("city")}
                 />
                 {errors.city && <p className="text-xs text-red-600">{errors.city.message}</p>}
               </div>
@@ -510,24 +496,20 @@ export function ProApplicationMultiStepForm() {
 
         <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-purple-500 bg-white py-6 shadow-[0_-8px_20px_rgba(0,0,0,0.15)]">
           <div className="flex items-center justify-between w-full gap-6">
-            <div className="flex flex-col">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Back button clicked! Step:', step, 'Disabled:', step === 1 || loading);
-                  back();
-                }}
-                disabled={step === 1 || loading}
-                className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
-                title={step === 1 ? 'Déjà à la première étape' : 'Retour à l\'étape précédente'}
-              >
-                Retour
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Back button clicked! Step:', step);
+                back();
+              }}
+              disabled={step === 1 || loading}
+              className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              Retour
+            </button>
 
-            {/* ALWAYS RENDER BOTH BUTTONS - NO CONDITIONAL */}
-            <div className="flex flex-col gap-2">
+            {step < 3 && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -535,22 +517,22 @@ export function ProApplicationMultiStepForm() {
                   console.log('Continuer button clicked! Step:', step);
                   next();
                 }}
-                disabled={loading || step >= 3}
-                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 min-w-[140px]"
-                style={{ display: step < 3 ? 'block' : 'none' }}
+                disabled={loading}
+                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
               >
                 Continuer
               </button>
+            )}
 
+            {step === 3 && (
               <button
                 type="submit"
-                disabled={loading || !consentAll || step < 3}
-                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 min-w-[140px]"
-                style={{ display: step === 3 ? 'block' : 'none' }}
+                disabled={loading || !consentAll}
+                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
               >
                 {loading ? "Envoi..." : "Soumettre"}
               </button>
-            </div>
+            )}
           </div>
         </div>
       </form>
