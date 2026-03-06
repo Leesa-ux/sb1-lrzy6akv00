@@ -4,7 +4,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { BELGIAN_COMMUNES } from "@/lib/belgian-communes";
-import { ShieldCheck } from "phosphor-react";
 
 type FormValues = {
   // Section 1
@@ -52,22 +51,18 @@ const BEAUTE_ESTHETIQUE = [
   "Brow & Lash Artist"
 ];
 
-const ALL_PROFESSIONS = [...EXPERTISE_CAPILLAIRE, ...BEAUTE_ESTHETIQUE];
 
 export function ProApplicationMultiStepForm() {
   const [step, setStep] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [portfolioPreview, setPortfolioPreview] = React.useState<string[]>([]);
 
-  React.useEffect(() => {
-    console.log('ProApplicationMultiStepForm rendered, step:', step, 'loading:', loading);
-  }, [step, loading]);
-
   const {
     register,
     handleSubmit,
     trigger,
     watch,
+    getValues,
     setValue,
     formState: { errors },
   } = useForm<FormValues>({
@@ -85,12 +80,26 @@ export function ProApplicationMultiStepForm() {
 
   const certs = watch("certifications");
   const consentAll = watch("consent_missions") && watch("consent_messages") && watch("consent_phone");
+  const postalCode = watch("postal_code");
+  const city = watch("city");
+
+  React.useEffect(() => {
+    const normalizedPostalCode = (postalCode || "").trim();
+    if (!/^\d{4}$/.test(normalizedPostalCode)) return;
+
+    const matchedCommune = BELGIAN_COMMUNES[normalizedPostalCode];
+    if (!matchedCommune) return;
+
+    if (!city?.trim()) {
+      setValue("city", matchedCommune, { shouldValidate: true, shouldDirty: true });
+    }
+  }, [postalCode, city, setValue]);
 
   const validateStep = async (s: number) => {
     if (s === 1) {
       return trigger([
         "first_name","last_name","email","phone","postal_code",
-        "date_of_birth",
+        "city","date_of_birth",
       ]);
     }
     if (s === 2) {
@@ -112,7 +121,6 @@ export function ProApplicationMultiStepForm() {
   };
 
   const back = () => {
-    console.log('Back clicked, current step:', step);
     setStep((p) => Math.max(1, p - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -230,7 +238,7 @@ export function ProApplicationMultiStepForm() {
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6 overflow-visible" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-6 space-y-6 overflow-visible pb-28" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold">1) Informations Personnelles</h2>
@@ -288,7 +296,16 @@ export function ProApplicationMultiStepForm() {
                 <input
                   className="mt-1 w-full rounded-md border border-gray-200 p-3 focus:border-[#6D28D9] focus:ring-1 focus:ring-[#6D28D9] outline-none transition-all"
                   placeholder="Bruxelles, Liège, etc."
-                  {...register("city")}
+                  {...register("city", {
+                    required: "Requis",
+                    validate: (value) => {
+                      const expectedCity = BELGIAN_COMMUNES[(getValues("postal_code") || "").trim()];
+                      if (!expectedCity) return true;
+                      return value.trim().toLowerCase() === expectedCity.toLowerCase()
+                        ? true
+                        : `La commune doit correspondre au code postal (${expectedCity})`;
+                    }
+                  })}
                 />
                 {errors.city && <p className="text-xs text-red-600">{errors.city.message}</p>}
               </div>
@@ -487,22 +504,11 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        {/* DEBUGGING INFO - REMOVE AFTER TESTING */}
-        <div className="mt-6 p-4 bg-yellow-100 border-2 border-yellow-500 rounded-lg">
-          <p className="text-2xl font-bold text-black">CURRENT STEP: {step}</p>
-          <p className="text-sm text-gray-700">Loading: {loading ? 'TRUE' : 'FALSE'}</p>
-          <p className="text-sm text-gray-700">Step less than 3: {step < 3 ? 'TRUE' : 'FALSE'}</p>
-        </div>
-
-        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-purple-500 bg-white py-6 shadow-[0_-8px_20px_rgba(0,0,0,0.15)]">
+        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t border-gray-200 bg-white/95 py-4 backdrop-blur">
           <div className="flex items-center justify-between w-full gap-6">
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Back button clicked! Step:', step);
-                back();
-              }}
+              onClick={back}
               disabled={step === 1 || loading}
               className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
@@ -512,11 +518,7 @@ export function ProApplicationMultiStepForm() {
             {step < 3 && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Continuer button clicked! Step:', step);
-                  next();
-                }}
+                onClick={next}
                 disabled={loading}
                 className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
               >
@@ -537,15 +539,6 @@ export function ProApplicationMultiStepForm() {
         </div>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-gray-100">
-        <div className="flex items-start gap-3 text-sm text-gray-600">
-          <ShieldCheck weight="fill" className="text-green-600 mt-0.5 flex-shrink-0" size={20} />
-          <p>
-            <span className="font-bold text-[#1A1A1A]">Confidentialité garantie.</span><br />
-            Vos données sont traitées de manière sécurisée. Nous vous contacterons sous 72 heures après examen.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
