@@ -58,7 +58,6 @@ export function ProApplicationMultiStepForm() {
   const [step, setStep] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [portfolioPreview, setPortfolioPreview] = React.useState<string[]>([]);
-  const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     console.log('ProApplicationMultiStepForm rendered, step:', step, 'loading:', loading);
@@ -69,7 +68,6 @@ export function ProApplicationMultiStepForm() {
     handleSubmit,
     trigger,
     watch,
-    getValues,
     setValue,
     formState: { errors },
   } = useForm<FormValues>({
@@ -87,59 +85,12 @@ export function ProApplicationMultiStepForm() {
 
   const certs = watch("certifications");
   const consentAll = watch("consent_missions") && watch("consent_messages") && watch("consent_phone");
-  const postalCode = watch("postal_code");
-  const city = watch("city");
-
-  // Watch all fields for real-time validation feedback
-  const firstName = watch("first_name");
-  const lastName = watch("last_name");
-  const email = watch("email");
-  const phone = watch("phone");
-  const dateOfBirth = watch("date_of_birth");
-  const workAuthorized = watch("work_authorized");
-  const portfolioUrl = watch("portfolio_url");
-  const portfolio = watch("portfolio");
-
-  // Update validation errors in real-time
-  React.useEffect(() => {
-    const errList: string[] = [];
-
-    if (step === 1) {
-      if (!firstName?.trim()) errList.push("Prénom manquant");
-      if (!lastName?.trim()) errList.push("Nom manquant");
-      if (!email?.trim()) errList.push("Email manquant");
-      if (!phone?.trim()) errList.push("Téléphone manquant");
-      if (!postalCode?.trim() || !/^\d{4}$/.test(postalCode)) errList.push("Code postal invalide");
-      if (!city?.trim()) errList.push("Commune manquante");
-      if (!dateOfBirth?.trim()) errList.push("Date de naissance manquante");
-      if (errors.city) errList.push("Commune ne correspond pas au code postal");
-    } else if (step === 2) {
-      if (!certs || certs.length === 0) errList.push("Aucune certification sélectionnée");
-      if (!portfolioUrl?.trim()) errList.push("Portfolio URL manquante");
-      if (!portfolio || portfolio.length === 0) errList.push("Photos portfolio manquantes");
-    }
-
-    setValidationErrors(errList);
-  }, [step, firstName, lastName, email, phone, postalCode, city, dateOfBirth, certs, portfolioUrl, portfolio, errors.city]);
-
-  React.useEffect(() => {
-    const normalizedPostalCode = (postalCode || "").trim();
-    if (!/^\d{4}$/.test(normalizedPostalCode)) return;
-
-    const matchedCommune = BELGIAN_COMMUNES[normalizedPostalCode];
-    if (!matchedCommune) return;
-
-    if (!city?.trim()) {
-      setValue("city", matchedCommune, { shouldValidate: true, shouldDirty: true });
-    }
-  }, [postalCode, city, setValue]);
 
   const validateStep = async (s: number) => {
     if (s === 1) {
       return trigger([
         "first_name","last_name","email","phone","postal_code",
         "date_of_birth",
-        "city","date_of_birth",
       ]);
     }
     if (s === 2) {
@@ -188,57 +139,71 @@ export function ProApplicationMultiStepForm() {
 
       setLoading(true);
 
-      const dataToSend = {
-        first_name: values.first_name,
-        last_name: values.last_name,
-        email: values.email,
-        phone: values.phone,
-        city: values.city,
-        postal_code: values.postal_code,
-        address: values.address || "",
-        date_of_birth: values.date_of_birth,
-        work_authorized: values.work_authorized === "yes",
-        certifications: values.certifications,
-        portfolio_url: values.portfolio_url,
-        media_projects: values.media_projects || "",
-        heard_about: values.heard_about || "",
-        smartphone_os: values.smartphone_os,
-        consent_missions: values.consent_missions,
-        consent_messages: values.consent_messages,
-        consent_phone: values.consent_phone,
-      };
+      const fd = new FormData();
 
-      const formData = new FormData();
-      formData.append("data", JSON.stringify(dataToSend));
+      fd.append("first_name", values.first_name);
+      fd.append("last_name", values.last_name);
+      fd.append("email", values.email);
+      fd.append("phone", values.phone);
+      fd.append("city", values.city);
+      fd.append("postal_code", values.postal_code);
+      if (values.address) fd.append("address", values.address);
+      fd.append("date_of_birth", values.date_of_birth);
 
-      files.forEach((file) => {
-        formData.append("portfolio", file);
-      });
+      fd.append("work_authorized", values.work_authorized === "yes" ? "true" : "false");
+      (values.certifications || []).forEach((c) => fd.append("certifications", c));
+      fd.append("portfolio_url", values.portfolio_url);
+      fd.append("media_projects", values.media_projects || "");
+      fd.append("heard_about", values.heard_about || "");
+
+      files.forEach((f) => fd.append("portfolio", f));
+
+      fd.append("smartphone_os", values.smartphone_os);
+      fd.append("consent_missions", values.consent_missions ? "true" : "false");
+      fd.append("consent_messages", values.consent_messages ? "true" : "false");
+      fd.append("consent_phone", values.consent_phone ? "true" : "false");
 
       const res = await fetch("/api/pro/apply", {
         method: "POST",
-        body: formData,
+        body: fd,
       });
 
+      const json = await res.json();
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Échec de l'envoi" }));
-        toast.error(err.error || "Erreur lors de la soumission");
+        toast.error(json?.error || "Échec de l'envoi de la candidature");
         return;
       }
 
-      toast.success("Candidature envoyée avec succès !");
-      window.location.href = "/success";
-    } catch (err: any) {
-      console.error("Submit error:", err);
-      toast.error(err.message || "Erreur inattendue");
+      toast.success("Candidature envoyée. Afroé vous contactera bientôt.");
+      setStep(1);
+    } catch (e: any) {
+      toast.error(e?.message || "Erreur inattendue");
     } finally {
       setLoading(false);
     }
   };
 
+  const toggleCert = (label: string) => {
+    const current = new Set(certs || []);
+    if (current.has(label)) {
+      current.delete(label);
+    } else {
+      current.add(label);
+    }
+    setValue("certifications", Array.from(current));
+  };
+
   const handlePortfolioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0) {
+      setPortfolioPreview([]);
+      return;
+    }
+
+    if (files.length > 3) {
+      toast.error("Maximum 3 images autorisées");
+      return;
+    }
 
     const previews: string[] = [];
     Array.from(files).forEach((file) => {
@@ -254,7 +219,7 @@ export function ProApplicationMultiStepForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm relative">
+    <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm">
       <h1 className="text-xl font-semibold text-[#1A1A1A]">Afroé PRO – Formulaire de Candidature</h1>
       <p className="mt-1 text-sm text-gray-600">Formulaire multi-étapes. 3 photos max. Données sécurisées.</p>
 
@@ -265,7 +230,7 @@ export function ProApplicationMultiStepForm() {
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6 overflow-visible pb-32 relative z-[1]" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-6 space-y-6 overflow-visible" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold">1) Informations Personnelles</h2>
@@ -297,7 +262,7 @@ export function ProApplicationMultiStepForm() {
               </div>
               <div>
                 <label className="text-sm font-medium">Téléphone</label>
-                <input className="mt-1 w-full rounded-md border p-2"
+                <input className="mt-1 w-full rounded-md border p-2" placeholder="+32 487 123 456"
                   {...register("phone", { required: "Requis" })}
                 />
                 {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
@@ -323,16 +288,7 @@ export function ProApplicationMultiStepForm() {
                 <input
                   className="mt-1 w-full rounded-md border border-gray-200 p-3 focus:border-[#6D28D9] focus:ring-1 focus:ring-[#6D28D9] outline-none transition-all"
                   placeholder="Bruxelles, Liège, etc."
-                  {...register("city", {
-                    required: "Requis",
-                    validate: (value) => {
-                      const expectedCity = BELGIAN_COMMUNES[(getValues("postal_code") || "").trim()];
-                      if (!expectedCity) return true;
-                      return value.trim().toLowerCase() === expectedCity.toLowerCase()
-                        ? true
-                        : `La commune doit correspondre au code postal (${expectedCity})`;
-                    }
-                  })}
+                  {...register("city")}
                 />
                 {errors.city && <p className="text-xs text-red-600">{errors.city.message}</p>}
               </div>
@@ -360,94 +316,152 @@ export function ProApplicationMultiStepForm() {
             <h2 className="text-sm font-semibold">2) Informations Professionnelles</h2>
 
             <div>
-              <label className="text-sm font-medium">Autorisé(e) à travailler en Belgique?</label>
-              <div className="mt-2 flex gap-4">
+              <label className="text-sm font-medium">Autorisé(e) à travailler en Belgique/Europe ?</label>
+              <div className="mt-2 flex gap-6 text-sm">
                 <label className="flex items-center gap-2">
                   <input type="radio" value="yes" {...register("work_authorized", { required: true })} />
-                  <span>Oui</span>
+                  Oui
                 </label>
                 <label className="flex items-center gap-2">
                   <input type="radio" value="no" {...register("work_authorized", { required: true })} />
-                  <span>Non</span>
+                  Non
                 </label>
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium">Certifications / Diplômes (sélection multiple)</label>
-              <div className="mt-2 grid grid-cols-2 gap-3 max-h-60 overflow-y-auto border rounded-md p-3">
-                {ALL_PROFESSIONS.map((prof) => (
-                  <label key={prof} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      value={prof}
-                      {...register("certifications", { required: "Sélectionnez au moins un" })}
-                    />
-                    <span>{prof}</span>
-                  </label>
-                ))}
+              <label className="text-sm font-medium">Votre Expertise</label>
+              <p className="text-xs text-gray-500 mb-3">Sélectionnez une ou plusieurs spécialités</p>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Expertise Capillaire</h4>
+                  <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                    {EXPERTISE_CAPILLAIRE.map(c => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => toggleCert(c)}
+                        className={`rounded-md border px-3 py-2.5 text-xs text-left transition-all ${
+                          (certs || []).includes(c)
+                            ? "border-[#6D28D9] bg-[#6D28D9] text-white shadow-sm"
+                            : "border-gray-200 bg-white hover:border-[#6D28D9] hover:bg-violet-50"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Beauté & Esthétique</h4>
+                  <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                    {BEAUTE_ESTHETIQUE.map(c => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => toggleCert(c)}
+                        className={`rounded-md border px-3 py-2.5 text-xs text-left transition-all ${
+                          (certs || []).includes(c)
+                            ? "border-[#6D28D9] bg-[#6D28D9] text-white shadow-sm"
+                            : "border-gray-200 bg-white hover:border-[#6D28D9] hover:bg-violet-50"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              {errors.certifications && <p className="text-xs text-red-600">{errors.certifications.message}</p>}
+
+              <input type="hidden" {...register("certifications", { validate: (v) => (v && v.length ? true : "Choisissez au moins une expertise") })} />
+              {errors.certifications && <p className="text-xs text-red-600 mt-2">{String(errors.certifications.message)}</p>}
             </div>
 
             <div>
-              <label className="text-sm font-medium">Portfolio URL (Instagram, site web, etc.)</label>
-              <input className="mt-1 w-full rounded-md border p-2"
+              <label className="text-sm font-medium">Upload Certifications/Diplômes (optionnel)</label>
+              <p className="text-xs text-gray-500 mb-2">Formats acceptés : PDF, JPG, PNG (5MB max chacun)</p>
+              <input
+                className="mt-1 w-full rounded-md border p-2 text-sm"
+                type="file"
+                accept="image/png,image/jpeg,application/pdf"
+                multiple
+                {...register("certification_files")}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Portfolio (Instagram / site web)</label>
+              <input className="mt-1 w-full rounded-md border p-2" placeholder="https://instagram.com/..."
                 {...register("portfolio_url", { required: "Requis" })}
               />
               {errors.portfolio_url && <p className="text-xs text-red-600">{errors.portfolio_url.message}</p>}
             </div>
 
             <div>
-              <label className="text-sm font-medium">Portfolio (1 à 3 photos max, 5Mo chacune)</label>
+              <label className="text-sm font-medium">Upload Portfolio (1 à 3 photos max)</label>
+              <p className="text-xs text-gray-500 mb-2">Formats : JPG, PNG, WEBP (5MB max chacune)</p>
               <input
+                className="mt-1 w-full rounded-md border p-2 text-sm"
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp"
                 multiple
-                className="mt-1 w-full"
-                {...register("portfolio", { required: "Requis" })}
-                onChange={handlePortfolioChange}
+                {...register("portfolio", {
+                  required: "Requis",
+                  validate: (files) => {
+                    const count = files?.length || 0;
+                    if (count < 1 || count > 3) return "Téléchargez 1 à 3 photos";
+                    return true;
+                  }
+                })}
+                onChange={(e) => {
+                  handlePortfolioChange(e);
+                  register("portfolio").onChange(e);
+                }}
               />
-              {errors.portfolio && <p className="text-xs text-red-600">{errors.portfolio.message}</p>}
+              {errors.portfolio && <p className="text-xs text-red-600 mt-1">{String(errors.portfolio.message)}</p>}
+
               {portfolioPreview.length > 0 && (
-                <div className="mt-3 flex gap-2 flex-wrap">
-                  {portfolioPreview.map((src, i) => (
-                    <img key={i} src={src} alt={`Preview ${i+1}`} className="w-24 h-24 object-cover rounded" />
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {portfolioPreview.map((src, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                      <img src={src} alt={`Aperçu ${idx + 1}`} className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 bg-[#6D28D9] text-white text-xs px-2 py-0.5 rounded-full">
+                        {idx + 1}
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
             </div>
 
             <div>
-              <label className="text-sm font-medium">Projets média (optionnel)</label>
-              <textarea className="mt-1 w-full rounded-md border p-2" rows={3}
-                {...register("media_projects")}
-              />
+              <label className="text-sm font-medium">Projets médias ? (optionnel)</label>
+              <textarea className="mt-1 w-full rounded-md border p-2" rows={3} {...register("media_projects")} />
             </div>
 
             <div>
-              <label className="text-sm font-medium">Comment avez-vous entendu parler d'Afroé?</label>
-              <input className="mt-1 w-full rounded-md border p-2"
-                {...register("heard_about")}
-              />
+              <label className="text-sm font-medium">Comment avez-vous connu Afroé ? (optionnel)</label>
+              <input className="mt-1 w-full rounded-md border p-2" {...register("heard_about")} />
             </div>
           </div>
         )}
 
         {step === 3 && (
           <div className="space-y-5">
-            <h2 className="text-sm font-semibold">3) Confirmations & Consentements</h2>
+            <h2 className="text-sm font-semibold">3) Appareils & Consentements</h2>
 
             <div>
-              <label className="text-sm font-medium">Système d'exploitation de votre smartphone?</label>
-              <div className="mt-2 flex gap-4">
+              <label className="text-sm font-medium">Smartphone</label>
+              <div className="mt-2 flex gap-6 text-sm">
                 <label className="flex items-center gap-2">
                   <input type="radio" value="ios" {...register("smartphone_os", { required: true })} />
-                  <span>iOS</span>
+                  iOS
                 </label>
                 <label className="flex items-center gap-2">
                   <input type="radio" value="android" {...register("smartphone_os", { required: true })} />
-                  <span>Android</span>
+                  Android
                 </label>
               </div>
             </div>
@@ -473,60 +487,52 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="sticky bottom-0 left-0 right-0 z-[100] mt-8 w-full border-t border-gray-200 bg-white py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
-          <div className="flex flex-col gap-3">
-            {/* Validation Error Display */}
-            {validationErrors.length > 0 && step < 3 && (
-              <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-xs font-semibold text-red-800 mb-1">Erreurs de validation:</p>
-                <ul className="text-xs text-red-700 list-disc list-inside space-y-0.5">
-                  {validationErrors.map((err, i) => (
-                    <li key={i}>{err}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+        {/* DEBUGGING INFO - REMOVE AFTER TESTING */}
+        <div className="mt-6 p-4 bg-yellow-100 border-2 border-yellow-500 rounded-lg">
+          <p className="text-2xl font-bold text-black">CURRENT STEP: {step}</p>
+          <p className="text-sm text-gray-700">Loading: {loading ? 'TRUE' : 'FALSE'}</p>
+          <p className="text-sm text-gray-700">Step less than 3: {step < 3 ? 'TRUE' : 'FALSE'}</p>
+        </div>
 
-            <div className="flex items-center justify-between w-full gap-6">
+        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-purple-500 bg-white py-6 shadow-[0_-8px_20px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center justify-between w-full gap-6">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Back button clicked! Step:', step);
+                back();
+              }}
+              disabled={step === 1 || loading}
+              className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              Retour
+            </button>
+
+            {step < 3 && (
               <button
                 type="button"
-                onClick={back}
-                disabled={step === 1 || loading}
-                className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Continuer button clicked! Step:', step);
+                  next();
+                }}
+                disabled={loading}
+                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
               >
-                Retour
+                Continuer
               </button>
+            )}
 
-              {step < 3 && (
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={next}
-                    disabled={loading}
-                    className={`rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:cursor-not-allowed transition-all min-w-[140px] ${
-                      validationErrors.length > 0 ? 'opacity-50' : ''
-                    }`}
-                  >
-                    Continuer
-                  </button>
-                  {validationErrors.length > 0 && (
-                    <span className="text-xs text-red-600 font-medium">
-                      ⚠ {validationErrors.length} erreur{validationErrors.length > 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {step === 3 && (
-                <button
-                  type="submit"
-                  disabled={loading || !consentAll}
-                  className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
-                >
-                  {loading ? "Envoi..." : "Soumettre"}
-                </button>
-              )}
-            </div>
+            {step === 3 && (
+              <button
+                type="submit"
+                disabled={loading || !consentAll}
+                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+              >
+                {loading ? "Envoi..." : "Soumettre"}
+              </button>
+            )}
           </div>
         </div>
       </form>
