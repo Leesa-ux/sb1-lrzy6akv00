@@ -154,7 +154,59 @@ export function ProApplicationMultiStepForm() {
       }
 
       setLoading(true);
-@@ -208,51 +216,51 @@ export function ProApplicationMultiStepForm() {
+
+      const dataToSend = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone: values.phone,
+        city: values.city,
+        postal_code: values.postal_code,
+        address: values.address || "",
+        date_of_birth: values.date_of_birth,
+        work_authorized: values.work_authorized === "yes",
+        certifications: values.certifications,
+        portfolio_url: values.portfolio_url,
+        media_projects: values.media_projects || "",
+        heard_about: values.heard_about || "",
+        smartphone_os: values.smartphone_os,
+        consent_missions: values.consent_missions,
+        consent_messages: values.consent_messages,
+        consent_phone: values.consent_phone,
+      };
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(dataToSend));
+
+      files.forEach((file) => {
+        formData.append("portfolio", file);
+      });
+
+      const res = await fetch("/api/pro/apply", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Échec de l'envoi" }));
+        toast.error(err.error || "Erreur lors de la soumission");
+        return;
+      }
+
+      toast.success("Candidature envoyée avec succès !");
+      window.location.href = "/success";
+    } catch (err: any) {
+      console.error("Submit error:", err);
+      toast.error(err.message || "Erreur inattendue");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePortfolioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
     const previews: string[] = [];
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
@@ -180,7 +232,6 @@ export function ProApplicationMultiStepForm() {
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6 overflow-visible" onSubmit={handleSubmit(onSubmit)}>
       <form className="mt-6 space-y-6 overflow-visible pb-28" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
           <div className="space-y-5">
@@ -207,7 +258,13 @@ export function ProApplicationMultiStepForm() {
               <div>
                 <label className="text-sm font-medium">Email</label>
                 <input className="mt-1 w-full rounded-md border p-2" type="email"
-@@ -266,51 +274,60 @@ export function ProApplicationMultiStepForm() {
+                  {...register("email", { required: "Requis" })}
+                />
+                {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
+              </div>
+              <div>
+                <label className="text-sm font-medium">Téléphone</label>
+                <input className="mt-1 w-full rounded-md border p-2"
                   {...register("phone", { required: "Requis" })}
                 />
                 {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
@@ -233,7 +290,6 @@ export function ProApplicationMultiStepForm() {
                 <input
                   className="mt-1 w-full rounded-md border border-gray-200 p-3 focus:border-[#6D28D9] focus:ring-1 focus:ring-[#6D28D9] outline-none transition-all"
                   placeholder="Bruxelles, Liège, etc."
-                  {...register("city")}
                   {...register("city", {
                     required: "Requis",
                     validate: (value) => {
@@ -269,7 +325,96 @@ export function ProApplicationMultiStepForm() {
         {step === 2 && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold">2) Informations Professionnelles</h2>
-@@ -465,87 +482,63 @@ export function ProApplicationMultiStepForm() {
+
+            <div>
+              <label className="text-sm font-medium">Autorisé(e) à travailler en Belgique?</label>
+              <div className="mt-2 flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input type="radio" value="yes" {...register("work_authorized", { required: true })} />
+                  <span>Oui</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" value="no" {...register("work_authorized", { required: true })} />
+                  <span>Non</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Certifications / Diplômes (sélection multiple)</label>
+              <div className="mt-2 grid grid-cols-2 gap-3 max-h-60 overflow-y-auto border rounded-md p-3">
+                {ALL_PROFESSIONS.map((prof) => (
+                  <label key={prof} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      value={prof}
+                      {...register("certifications", { required: "Sélectionnez au moins un" })}
+                    />
+                    <span>{prof}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.certifications && <p className="text-xs text-red-600">{errors.certifications.message}</p>}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Portfolio URL (Instagram, site web, etc.)</label>
+              <input className="mt-1 w-full rounded-md border p-2"
+                {...register("portfolio_url", { required: "Requis" })}
+              />
+              {errors.portfolio_url && <p className="text-xs text-red-600">{errors.portfolio_url.message}</p>}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Portfolio (1 à 3 photos max, 5Mo chacune)</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="mt-1 w-full"
+                {...register("portfolio", { required: "Requis" })}
+                onChange={handlePortfolioChange}
+              />
+              {errors.portfolio && <p className="text-xs text-red-600">{errors.portfolio.message}</p>}
+              {portfolioPreview.length > 0 && (
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  {portfolioPreview.map((src, i) => (
+                    <img key={i} src={src} alt={`Preview ${i+1}`} className="w-24 h-24 object-cover rounded" />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Projets média (optionnel)</label>
+              <textarea className="mt-1 w-full rounded-md border p-2" rows={3}
+                {...register("media_projects")}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Comment avez-vous entendu parler d'Afroé?</label>
+              <input className="mt-1 w-full rounded-md border p-2"
+                {...register("heard_about")}
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-5">
+            <h2 className="text-sm font-semibold">3) Confirmations & Consentements</h2>
+
+            <div>
+              <label className="text-sm font-medium">Système d'exploitation de votre smartphone?</label>
+              <div className="mt-2 flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input type="radio" value="ios" {...register("smartphone_os", { required: true })} />
+                  <span>iOS</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" value="android" {...register("smartphone_os", { required: true })} />
+                  <span>Android</span>
                 </label>
               </div>
             </div>
@@ -295,23 +440,10 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        {/* DEBUGGING INFO - REMOVE AFTER TESTING */}
-        <div className="mt-6 p-4 bg-yellow-100 border-2 border-yellow-500 rounded-lg">
-          <p className="text-2xl font-bold text-black">CURRENT STEP: {step}</p>
-          <p className="text-sm text-gray-700">Loading: {loading ? 'TRUE' : 'FALSE'}</p>
-          <p className="text-sm text-gray-700">Step less than 3: {step < 3 ? 'TRUE' : 'FALSE'}</p>
-        </div>
-
-        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-purple-500 bg-white py-6 shadow-[0_-8px_20px_rgba(0,0,0,0.15)]">
         <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t border-gray-200 bg-white/95 py-4 backdrop-blur">
           <div className="flex items-center justify-between w-full gap-6">
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Back button clicked! Step:', step);
-                back();
-              }}
               onClick={back}
               disabled={step === 1 || loading}
               className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
@@ -322,11 +454,6 @@ export function ProApplicationMultiStepForm() {
             {step < 3 && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log('Continuer button clicked! Step:', step);
-                  next();
-                }}
                 onClick={next}
                 disabled={loading}
                 className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
