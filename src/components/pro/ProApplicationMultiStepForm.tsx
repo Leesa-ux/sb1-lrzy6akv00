@@ -58,6 +58,7 @@ export function ProApplicationMultiStepForm() {
   const [step, setStep] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [portfolioPreview, setPortfolioPreview] = React.useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     console.log('ProApplicationMultiStepForm rendered, step:', step, 'loading:', loading);
@@ -88,6 +89,38 @@ export function ProApplicationMultiStepForm() {
   const consentAll = watch("consent_missions") && watch("consent_messages") && watch("consent_phone");
   const postalCode = watch("postal_code");
   const city = watch("city");
+
+  // Watch all fields for real-time validation feedback
+  const firstName = watch("first_name");
+  const lastName = watch("last_name");
+  const email = watch("email");
+  const phone = watch("phone");
+  const dateOfBirth = watch("date_of_birth");
+  const workAuthorized = watch("work_authorized");
+  const portfolioUrl = watch("portfolio_url");
+  const portfolio = watch("portfolio");
+
+  // Update validation errors in real-time
+  React.useEffect(() => {
+    const errList: string[] = [];
+
+    if (step === 1) {
+      if (!firstName?.trim()) errList.push("Prénom manquant");
+      if (!lastName?.trim()) errList.push("Nom manquant");
+      if (!email?.trim()) errList.push("Email manquant");
+      if (!phone?.trim()) errList.push("Téléphone manquant");
+      if (!postalCode?.trim() || !/^\d{4}$/.test(postalCode)) errList.push("Code postal invalide");
+      if (!city?.trim()) errList.push("Commune manquante");
+      if (!dateOfBirth?.trim()) errList.push("Date de naissance manquante");
+      if (errors.city) errList.push("Commune ne correspond pas au code postal");
+    } else if (step === 2) {
+      if (!certs || certs.length === 0) errList.push("Aucune certification sélectionnée");
+      if (!portfolioUrl?.trim()) errList.push("Portfolio URL manquante");
+      if (!portfolio || portfolio.length === 0) errList.push("Photos portfolio manquantes");
+    }
+
+    setValidationErrors(errList);
+  }, [step, firstName, lastName, email, phone, postalCode, city, dateOfBirth, certs, portfolioUrl, portfolio, errors.city]);
 
   React.useEffect(() => {
     const normalizedPostalCode = (postalCode || "").trim();
@@ -221,7 +254,7 @@ export function ProApplicationMultiStepForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm">
+    <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm relative">
       <h1 className="text-xl font-semibold text-[#1A1A1A]">Afroé PRO – Formulaire de Candidature</h1>
       <p className="mt-1 text-sm text-gray-600">Formulaire multi-étapes. 3 photos max. Données sécurisées.</p>
 
@@ -232,7 +265,7 @@ export function ProApplicationMultiStepForm() {
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6 overflow-visible pb-28" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-6 space-y-6 overflow-visible pb-32 relative z-[1]" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold">1) Informations Personnelles</h2>
@@ -440,37 +473,60 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t border-gray-200 bg-white/95 py-4 backdrop-blur">
-          <div className="flex items-center justify-between w-full gap-6">
-            <button
-              type="button"
-              onClick={back}
-              disabled={step === 1 || loading}
-              className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              Retour
-            </button>
+        <div className="sticky bottom-0 left-0 right-0 z-[100] mt-8 w-full border-t border-gray-200 bg-white py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+          <div className="flex flex-col gap-3">
+            {/* Validation Error Display */}
+            {validationErrors.length > 0 && step < 3 && (
+              <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-xs font-semibold text-red-800 mb-1">Erreurs de validation:</p>
+                <ul className="text-xs text-red-700 list-disc list-inside space-y-0.5">
+                  {validationErrors.map((err, i) => (
+                    <li key={i}>{err}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-            {step < 3 && (
+            <div className="flex items-center justify-between w-full gap-6">
               <button
                 type="button"
-                onClick={next}
-                disabled={loading}
-                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+                onClick={back}
+                disabled={step === 1 || loading}
+                className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Continuer
+                Retour
               </button>
-            )}
 
-            {step === 3 && (
-              <button
-                type="submit"
-                disabled={loading || !consentAll}
-                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
-              >
-                {loading ? "Envoi..." : "Soumettre"}
-              </button>
-            )}
+              {step < 3 && (
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={next}
+                    disabled={loading}
+                    className={`rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:cursor-not-allowed transition-all min-w-[140px] ${
+                      validationErrors.length > 0 ? 'opacity-50' : ''
+                    }`}
+                  >
+                    Continuer
+                  </button>
+                  {validationErrors.length > 0 && (
+                    <span className="text-xs text-red-600 font-medium">
+                      ⚠ {validationErrors.length} erreur{validationErrors.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {step === 3 && (
+                <button
+                  type="submit"
+                  disabled={loading || !consentAll}
+                  className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+                >
+                  {loading ? "Envoi..." : "Soumettre"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </form>
