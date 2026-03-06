@@ -256,6 +256,7 @@ export function ProApplicationMultiStepForm() {
                   <img
                     key={i}
                     src={img}
+                    alt={`Portfolio preview ${i + 1}`}
                     className="rounded object-cover h-20 w-full"
                   />
                 ))}
