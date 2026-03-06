@@ -243,7 +243,7 @@ export function ProApplicationMultiStepForm() {
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-6 space-y-6 overflow-visible" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold">1) Informations Personnelles</h2>
@@ -501,43 +501,56 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="sticky bottom-0 z-50 mt-8 w-full border-t bg-white py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center justify-between w-full gap-4">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Back button clicked! Step:', step, 'Disabled:', step === 1 || loading);
-                back();
-              }}
-              disabled={step === 1 || loading}
-              className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
-              title={step === 1 ? 'Déjà à la première étape' : 'Retour à l\'étape précédente'}
-            >
-              Retour
-            </button>
+        {/* DEBUGGING INFO - REMOVE AFTER TESTING */}
+        <div className="mt-6 p-4 bg-yellow-100 border-2 border-yellow-500 rounded-lg">
+          <p className="text-2xl font-bold text-black">CURRENT STEP: {step}</p>
+          <p className="text-sm text-gray-700">Loading: {loading ? 'TRUE' : 'FALSE'}</p>
+          <p className="text-sm text-gray-700">Step less than 3: {step < 3 ? 'TRUE' : 'FALSE'}</p>
+        </div>
 
-            {step < 3 ? (
+        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-purple-500 bg-white py-6 shadow-[0_-8px_20px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center justify-between w-full gap-6">
+            <div className="flex flex-col">
               <button
                 type="button"
                 onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Back button clicked! Step:', step, 'Disabled:', step === 1 || loading);
+                  back();
+                }}
+                disabled={step === 1 || loading}
+                className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                title={step === 1 ? 'Déjà à la première étape' : 'Retour à l\'étape précédente'}
+              >
+                Retour
+              </button>
+            </div>
+
+            {/* ALWAYS RENDER BOTH BUTTONS - NO CONDITIONAL */}
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
                   console.log('Continuer button clicked! Step:', step);
                   next();
                 }}
-                disabled={loading}
-                className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                disabled={loading || step >= 3}
+                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 min-w-[140px]"
+                style={{ display: step < 3 ? 'block' : 'none' }}
               >
                 Continuer
               </button>
-            ) : (
+
               <button
                 type="submit"
-                disabled={loading || !consentAll}
-                className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                disabled={loading || !consentAll || step < 3}
+                className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 min-w-[140px]"
+                style={{ display: step === 3 ? 'block' : 'none' }}
               >
                 {loading ? "Envoi..." : "Soumettre"}
               </button>
-            )}
+            </div>
           </div>
         </div>
       </form>
