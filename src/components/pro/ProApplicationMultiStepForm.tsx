@@ -55,7 +55,7 @@ const BEAUTE_ESTHETIQUE = [
 const ALL_PROFESSIONS = [...EXPERTISE_CAPILLAIRE, ...BEAUTE_ESTHETIQUE];
 
 export function ProApplicationMultiStepForm() {
-  const [step, setStep] = React.useState(1);
+  const [step, setStep] = React.useState(2);
   const [loading, setLoading] = React.useState(false);
   const [portfolioPreview, setPortfolioPreview] = React.useState<string[]>([]);
   const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
@@ -100,26 +100,7 @@ export function ProApplicationMultiStepForm() {
   const portfolioUrl = watch("portfolio_url");
   const portfolio = watch("portfolio");
 
-  // Update validation errors in real-time
-  React.useEffect(() => {
-    const errList: string[] = [];
-
-    if (step === 1) {
-      if (!firstName?.trim()) errList.push("Prénom manquant");
-      if (!lastName?.trim()) errList.push("Nom manquant");
-      if (!email?.trim()) errList.push("Email manquant");
-      if (!phone?.trim()) errList.push("Téléphone manquant");
-      if (!postalCode?.trim() || !/^\d{4}$/.test(postalCode)) errList.push("Code postal invalide");
-      if (!city?.trim()) errList.push("Commune manquante");
-      if (!dateOfBirth?.trim()) errList.push("Date de naissance manquante");
-    } else if (step === 2) {
-      if (!certs || certs.length === 0) errList.push("Aucune certification sélectionnée");
-      if (!portfolioUrl?.trim()) errList.push("Portfolio URL manquante");
-      if (!portfolio || portfolio.length === 0) errList.push("Photos portfolio manquantes");
-    }
-
-    setValidationErrors(errList);
-  }, [step, firstName, lastName, email, phone, postalCode, city, dateOfBirth, certs, portfolioUrl, portfolio]);
+  // Validation disabled for testing
 
   React.useEffect(() => {
     const normalizedPostalCode = (postalCode || "").trim();
@@ -463,42 +444,19 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        {/* Validation Error Display */}
-        {validationErrors.length > 0 && (
-          <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-xs font-semibold text-red-800 mb-1">Erreurs de validation:</p>
-            <ul className="text-xs text-red-700 list-disc list-inside space-y-0.5">
-              {validationErrors.map((err, i) => (
-                <li key={i}>{err}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         {/* Navigation Buttons */}
         <div className="flex flex-col items-center gap-4 w-full mt-10 z-[9999] relative overflow-visible !overflow-visible">
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={nextStep}
-              disabled={validationErrors.length > 0}
-              className="rounded-md bg-red-600 px-8 py-3 text-base font-bold text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full max-w-md"
-            >
-              Continuer
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading || !consentAll}
-              className="rounded-md bg-red-600 px-8 py-3 text-base font-bold text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full max-w-md"
-            >
-              {loading ? "Envoi..." : "Soumettre"}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setStep(3)}
+            className="rounded-md bg-red-600 px-8 py-3 text-base font-bold text-white hover:bg-red-700 transition-all w-full max-w-md"
+          >
+            Continuer
+          </button>
 
           <button
             type="button"
-            onClick={prevStep}
+            onClick={() => setStep(1)}
             className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-all w-full max-w-md"
           >
             Retour
