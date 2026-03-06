@@ -112,7 +112,6 @@ export function ProApplicationMultiStepForm() {
       if (!postalCode?.trim() || !/^\d{4}$/.test(postalCode)) errList.push("Code postal invalide");
       if (!city?.trim()) errList.push("Commune manquante");
       if (!dateOfBirth?.trim()) errList.push("Date de naissance manquante");
-      if (errors.city) errList.push("Commune ne correspond pas au code postal");
     } else if (step === 2) {
       if (!certs || certs.length === 0) errList.push("Aucune certification sélectionnée");
       if (!portfolioUrl?.trim()) errList.push("Portfolio URL manquante");
@@ -120,7 +119,7 @@ export function ProApplicationMultiStepForm() {
     }
 
     setValidationErrors(errList);
-  }, [step, firstName, lastName, email, phone, postalCode, city, dateOfBirth, certs, portfolioUrl, portfolio, errors.city]);
+  }, [step, firstName, lastName, email, phone, postalCode, city, dateOfBirth, certs, portfolioUrl, portfolio]);
 
   React.useEffect(() => {
     const normalizedPostalCode = (postalCode || "").trim();
@@ -324,17 +323,11 @@ export function ProApplicationMultiStepForm() {
                   className="mt-1 w-full rounded-md border border-gray-200 p-3 focus:border-[#6D28D9] focus:ring-1 focus:ring-[#6D28D9] outline-none transition-all"
                   placeholder="Bruxelles, Liège, etc."
                   {...register("city", {
-                    required: "Requis",
-                    validate: (value) => {
-                      const expectedCity = BELGIAN_COMMUNES[(getValues("postal_code") || "").trim()];
-                      if (!expectedCity) return true;
-                      return value.trim().toLowerCase() === expectedCity.toLowerCase()
-                        ? true
-                        : `La commune doit correspondre au code postal (${expectedCity})`;
-                    }
+                    required: "Requis"
                   })}
                 />
                 {errors.city && <p className="text-xs text-red-600">{errors.city.message}</p>}
+                <p className="mt-1 text-xs text-gray-500">La commune sera auto-remplie selon votre code postal</p>
               </div>
             </div>
 
@@ -473,7 +466,8 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="sticky bottom-0 left-0 right-0 z-[100] mt-8 w-full border-t border-gray-200 bg-white py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+        {/* Footer Navigation - Always Visible */}
+        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-gray-300 bg-white py-5 shadow-[0_-8px_20px_rgba(0,0,0,0.12)] relative">
           <div className="flex flex-col gap-3">
             {/* Validation Error Display */}
             {validationErrors.length > 0 && step < 3 && (
@@ -488,6 +482,7 @@ export function ProApplicationMultiStepForm() {
             )}
 
             <div className="flex items-center justify-between w-full gap-6">
+              {/* Back Button */}
               <button
                 type="button"
                 onClick={back}
@@ -497,15 +492,14 @@ export function ProApplicationMultiStepForm() {
                 Retour
               </button>
 
-              {step < 3 && (
+              {/* Continue Button - Always Visible on Steps 1 & 2 */}
+              {step < 3 ? (
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={next}
-                    disabled={loading}
-                    className={`rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:cursor-not-allowed transition-all min-w-[140px] ${
-                      validationErrors.length > 0 ? 'opacity-50' : ''
-                    }`}
+                    disabled={validationErrors.length > 0 || loading}
+                    className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
                   >
                     Continuer
                   </button>
@@ -515,9 +509,8 @@ export function ProApplicationMultiStepForm() {
                     </span>
                   )}
                 </div>
-              )}
-
-              {step === 3 && (
+              ) : (
+                /* Submit Button - Step 3 Only */
                 <button
                   type="submit"
                   disabled={loading || !consentAll}
