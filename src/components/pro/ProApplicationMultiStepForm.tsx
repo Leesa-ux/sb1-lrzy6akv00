@@ -250,20 +250,20 @@ export function ProApplicationMultiStepForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm relative">
+    <div className="mx-auto w-full max-w-2xl rounded-2xl border bg-white p-6 shadow-sm relative overflow-visible !overflow-visible">
       <h1 className="text-xl font-semibold text-[#1A1A1A]">Afroé PRO – Formulaire de Candidature</h1>
       <p className="mt-1 text-sm text-gray-600">Formulaire multi-étapes. 3 photos max. Données sécurisées.</p>
 
-      <div className="mt-6 flex items-center gap-2">
+      <div className="mt-6 flex items-center gap-2 overflow-visible !overflow-visible">
         {[1,2,3].map(n => (
           <div key={n} className={`h-2 flex-1 rounded-full ${n <= step ? "bg-[#6D28D9]" : "bg-gray-200"}`} />
         ))}
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6 overflow-visible" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-6 space-y-6 overflow-visible !overflow-visible" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
-          <div className="space-y-5">
+          <div className="space-y-5 overflow-visible !overflow-visible">
             <h2 className="text-sm font-semibold">1) Informations Personnelles</h2>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -346,7 +346,7 @@ export function ProApplicationMultiStepForm() {
         )}
 
         {step === 2 && (
-          <div className="space-y-5">
+          <div className="space-y-5 overflow-visible !overflow-visible">
             <h2 className="text-sm font-semibold">2) Informations Professionnelles</h2>
 
             <div>
@@ -425,7 +425,7 @@ export function ProApplicationMultiStepForm() {
         )}
 
         {step === 3 && (
-          <div className="space-y-5">
+          <div className="space-y-5 overflow-visible !overflow-visible">
             <h2 className="text-sm font-semibold">3) Confirmations & Consentements</h2>
 
             <div>
@@ -476,21 +476,13 @@ export function ProApplicationMultiStepForm() {
         )}
 
         {/* Navigation Buttons */}
-        <div className="mt-8 pt-4 flex justify-between border-t">
-          <button
-            type="button"
-            onClick={prevStep}
-            className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-all"
-          >
-            Retour
-          </button>
-
+        <div className="flex flex-col items-center gap-4 w-full mt-10 z-[9999] relative overflow-visible !overflow-visible">
           {step < 3 ? (
             <button
               type="button"
               onClick={nextStep}
               disabled={validationErrors.length > 0}
-              className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+              className="rounded-md bg-red-600 px-8 py-3 text-base font-bold text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full max-w-md"
             >
               Continuer
             </button>
@@ -498,11 +490,19 @@ export function ProApplicationMultiStepForm() {
             <button
               type="submit"
               disabled={loading || !consentAll}
-              className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+              className="rounded-md bg-red-600 px-8 py-3 text-base font-bold text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full max-w-md"
             >
               {loading ? "Envoi..." : "Soumettre"}
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={prevStep}
+            className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-all w-full max-w-md"
+          >
+            Retour
+          </button>
         </div>
       </form>
 
