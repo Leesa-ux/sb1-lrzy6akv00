@@ -59,6 +59,10 @@ export function ProApplicationMultiStepForm() {
   const [loading, setLoading] = React.useState(false);
   const [portfolioPreview, setPortfolioPreview] = React.useState<string[]>([]);
 
+  React.useEffect(() => {
+    console.log('ProApplicationMultiStepForm rendered, step:', step, 'loading:', loading);
+  }, [step, loading]);
+
   const {
     register,
     handleSubmit,
@@ -120,7 +124,11 @@ export function ProApplicationMultiStepForm() {
     }
   };
 
-  const back = () => setStep((p) => Math.max(1, p - 1));
+  const back = () => {
+    console.log('Back clicked, current step:', step);
+    setStep((p) => Math.max(1, p - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -493,12 +501,17 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        <div className="sticky bottom-0 z-10 mt-8 flex items-center justify-between border-t bg-white py-4">
+        <div className="sticky bottom-0 z-50 mt-8 flex items-center justify-between border-t bg-white py-4 -mx-6 px-6 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
           <button
             type="button"
-            onClick={back}
+            onClick={(e) => {
+              e.preventDefault();
+              console.log('Back button clicked! Step:', step, 'Disabled:', step === 1 || loading);
+              back();
+            }}
             disabled={step === 1 || loading}
-            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            title={step === 1 ? 'Déjà à la première étape' : 'Retour à l\'étape précédente'}
           >
             Retour
           </button>
@@ -508,7 +521,7 @@ export function ProApplicationMultiStepForm() {
               type="button"
               onClick={next}
               disabled={loading}
-              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6]"
+              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               Continuer
             </button>
@@ -516,7 +529,7 @@ export function ProApplicationMultiStepForm() {
             <button
               type="submit"
               disabled={loading || !consentAll}
-              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6]"
+              className="rounded-md bg-[#6D28D9] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? "Envoi..." : "Soumettre"}
             </button>
