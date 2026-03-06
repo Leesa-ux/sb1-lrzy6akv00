@@ -152,15 +152,12 @@ export function ProApplicationMultiStepForm() {
     return true;
   };
 
-  const next = async () => {
-    if (await validateStep(step)) {
-      setStep((p) => Math.min(3, p + 1));
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+  const nextStep = () => {
+    setStep((p) => Math.min(3, p + 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const back = () => {
-    console.log('Back clicked, current step:', step);
+  const prevStep = () => {
     setStep((p) => Math.max(1, p - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -264,7 +261,7 @@ export function ProApplicationMultiStepForm() {
       </div>
       <div className="mt-2 text-xs text-[#1A1A1A]">Étape {step}/3</div>
 
-      <form className="mt-6 space-y-6 overflow-visible pb-32 relative z-[1]" onSubmit={handleSubmit(onSubmit)}>
+      <form className="mt-6 space-y-6 overflow-visible" onSubmit={handleSubmit(onSubmit)}>
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-sm font-semibold">1) Informations Personnelles</h2>
@@ -466,61 +463,46 @@ export function ProApplicationMultiStepForm() {
           </div>
         )}
 
-        {/* Footer Navigation - Always Visible */}
-        <div className="sticky bottom-0 left-0 right-0 z-50 mt-8 w-full border-t-2 border-gray-300 bg-white py-5 shadow-[0_-8px_20px_rgba(0,0,0,0.12)] relative">
-          <div className="flex flex-col gap-3">
-            {/* Validation Error Display */}
-            {validationErrors.length > 0 && step < 3 && (
-              <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-xs font-semibold text-red-800 mb-1">Erreurs de validation:</p>
-                <ul className="text-xs text-red-700 list-disc list-inside space-y-0.5">
-                  {validationErrors.map((err, i) => (
-                    <li key={i}>{err}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between w-full gap-6">
-              {/* Back Button */}
-              <button
-                type="button"
-                onClick={back}
-                disabled={step === 1 || loading}
-                className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                Retour
-              </button>
-
-              {/* Continue Button - Always Visible on Steps 1 & 2 */}
-              {step < 3 ? (
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={next}
-                    disabled={validationErrors.length > 0 || loading}
-                    className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
-                  >
-                    Continuer
-                  </button>
-                  {validationErrors.length > 0 && (
-                    <span className="text-xs text-red-600 font-medium">
-                      ⚠ {validationErrors.length} erreur{validationErrors.length > 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-              ) : (
-                /* Submit Button - Step 3 Only */
-                <button
-                  type="submit"
-                  disabled={loading || !consentAll}
-                  className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
-                >
-                  {loading ? "Envoi..." : "Soumettre"}
-                </button>
-              )}
-            </div>
+        {/* Validation Error Display */}
+        {validationErrors.length > 0 && (
+          <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-xs font-semibold text-red-800 mb-1">Erreurs de validation:</p>
+            <ul className="text-xs text-red-700 list-disc list-inside space-y-0.5">
+              {validationErrors.map((err, i) => (
+                <li key={i}>{err}</li>
+              ))}
+            </ul>
           </div>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="mt-8 pt-4 flex justify-between border-t">
+          <button
+            type="button"
+            onClick={prevStep}
+            className="rounded-md border-2 border-gray-400 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+          >
+            Retour
+          </button>
+
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={nextStep}
+              disabled={validationErrors.length > 0}
+              className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+            >
+              Continuer
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={loading || !consentAll}
+              className="rounded-md bg-[#6D28D9] px-8 py-3 text-base font-bold text-white hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[140px]"
+            >
+              {loading ? "Envoi..." : "Soumettre"}
+            </button>
+          )}
         </div>
       </form>
 
