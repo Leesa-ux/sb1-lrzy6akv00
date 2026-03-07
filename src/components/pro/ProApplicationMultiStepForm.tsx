@@ -184,12 +184,17 @@ React.useEffect(() => {
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
 
           <h1 className="text-xl font-semibold text-[#1A1A1A]">
-            Afroé PRO – Formulaire de Candidature
-          </h1>
+           <h1 className="text-xl font-semibold text-[#1A1A1A]">
+  Afroé PRO – Formulaire de Candidature
+</h1>
 
-          <p className="mt-1 text-sm text-gray-600">
-            Étape {step}/3 – Données sécurisées
-          </p>
+<p className="text-xs text-gray-400 mt-1">
+  Vos informations sont sauvegardées automatiquement.
+</p>
+
+<p className="mt-1 text-sm text-gray-600">
+  Étape {step}/3 – Données sécurisées
+</p>
 
 
           {/* Progress bar */}
