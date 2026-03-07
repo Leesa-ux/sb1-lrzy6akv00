@@ -175,27 +175,25 @@ React.useEffect(() => {
 };
 
 
-  return (
+ return (
 
-    <div className="min-h-screen bg-gray-50 py-12 px-4 flex justify-center">
+  <div className="min-h-screen bg-gray-50 py-12 px-4 flex justify-center">
 
-      <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl">
 
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border bg-white p-6 shadow-sm">
 
-          <h1 className="text-xl font-semibold text-[#1A1A1A]">
-           <h1 className="text-xl font-semibold text-[#1A1A1A]">
-  Afroé PRO – Formulaire de Candidature
-</h1>
+        <h1 className="text-xl font-semibold text-[#1A1A1A]">
+          Afroé PRO – Formulaire de Candidature
+        </h1>
 
-<p className="text-xs text-gray-400 mt-1">
-  Vos informations sont sauvegardées automatiquement.
-</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Vos informations sont sauvegardées automatiquement.
+        </p>
 
-<p className="mt-1 text-sm text-gray-600">
-  Étape {step}/3 – Données sécurisées
-</p>
-
+        <p className="mt-1 text-sm text-gray-600">
+          Étape {step}/3 – Données sécurisées
+        </p>
 
           {/* Progress bar */}
 
