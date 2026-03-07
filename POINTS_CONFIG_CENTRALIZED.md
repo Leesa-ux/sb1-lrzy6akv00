@@ -196,8 +196,8 @@ pointsForReferredRole("beautypro") // returns 25
 ```typescript
 isPrelaunch() // returns false
 pointsForReferredRole("client") // returns 10
-pointsForReferredRole("influencer") // returns 50
-pointsForReferredRole("beautypro") // returns 100
+pointsForReferredRole("influencer") // returns 30
+pointsForReferredRole("beautypro") // returns 50
 ```
 
 ## Files Modified
@@ -220,7 +220,7 @@ pointsForReferredRole("beautypro") // returns 100
 | Phase | Client | Influencer | Beauty Pro |
 |-------|--------|------------|------------|
 | **Prelaunch** (Waitlist) | 5 | 15 | 25 |
-| **Postlaunch** (Launch) | 10 | 50 | 100 |
+| **Postlaunch** (Launch) | 10 | 30 | 50 |
 
 ### Other Constants
 
