@@ -254,11 +254,17 @@ React.useEffect(() => {
 
                   <div className="grid grid-cols-2 gap-4">
 
-                    <input
-                      {...register("first_name",{required:true})}
-                      placeholder="Prénom"
-                      className="border p-2 rounded"
-                    />
+                   <input
+  {...register("first_name",{required:true})}
+  placeholder="Prénom"
+  className="border p-2 rounded"
+  onKeyDown={(e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      setFocus("last_name");
+    }
+  }}
+/>
 
                     <input
                       {...register("last_name",{required:true})}
