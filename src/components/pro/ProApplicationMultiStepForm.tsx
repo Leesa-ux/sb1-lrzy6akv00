@@ -428,7 +428,7 @@ Plus qu’un clic et votre candidature est envoyée.
                   disabled={loading}
                   className="w-full py-4 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition"
                 >
-                  Soumettre ma candidature
+                  Envoyer ma candidature
                 </button>
 
               )}
