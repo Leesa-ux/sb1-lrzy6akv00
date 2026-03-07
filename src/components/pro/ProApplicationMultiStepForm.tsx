@@ -48,6 +48,8 @@ export function ProApplicationMultiStepForm() {
     setValue,
     watch,
     trigger,
+    reset,
+    getValues
   } = useForm<FormValues>({
     defaultValues: {
       certifications: [],
