@@ -74,16 +74,45 @@ export function ProApplicationMultiStepForm() {
   }, [postalCode, city, setValue]);
 
 
-  /* Scroll to top when step changes */
+ /* Restore saved form */
 
-  React.useEffect(() => {
+React.useEffect(() => {
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+  const saved = localStorage.getItem("afroe_pro_application");
 
-  }, [step]);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      reset(parsed.values);
+      setStep(parsed.step || 1);
+    } catch (err) {
+      console.error("Restore failed", err);
+    }
+  }
+
+}, [reset]);
+
+  /* Auto-save form */
+
+React.useEffect(() => {
+
+  const interval = setInterval(() => {
+
+    const values = getValues();
+
+    localStorage.setItem(
+      "afroe_pro_application",
+      JSON.stringify({
+        step,
+        values
+      })
+    );
+
+  }, 5000);
+
+  return () => clearInterval(interval);
+
+}, [step, getValues]);
 
 
   /* Portfolio preview */
