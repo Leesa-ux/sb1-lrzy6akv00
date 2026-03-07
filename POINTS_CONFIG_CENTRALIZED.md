@@ -53,8 +53,8 @@ export function pointsForReferredRole(
 
 - **Postlaunch (Validation):**
   - Client: 10 points
-  - Influencer: 50 points
-  - Beauty Pro: 100 points
+  - Influencer: 30 points
+  - Beauty Pro: 50 points
 
 ### 2. **app/components/AfroeWaitlistLandingV2.tsx** - Main Landing Page ✅
 
