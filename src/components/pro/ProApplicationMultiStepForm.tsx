@@ -176,18 +176,61 @@ React.useEffect(() => {
   const prevStep = () => setStep((s) => s - 1);
 
 
- const onSubmit = async (values: FormValues) => {
+const onSubmit = async (values: FormValues) => {
 
-  setLoading(true);
+  setLoading(true)
 
-  console.log(values);
+  try {
 
-  localStorage.removeItem("afroe_pro_application");
+    const { error } = await supabase
+      .from("pro_applications")
+      .insert([{
 
-  toast.success("Candidature envoyée !");
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone: values.phone,
 
-  setLoading(false);
-};
+        city: values.city,
+        postal_code: values.postal_code,
+        full_address: values.address,
+
+        date_of_birth: values.date_of_birth,
+
+        work_authorized: values.work_authorized === "yes",
+
+        certifications: values.certifications,
+
+        portfolio_url: values.portfolio_url,
+
+        media_projects: values.media_projects,
+        heard_about: values.heard_about,
+
+        smartphone: values.smartphone_os,
+
+        consent_missions: values.consent_missions,
+        consent_messages: values.consent_messages,
+        consent_phone_call: values.consent_phone,
+
+        status: "pending"
+
+      }])
+
+    if (error) throw error
+
+    localStorage.removeItem("afroe_pro_application")
+
+    toast.success("Candidature envoyée avec succès !")
+
+  } catch (err) {
+
+    console.error(err)
+    toast.error("Erreur lors de l'envoi.")
+
+  }
+
+  setLoading(false)
+}
 
 
  return (
