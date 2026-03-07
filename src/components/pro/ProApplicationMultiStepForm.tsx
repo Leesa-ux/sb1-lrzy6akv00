@@ -161,16 +161,18 @@ React.useEffect(() => {
   const prevStep = () => setStep((s) => s - 1);
 
 
-  const onSubmit = async (values: FormValues) => {
+ const onSubmit = async (values: FormValues) => {
 
-    setLoading(true);
+  setLoading(true);
 
-    console.log(values);
+  console.log(values);
 
-    toast.success("Candidature envoyée !");
+  localStorage.removeItem("afroe_pro_application");
 
-    setLoading(false);
-  };
+  toast.success("Candidature envoyée !");
+
+  setLoading(false);
+};
 
 
   return (
