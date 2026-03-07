@@ -193,16 +193,10 @@ const onSubmit = async (values: FormValues) => {
 
         city: values.city,
         postal_code: values.postal_code,
-       
-
-        work_authorized: values.work_authorized === "yes",
 
         certifications: values.certifications,
-
         portfolio_url: values.portfolio_url,
-
         media_projects: values.media_projects,
-        heard_about: values.heard_about,
 
         smartphone: values.smartphone_os,
 
