@@ -292,11 +292,17 @@ React.useEffect(() => {
   }}
 />
 
-                  <input
-                    {...register("phone",{required:true})}
-                    placeholder="Téléphone"
-                    className="w-full border p-2 rounded"
-                  />
+                 <input
+  {...register("phone",{required:true})}
+  placeholder="Téléphone"
+  className="w-full border p-2 rounded"
+  onKeyDown={(e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      setFocus("postal_code");
+    }
+  }}
+/>
 
                   <div className="grid grid-cols-2 gap-4">
 
