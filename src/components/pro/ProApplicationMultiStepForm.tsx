@@ -191,9 +191,11 @@ React.useEffect(() => {
           Vos informations sont sauvegardées automatiquement.
         </p>
 
-        <p className="mt-1 text-sm text-gray-600">
-          Étape {step}/3 – Données sécurisées
-        </p>
+     <p className="mt-1 text-sm text-gray-600">
+  Étape {step}/3 – {step === 1 && "Commençons avec vos informations"}
+  {step === 2 && "Parlez-nous de votre expertise"}
+  {step === 3 && "Dernière étape"}
+</p>
 
           {/* Progress bar */}
 
