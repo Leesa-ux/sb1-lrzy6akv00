@@ -364,6 +364,9 @@ React.useEffect(() => {
                   <h2 className="font-bold">
                     3) Finalisation
                   </h2>
+                  <p className="text-sm text-gray-500">
+Plus qu’un clic et votre candidature est envoyée.
+</p>
 
                   <div className="space-y-2 border p-4 rounded bg-gray-50">
 
