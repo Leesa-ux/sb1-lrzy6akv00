@@ -49,7 +49,8 @@ export function ProApplicationMultiStepForm() {
     watch,
     trigger,
     reset,
-    getValues
+    getValues,
+    setFocus
   } = useForm<FormValues>({
     defaultValues: {
       certifications: [],
@@ -113,6 +114,20 @@ React.useEffect(() => {
   return () => clearInterval(interval);
 
 }, [step, getValues]);
+
+  /* Autofocus progression */
+
+React.useEffect(() => {
+
+  if (step === 1) {
+    setFocus("first_name");
+  }
+
+  if (step === 2) {
+    setFocus("portfolio_url");
+  }
+
+}, [step, setFocus]);
 
 
   /* Portfolio preview */
