@@ -266,11 +266,17 @@ React.useEffect(() => {
   }}
 />
 
-                    <input
-                      {...register("last_name",{required:true})}
-                      placeholder="Nom"
-                      className="border p-2 rounded"
-                    />
+                  <input
+  {...register("last_name",{required:true})}
+  placeholder="Nom"
+  className="border p-2 rounded"
+  onKeyDown={(e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      setFocus("email");
+    }
+  }}
+/>
 
                   </div>
 
