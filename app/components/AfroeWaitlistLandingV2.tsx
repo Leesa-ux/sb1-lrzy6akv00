@@ -123,6 +123,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   const [smsState, setSmsState] = useState<SmsState>("idle");
   const [smsCode, setSmsCode] = useState<string>("");
   const [smsExpiresAt, setSmsExpiresAt] = useState<number | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const smsRemaining = useMemo(() => {
     if (!smsExpiresAt) return 0;
     return Math.max(0, smsExpiresAt - Date.now());
@@ -140,12 +141,18 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   async function sendSmsCode(): Promise<void> {
     if (!phone) return;
     setSmsState("sending");
+    setPhoneError(null);
     try {
       const r = await fetch("/api/send-sms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, email, role, ref: null }),
       });
+      if (r.status === 400) {
+        setPhoneError("Ce numéro ne peut pas être utilisé.");
+        setSmsState("error");
+        return;
+      }
       if (!r.ok) throw new Error("sms");
       setSmsState("sent");
       setSmsExpiresAt(Date.now() + 2 * 60 * 1000);
@@ -174,9 +181,9 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
     const nameOk = firstName.trim().length > 0 && lastName.trim().length > 0;
     const phoneOk = phone.trim().length > 0;
     const roleOk = !!role;
-    const smsOk = !consentSMS || devSkipSms || smsState === "verified";
+    const smsOk = devSkipSms || smsState === "verified";
     return nameOk && phoneOk && roleOk && smsOk;
-  }, [firstName, lastName, phone, role, consentSMS, devSkipSms, smsState]);
+  }, [firstName, lastName, phone, role, devSkipSms, smsState]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -433,112 +440,14 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                   onChange={setPhone}
                   required={true}
                 />
+                {phoneError && (
+                  <p className="text-xs text-rose-400 mt-1">
+                    ⚠ {phoneError}
+                  </p>
+                )}
               </div>
             </div>
 
-            {phone && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setConsentSMS((v) => !v)}
-                    className={clsx(
-                      "flex-1 rounded-xl px-4 py-2 text-sm font-medium border transition-colors",
-                      consentSMS
-                        ? "bg-blue-600 border-blue-500"
-                        : "bg-slate-800 border-white/10",
-                    )}
-                    aria-pressed={consentSMS}
-                  >
-                    {consentSMS
-                      ? "✓ Recevoir un SMS de vérification"
-                      : "Sans SMS"}
-                  </button>
-                </div>
-
-                {consentSMS && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={
-                        !phone ||
-                        smsState === "sending" ||
-                        smsState === "sent" ||
-                        smsState === "verified"
-                      }
-                      onClick={sendSmsCode}
-                      className={clsx(
-                        "rounded-xl px-4 py-2 text-sm font-medium border",
-                        !phone || smsState === "sent" || smsState === "verified"
-                          ? "bg-slate-800 border-white/10 opacity-50 cursor-not-allowed"
-                          : "bg-slate-900/60 border-white/10 hover:border-white/20",
-                      )}
-                    >
-                      {smsState === "sending"
-                        ? "Envoi…"
-                        : smsState === "sent" || smsState === "verified"
-                          ? "Code envoyé ✓"
-                          : "Envoyer le code"}
-                    </button>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      value={smsCode}
-                      onChange={(e) => setSmsCode(e.target.value)}
-                      placeholder="Code 6 chiffres"
-                      className="flex-1 bg-slate-900/60 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
-                    />
-                    <button
-                      type="button"
-                      disabled={
-                        !smsCode ||
-                        smsState === "verifying" ||
-                        (!devSkipSms && consentSMS && smsRemaining === 0)
-                      }
-                      onClick={verifySmsCode}
-                      className={clsx(
-                        "rounded-xl px-4 py-2 text-sm font-medium border",
-                        !smsCode
-                          ? "bg-slate-800 border-white/10 opacity-50"
-                          : "bg-slate-900/60 border-white/10 hover:border-white/20",
-                      )}
-                    >
-                      {smsState === "verifying" ? "Vérif…" : "Vérifier"}
-                    </button>
-                  </div>
-                )}
-
-                {consentSMS && (
-                  <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
-                    <span>
-                      Vérification SMS{" "}
-                      {devSkipSms ? "(mode dev)" : "(expire dans 2 min)"}.
-                    </span>
-                    {!devSkipSms && smsState === "sent" && (
-                      <span className="text-amber-300 font-mono">
-                        ⏱ {String(smsMin).padStart(2, "0")}:
-                        {String(smsSec).padStart(2, "0")}
-                      </span>
-                    )}
-                    {smsState === "expired" && (
-                      <span className="text-rose-300">
-                        Expiré — renvoyer le code.
-                      </span>
-                    )}
-                    {smsState === "error" && (
-                      <span className="text-rose-300">Erreur — réessaye.</span>
-                    )}
-                    {smsState === "verified" && (
-                      <span className="text-emerald-300 font-medium">
-                        Numéro vérifié ✅
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
 
             <div>
               <p className="text-sm text-slate-300 mb-2">Je suis :</p>
@@ -621,6 +530,46 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               </label>
             </div>
 
+            <div className="space-y-3 pt-4 border-t border-white/10">
+              <button
+                type="button"
+                onClick={sendSmsCode}
+                disabled={!phone || smsState === "sending" || smsState === "sent" || smsState === "verified"}
+                className="w-full rounded-xl px-4 py-3 text-sm font-medium border bg-slate-900/60 border-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                📩 Vérifier mon téléphone
+              </button>
+
+              {(smsState === "sent" || smsState === "verifying") && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={smsCode}
+                    onChange={(e) => setSmsCode(e.target.value)}
+                    placeholder="Code SMS (6 chiffres)"
+                    className="flex-1 bg-slate-900/60 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-fuchsia-400"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={verifySmsCode}
+                    disabled={!smsCode || smsState === "verifying"}
+                    className="rounded-xl px-4 py-2 text-sm font-medium border bg-slate-900/60 border-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Vérifier
+                  </button>
+                </div>
+              )}
+
+              {smsState === "verified" && (
+                <p className="text-xs text-emerald-400 font-medium">
+                  ✔ Numéro vérifié
+                </p>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={submit === "loading" || !canSubmit}
@@ -634,7 +583,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
             </button>
 
             <p className="text-xs text-slate-400 text-center">
-              On t'enverra le top départ par email{consentSMS && " / SMS"}. Tu
+              On t'enverra le top départ par email / SMS. Tu
               peux te désinscrire à tout moment. Zéro spam. Tes données sont
               sécurisées (RGPD).
             </p>
