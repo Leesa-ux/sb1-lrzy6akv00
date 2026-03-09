@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { BELGIAN_COMMUNES } from "@/lib/belgian-communes";
 import { ShieldCheck } from "phosphor-react";
+import { supabase } from "@/lib/supabase";
 
 type FormValues = {
   first_name: string;

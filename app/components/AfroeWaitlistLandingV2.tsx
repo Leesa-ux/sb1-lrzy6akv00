@@ -685,7 +685,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
 
           <div className="glassy neon-fuchsia rounded-2xl p-6">
             <h3 className="text-xl font-bold mb-4 text-fuchsia-300">
-              Après le lancement (app live)
+              APRÈS LE LANCEMENT (APP LIVE)
             </h3>
             <ul className="space-y-3 text-sm sm:text-base text-slate-200/90">
               <li className="flex items-start gap-3">
@@ -699,13 +699,13 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                 <span className="text-2xl">📸</span>
                 <div>
                   <span className="font-semibold">Influenceur·euse</span> (&gt;
-                  2k followers) : +50 pts
+                  2k followers) : +30 pts
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">💅</span>
                 <div>
-                  <span className="font-semibold">Beauty Pro</span> : +100 pts
+                  <span className="font-semibold">Beauty Pro</span> : +50 pts
                   (inscription validée)
                 </div>
               </li>

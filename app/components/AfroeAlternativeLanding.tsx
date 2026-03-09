@@ -1174,7 +1174,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="flex">
                     <div className="flex items-center bg-slate-800 border border-white/10 border-r-0 rounded-l-xl px-3 py-3 text-sm text-slate-300">+32</div>
-                    <input type="tel" inputMode="numeric" pattern="[0-9]*" required={consentSMS} value={phoneLocal} onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); if (val.length <= 9) { setPhoneLocal(val); setPhoneError(""); setGlobalError(""); } }} placeholder="9 chiffres (sans le 0)" className={clsx("flex-1 rounded-r-xl px-3 py-3 text-sm outline-none focus:ring-1", phoneError ? "bg-slate-900/60 border-2 border-rose-500 focus:ring-rose-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} disabled={phoneVerified} />
+                    <input type="tel" inputMode="numeric" pattern="[0-9]*" required={consentSMS} value={phoneLocal} onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); if (val.length <= 9) { setPhoneLocal(val); setPhoneError(""); setGlobalError(""); } }} placeholder="9 chiffres (sans le 0)\" className={clsx("flex-1 rounded-r-xl px-3 py-3 text-sm outline-none focus:ring-1", phoneError ? "bg-slate-900/60 border-2 border-rose-500 focus:ring-rose-400" : "bg-slate-900/60 border border-white/10 focus:ring-fuchsia-400")} disabled={phoneVerified} />
                   </div>
                   {!phoneVerified ? (
                     smsState === "idle" || smsState === "error" || smsState === "expired" || smsState === "checking" ? (
@@ -1377,11 +1377,11 @@ export default function AfroeAlternativeLanding(): JSX.Element {
                 </div>
 
                 <div>
-                  <div className="text-sm font-semibold text-blue-300 mb-2">Après le lancement (app live)</div>
+                  <div className="text-sm font-semibold text-blue-300 mb-2">APRÈS LE LANCEMENT (APP LIVE)</div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                     <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Client·e</div><div className="text-2xl font-bold">+10</div><div className="text-[11px] text-slate-400">Téléchargement app</div></div>
-                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur·euse</div><div className="text-2xl font-bold">+50</div><div className="text-[11px] text-slate-400">&ge; 2k followers validé</div></div>
-                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Beauty Pro</div><div className="text-2xl font-bold">+100</div><div className="text-[11px] text-slate-400">Inscription validée</div></div>
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Influenceur·euse</div><div className="text-2xl font-bold">+30</div><div className="text-[11px] text-slate-400">&ge; 2k followers validé</div></div>
+                    <div className="bg-slate-900/60 border border-white/10 rounded-xl p-3"><div className="text-slate-300">Beauty Pro</div><div className="text-2xl font-bold">+50</div><div className="text-[11px] text-slate-400">Inscription validée</div></div>
                   </div>
                 </div>
               </div>
