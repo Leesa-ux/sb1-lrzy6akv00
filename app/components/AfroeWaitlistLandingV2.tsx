@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import HeroSectionV2 from "./HeroSectionV2";
 import { PhoneInputBelgiumDark } from "./PhoneInputBelgiumDark";
+import { Sparkle, Gift, ChartLine, Camera, HandHeart, Trophy, Calculator } from "@phosphor-icons/react";
 
 function normalizeError(err: unknown): Error {
   if (err instanceof Error) return err;
@@ -281,7 +282,9 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 text-sm sm:text-base">
           <div className="glassy neon-fuchsia rounded-2xl p-6">
-            <div className="text-3xl mb-3">✨</div>
+            <div className="mb-3">
+              <Sparkle size={32} weight="thin" className="text-fuchsia-400" />
+            </div>
             <h3 className="text-xl font-bold mb-2">Accès en avant-première</h3>
             <p className="text-slate-200/90 leading-relaxed">
               Découvre l'app Afroé avant tout le monde : services à domicile ou
@@ -290,7 +293,9 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
           </div>
 
           <div className="glassy neon-gold rounded-2xl p-6">
-            <div className="text-3xl mb-3">🎁</div>
+            <div className="mb-3">
+              <Gift size={32} weight="thin" className="text-amber-400" />
+            </div>
             <h3 className="text-xl font-bold mb-2">Récompenses exclusives</h3>
             <p className="text-slate-200/90 leading-relaxed">
               iPhone 17 Pro pour le #1, 2 000 € cash (tirage), Glow Kits,
@@ -299,7 +304,9 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
           </div>
 
           <div className="glassy neon-blue rounded-2xl p-6">
-            <div className="text-3xl mb-3">📈</div>
+            <div className="mb-3">
+              <ChartLine size={32} weight="thin" className="text-blue-400" />
+            </div>
             <h3 className="text-xl font-bold mb-2">Classement Glow</h3>
             <p className="text-slate-200/90 leading-relaxed">
               Invite ton crew, monte dans le classement et débloque des statuts
@@ -456,34 +463,36 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               <p className="text-sm text-slate-300 mb-2">Je suis :</p>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { key: "client" as const, label: "Client.e", emoji: "✨" },
+                  { key: "client" as const, label: "Client.e", icon: Sparkle },
                   {
                     key: "influencer" as const,
                     label: "Influenceur.euse",
-                    emoji: "📸",
+                    icon: Camera,
                   },
-                  { key: "pro" as const, label: "Beauty Pro", emoji: "💅" },
+                  { key: "pro" as const, label: "Beauty Pro", icon: HandHeart },
                 ].map((opt) => (
                   <button
                     key={opt.key}
                     type="button"
                     onClick={() => setRole(opt.key)}
                     className={clsx(
-                      "px-4 py-2 rounded-xl border text-sm font-medium transition-all",
+                      "px-4 py-2 rounded-xl border text-sm font-medium transition-all flex items-center gap-2",
                       role === opt.key
                         ? "border-amber-300 bg-amber-300/20 text-amber-300"
                         : "border-white/10 bg-slate-900/60 hover:border-white/20",
                     )}
                   >
-                    {opt.emoji} {opt.label}
+                    <opt.icon size={18} weight="thin" />
+                    {opt.label}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="space-y-2 pt-4 border-t border-white/10">
-              <p className="text-sm text-fuchsia-300 font-medium">
-                🧮 Question d'habileté (obligatoire en Belgique)
+              <p className="text-sm text-fuchsia-300 font-medium flex items-center gap-2">
+                <Calculator size={18} weight="thin" />
+                Question d'habileté (obligatoire en Belgique)
               </p>
               <p className="text-sm text-slate-300 mb-2">
                 Combien fait <strong>8 × 4</strong> ?
@@ -586,13 +595,23 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
             <button
               type="submit"
               disabled={submit === "loading" || !canSubmit}
-              className="w-full bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl px-6 py-4 text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-[0_0_20px_rgba(217,70,239,0.4)]"
+              className="w-full bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl px-6 py-4 text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-[0_0_20px_rgba(217,70,239,0.4)] flex items-center justify-center gap-2"
             >
               {submit === "loading"
                 ? "On te place dans la Glow List…"
                 : submit === "done"
-                  ? "C'est validé — check ton email ✨"
-                  : "Participer au concours ✨"}
+                  ? (
+                    <>
+                      C'est validé — check ton email
+                      <Sparkle size={20} weight="thin" />
+                    </>
+                  )
+                  : (
+                    <>
+                      Participer au concours
+                      <Sparkle size={20} weight="thin" />
+                    </>
+                  )}
             </button>
 
             <p className="text-xs text-slate-400 text-center">
@@ -622,21 +641,21 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
             </h3>
             <ul className="space-y-3 text-sm sm:text-base text-slate-200/90">
               <li className="flex items-start gap-3">
-                <span className="text-2xl">✨</span>
+                <Sparkle size={24} weight="thin" className="text-fuchsia-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Client.e</span> : +5 pts
                   (inscription waitlist)
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-2xl">📸</span>
+                <Camera size={24} weight="thin" className="text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Influenceur·euse</span> (&gt;
                   2k followers) : +15 pts
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-2xl">💅</span>
+                <HandHeart size={24} weight="thin" className="text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Beauty Pro</span> : +25 pts
                   (inscription waitlist)
@@ -651,21 +670,21 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
             </h3>
             <ul className="space-y-3 text-sm sm:text-base text-slate-200/90">
               <li className="flex items-start gap-3">
-                <span className="text-2xl">✨</span>
+                <Sparkle size={24} weight="thin" className="text-fuchsia-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Client.e</span> : +10 pts
                   (téléchargement app)
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-2xl">📸</span>
+                <Camera size={24} weight="thin" className="text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Influenceur·euse</span> (&gt;
                   2k followers) : +30 pts
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-2xl">💅</span>
+                <HandHeart size={24} weight="thin" className="text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold">Beauty Pro</span> : +50 pts
                   (inscription validée)
@@ -772,7 +791,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
           </h2>
           <ul className="text-base sm:text-lg text-slate-200/90 space-y-3 mb-6">
             <li className="flex items-start gap-3">
-              <span className="text-3xl">🏆</span>
+              <Trophy size={32} weight="thin" className="text-amber-400 flex-shrink-0 mt-1" />
               <div>
                 <span className="font-bold text-amber-300">2 000 €</span> —
                 tirage au sort pour tout·e participant·e avec{" "}
@@ -780,7 +799,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               </div>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-3xl">🏆</span>
+              <Trophy size={32} weight="thin" className="text-amber-400 flex-shrink-0 mt-1" />
               <div>
                 <span className="font-bold text-amber-300">iPhone 17 Pro</span>{" "}
                 — pour le <span className="font-semibold">rang #1</span> au
