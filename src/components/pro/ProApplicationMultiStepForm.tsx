@@ -18,6 +18,9 @@ type FormValues = {
   certifications: string[];
   portfolio_url: string;
   portfolio: FileList;
+  media_projects?: string;
+  smartphone_os?: string;
+  consent_phone?: boolean;
   consent_missions: boolean;
   consent_messages: boolean;
 };

@@ -41,6 +41,13 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
   const [success, setSuccess] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>('');
 
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [smsSending, setSmsSending] = useState(false);
+  const [smsSent, setSmsSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
@@ -49,10 +56,86 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     }
   }, []);
 
+  const handleSendSms = async () => {
+    setSmsSending(true);
+    setPhoneError(null);
+    setError(null);
+
+    try {
+      const verifyResponse = await fetch('/api/verify-phone-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone }),
+      });
+
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyData.canUse) {
+        setPhoneError('⚠ Ce numéro ne peut pas être utilisé.');
+        setSmsSending(false);
+        return;
+      }
+
+      const smsResponse = await fetch('/api/send-signup-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone }),
+      });
+
+      const smsData = await smsResponse.json();
+
+      if (!smsResponse.ok) {
+        throw new Error(smsData.error || 'Erreur lors de l\'envoi du SMS');
+      }
+
+      setSmsSent(true);
+    } catch (err) {
+      setPhoneError('⚠ Ce numéro ne peut pas être utilisé.');
+    } finally {
+      setSmsSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otpCode.length !== 6) {
+      setError('Le code doit contenir 6 chiffres');
+      return;
+    }
+
+    setVerifyingOtp(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/verify-signup-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone, code: otpCode }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Code incorrect');
+      }
+
+      setPhoneVerified(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Code incorrect ou expiré');
+    } finally {
+      setVerifyingOtp(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!phoneVerified) {
+      setError('Veuillez vérifier votre numéro de téléphone.');
+      setLoading(false);
+      return;
+    }
 
     if (parseInt(formData.skill_answer) !== 32) {
       setError('La réponse à la question d\'habileté est incorrecte. (8 × 4 = ?)');
@@ -61,7 +144,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     }
 
     if (!formData.consent) {
-      setError('Veuillez accepter les CGU et la Politique de Confidentialité pour continuer.');
+      setError('Veuillez accepter les conditions pour continuer.');
       setLoading(false);
       return;
     }
@@ -189,27 +272,6 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
           </Alert>
         )}
 
-        <div>
-          <Label htmlFor="email">Email *</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="ton@email.com"
-            disabled={loading}
-          />
-        </div>
-
-        <PhoneInputBelgium
-          value={formData.phone}
-          onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
-          disabled={loading}
-          required={true}
-        />
-
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="first_name">Prénom *</Label>
@@ -240,16 +302,37 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
         </div>
 
         <div>
-          <Label htmlFor="city">Ville</Label>
+          <Label htmlFor="email">Email *</Label>
           <Input
-            id="city"
-            name="city"
-            type="text"
-            value={formData.city}
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={formData.email}
             onChange={handleChange}
-            placeholder="Paris, Lyon, Marseille..."
+            placeholder="ton@email.com"
             disabled={loading}
           />
+        </div>
+
+        <div>
+          <PhoneInputBelgium
+            value={formData.phone}
+            onChange={(value) => {
+              setFormData(prev => ({ ...prev, phone: value }));
+              setPhoneError(null);
+              setSmsSent(false);
+              setPhoneVerified(false);
+            }}
+            disabled={loading || phoneVerified}
+            required={true}
+          />
+          <p className="text-xs text-gray-500 mt-1.5">
+            🔒 Utilisé uniquement pour sécuriser le concours et envoyer ton lien Glow.
+          </p>
+          {phoneError && (
+            <p className="text-sm text-red-600 mt-1">{phoneError}</p>
+          )}
         </div>
 
         <div>
@@ -298,16 +381,59 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
             className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
           />
           <Label htmlFor="consent" className="text-sm text-gray-600">
-            J'accepte les <a href="/cgu" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 underline" onClick={(e) => e.stopPropagation()}>Conditions Générales d'Utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 underline" onClick={(e) => e.stopPropagation()}>Politique de Confidentialité</a> d'Afroé, et je confirme que les informations fournies sont exactes. *
+            ☑ J'accepte les <a href="/reglement" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 underline" onClick={(e) => e.stopPropagation()}>Conditions Générales d'Utilisation</a>, le <a href="/reglement" target=\"_blank" rel="noopener noreferrer\" className="text-purple-600 hover:text-purple-700 underline\" onClick={(e) => e.stopPropagation()}>Règlement du concours</a> et la <a href="/confidentialite" target=\"_blank" rel="noopener noreferrer\" className="text-purple-600 hover:text-purple-700 underline\" onClick={(e) => e.stopPropagation()}>Politique de Confidentialité</a> d'Afroé, et je confirme que les informations fournies sont exactes.
           </Label>
         </div>
 
+        {!smsSent && !phoneVerified && (
+          <Button
+            type="button"
+            onClick={handleSendSms}
+            disabled={!formData.phone || smsSending || phoneError !== null}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3"
+          >
+            {smsSending ? 'Envoi...' : '📩 Envoyer le code SMS'}
+          </Button>
+        )}
+
+        {smsSent && !phoneVerified && (
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="otp">Code SMS (6 chiffres)</Label>
+              <Input
+                id="otp"
+                name="otp"
+                type="text"
+                maxLength={6}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                disabled={verifyingOtp}
+              />
+            </div>
+            <Button
+              type="button"
+              onClick={handleVerifyOtp}
+              disabled={otpCode.length !== 6 || verifyingOtp}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3"
+            >
+              {verifyingOtp ? 'Vérification...' : 'Vérifier le code'}
+            </Button>
+          </div>
+        )}
+
+        {phoneVerified && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-sm text-green-700 font-medium">✔ Numéro vérifié</p>
+          </div>
+        )}
+
         <Button
           type="submit"
-          disabled={loading}
+          disabled={loading || !phoneVerified}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3"
         >
-          {loading ? 'Inscription en cours...' : 'Participer au concours'}
+          {loading ? 'Inscription en cours...' : '✨ Participer au concours'}
         </Button>
 
         <p className="text-xs text-gray-500 text-center">
