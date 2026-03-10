@@ -5,6 +5,7 @@ export async function submitProApplication(formData: {
   phone: string;
   city: string;
   services_offered: string[];
+  certifications: string[];
   consent_missions: boolean;
   consent_messages: boolean;
   consent_phone_call?: boolean;

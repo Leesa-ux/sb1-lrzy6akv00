@@ -15,7 +15,8 @@ type FormValues = {
   city: string;
   postal_code: string;
   date_of_birth: string;
-  certifications: string[];
+  services_offered: string[];
+  certifications: string;
   portfolio_url: string;
   portfolio: FileList;
   media_projects?: string;
@@ -57,7 +58,8 @@ export function ProApplicationMultiStepForm() {
     setFocus
   } = useForm<FormValues>({
     defaultValues: {
-      certifications: [],
+      services_offered: [],
+      certifications: "",
       city: "",
       postal_code: "",
     },
@@ -186,13 +188,20 @@ const onSubmit = async (values: FormValues) => {
 
   try {
 
+    // Convert certifications textarea to array
+    const certificationsArray = values.certifications
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
     const response = await submitProApplication({
       first_name: values.first_name,
       last_name: values.last_name,
       email: values.email,
       phone: values.phone,
       city: values.city,
-      services_offered: values.certifications,
+      services_offered: values.services_offered,
+      certifications: certificationsArray,
       consent_missions: values.consent_missions,
       consent_messages: values.consent_messages,
       consent_phone_call: values.consent_phone
@@ -366,8 +375,8 @@ const onSubmit = async (values: FormValues) => {
                     2) Informations Professionnelles
                   </h2>
 
-                  <label className="text-sm">
-                    Certifications
+                  <label className="text-sm font-semibold">
+                    Services Offerts
                   </label>
 
                   <div className="grid grid-cols-2 gap-2 border p-3 rounded max-h-40 overflow-y-auto">
@@ -377,13 +386,22 @@ const onSubmit = async (values: FormValues) => {
                         <input
                           type="checkbox"
                           value={p}
-                          {...register("certifications")}
+                          {...register("services_offered")}
                         />
                         {p}
                       </label>
                     ))}
 
                   </div>
+
+                  <label className="text-sm font-semibold mt-4 block">
+                    Diplômes / Certifications
+                  </label>
+                  <textarea
+                    {...register("certifications")}
+                    placeholder="Listez vos diplômes et certifications (un par ligne)"
+                    className="w-full border p-2 rounded min-h-[100px]"
+                  />
 
                   <input
                     {...register("portfolio_url")}
