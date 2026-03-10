@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { BELGIAN_COMMUNES } from "@/lib/belgian-communes";
 import { ShieldCheck } from "phosphor-react";
-import { supabase } from "@/lib/supabase";
+import { submitProApplication } from "@/lib/submitProApplication";
 
 type FormValues = {
   first_name: string;
@@ -186,37 +186,24 @@ const onSubmit = async (values: FormValues) => {
 
   try {
 
-    const { error } = await supabase
-      .from("pro_applications")
-      .insert([{
+    const response = await submitProApplication({
+      first_name: values.first_name,
+      last_name: values.last_name,
+      email: values.email,
+      phone: values.phone,
+      city: values.city,
+      services_offered: values.certifications,
+      consent_missions: values.consent_missions,
+      consent_messages: values.consent_messages,
+      consent_phone_call: values.consent_phone
+    });
 
-        first_name: values.first_name,
-        last_name: values.last_name,
-        email: values.email,
-        phone: values.phone,
-
-        city: values.city,
-        postal_code: values.postal_code,
-
-        certifications: values.certifications,
-        portfolio_url: values.portfolio_url,
-        media_projects: values.media_projects,
-
-        smartphone: values.smartphone_os,
-
-        consent_missions: values.consent_missions,
-        consent_messages: values.consent_messages,
-        consent_phone_call: values.consent_phone,
-
-        status: "pending"
-
-      }])
-
-    if (error) throw error
-
-    localStorage.removeItem("afroe_pro_application")
-
-    toast.success("Candidature envoyée avec succès !")
+    if (response.success === true) {
+      localStorage.removeItem("afroe_pro_application")
+      toast.success("Votre candidature a été soumise ! Vérifiez votre email.")
+    } else {
+      toast.error(response.message || "Erreur lors de l'envoi.")
+    }
 
   } catch (err) {
 
