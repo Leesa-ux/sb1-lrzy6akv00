@@ -494,7 +494,7 @@ export default function BeautyProApplyPage() {
               <Field label="Code postal *" error={errors.postal_code}>
                 <input style={inp(errors.postal_code)} value={form.postal_code}
                   onChange={(e) => set("postal_code", e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  placeholder="1000" maxLength={4} />
+                  placeholder="1000\" maxLength={4} />
               </Field>
               <Field label="Commune">
                 <div style={{ position: "relative" }}>
