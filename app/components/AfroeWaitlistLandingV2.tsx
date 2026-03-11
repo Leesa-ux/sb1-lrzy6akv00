@@ -463,13 +463,14 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               <p className="text-sm text-slate-300 mb-2">Je suis :</p>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { key: "client" as const, label: "Client.e", icon: Sparkle },
+                  { key: "client" as const, label: "Client.e", icon: Sparkle, iconColor: "text-fuchsia-400" },
                   {
                     key: "influencer" as const,
                     label: "Influenceur.euse",
                     icon: Camera,
+                    iconColor: "text-blue-400",
                   },
-                  { key: "pro" as const, label: "Beauty Pro", icon: HandHeart },
+                  { key: "pro" as const, label: "Beauty Pro", icon: HandHeart, iconColor: "text-amber-400" },
                 ].map((opt) => (
                   <button
                     key={opt.key}
@@ -482,7 +483,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                         : "border-white/10 bg-slate-900/60 hover:border-white/20",
                     )}
                   >
-                    <opt.icon size={18} weight="thin" />
+                    <opt.icon size={18} weight="thin" className={opt.iconColor} />
                     {opt.label}
                   </button>
                 ))}
