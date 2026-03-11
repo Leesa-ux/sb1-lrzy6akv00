@@ -33,8 +33,8 @@ export default function ReglementPage() {
             <section>
               <h2 className="text-2xl font-bold mb-4 text-white">2. Dates et durée</h2>
               <ul className="list-disc list-inside space-y-2">
-                <li>Date de début : <span className="font-semibold">01 février 2026 (CET)</span></li>
-                <li>Date de fin : <span className="font-semibold">20 mars 2026 à 23h59 (CET – heure de Belgique)</span></li>
+                <li>Date de début : <span className="font-semibold">15 mars 2026 (CET)</span></li>
+                <li>Date de fin : <span className="font-semibold">30 avril 2026 à 23h59 (CET – heure de Belgique)</span></li>
                 <li>Tirage au sort (lot 2 000 €) : dans les 30 jours suivant la clôture</li>
               </ul>
             </section>
@@ -76,7 +76,7 @@ export default function ReglementPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-3 text-blue-300">4.1 Avant le lancement (phase waitlist — points provisoires)</h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li><strong>+{POINTS_CONFIG.EARLY_BIRD_BONUS} points</strong> : bonus Early Bird ({POINTS_CONFIG.EARLY_BIRD_LIMIT} premiers inscrits)</li>
+                    </li>
                     <li><strong>+{POINTS_CONFIG.WAITLIST.CLIENT} points</strong> : par Client·e inscrit·e sur la waitlist via votre lien</li>
                     <li><strong>+{POINTS_CONFIG.WAITLIST.INFLUENCER} points</strong> : par Influenceur·euse (&gt; 2 000 followers) inscrit·e via votre lien</li>
                     <li><strong>+{POINTS_CONFIG.WAITLIST.BEAUTY_PRO} points</strong> : par Beauty Pro inscrit·e sur la waitlist via votre lien</li>
