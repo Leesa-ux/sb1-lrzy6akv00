@@ -13,8 +13,8 @@
  *
  * AFTER LAUNCH (Validation Phase):
  * - Client           → +10 pts  (téléchargement app)
- * - Influencer       → +50 pts  (influenceur validé, ≥ 2k followers)
- * - Beauty Pro       → +100 pts (inscription pro validée)
+ * - Influencer       → +30 pts  (influenceur validé, ≥ 2k followers)
+ * - Beauty Pro       → +50 pts  (inscription pro validée)
  *
  * EARLY-BIRD BONUS:
  * - First 100 validated waitlist signups get an extra +50 points
@@ -69,8 +69,8 @@ export function calculateProvisionalPoints(user: UserPointsData): number {
  * Formula:
  *   finalPoints =
  *     (appDownloads * 10) +
- *     (validatedInfluencers * 50) +
- *     (validatedPros * 100) +
+ *     (validatedInfluencers * 30) +
+ *     (validatedPros * 50) +
  *     earlyBirdBonus
  *
  * @param user - User data with validation counters
@@ -78,8 +78,8 @@ export function calculateProvisionalPoints(user: UserPointsData): number {
  */
 export function calculateFinalPoints(user: UserPointsData): number {
   const appDownloadPoints = user.appDownloads * 10;
-  const validatedInfluencerPoints = user.validatedInfluencers * 50;
-  const validatedProPoints = user.validatedPros * 100;
+  const validatedInfluencerPoints = user.validatedInfluencers * 30;
+  const validatedProPoints = user.validatedPros * 50;
   const bonus = user.earlyBirdBonus;
 
   return appDownloadPoints + validatedInfluencerPoints + validatedProPoints + bonus;
@@ -185,8 +185,8 @@ export const POINTS_CONFIG = {
   // Post-launch (validation) points
   LAUNCH: {
     APP_DOWNLOAD: 10,
-    VALIDATED_INFLUENCER: 50,
-    VALIDATED_PRO: 100,
+    VALIDATED_INFLUENCER: 30,
+    VALIDATED_PRO: 50,
   },
   // Early-bird bonus
   EARLY_BIRD_BONUS: 50,

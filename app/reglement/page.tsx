@@ -76,7 +76,6 @@ export default function ReglementPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-3 text-blue-300">4.1 Avant le lancement (phase waitlist — points provisoires)</h3>
                   <ul className="list-disc list-inside space-y-2">
-                    </li>
                     <li><strong>+{POINTS_CONFIG.WAITLIST.CLIENT} points</strong> : par Client·e inscrit·e sur la waitlist via votre lien</li>
                     <li><strong>+{POINTS_CONFIG.WAITLIST.INFLUENCER} points</strong> : par Influenceur·euse (&gt; 2 000 followers) inscrit·e via votre lien</li>
                     <li><strong>+{POINTS_CONFIG.WAITLIST.BEAUTY_PRO} points</strong> : par Beauty Pro inscrit·e sur la waitlist via votre lien</li>
