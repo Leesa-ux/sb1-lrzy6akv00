@@ -12,7 +12,6 @@ interface LeaderboardEntry {
   role: string;
   referralsCount: number;
   points: number;
-  earlyBird: boolean;
   tier: string;
 }
 
@@ -93,14 +92,12 @@ export default function LeaderboardPage() {
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'Legend':
+      case 'Leader Circle':
         return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white';
-      case 'Elite Influencer':
+      case 'Glow Icons':
         return 'bg-gradient-to-r from-purple-500 to-pink-500 text-white';
-      case 'Top Glower':
+      case 'Circle Insiders':
         return 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white';
-      case 'Rising Star':
-        return 'bg-gradient-to-r from-green-400 to-emerald-500 text-white';
       case 'Glow Starter':
         return 'bg-gray-200 text-gray-700';
       default:
@@ -110,18 +107,16 @@ export default function LeaderboardPage() {
 
   const getTierIcon = (tier: string) => {
     switch (tier) {
-      case 'Legend':
+      case 'Leader Circle':
         return '👑';
-      case 'Elite Influencer':
-        return '💎';
-      case 'Top Glower':
-        return '✨';
-      case 'Rising Star':
-        return '⭐';
+      case 'Glow Icons':
+        return '🏆';
+      case 'Circle Insiders':
+        return '🔑';
       case 'Glow Starter':
-        return '🌱';
+        return '✦';
       default:
-        return '🏷';
+        return '🌱';
     }
   };
 
@@ -237,11 +232,6 @@ export default function LeaderboardPage() {
                             <span className="font-semibold text-gray-900">
                               {entry.firstName}
                             </span>
-                            {entry.earlyBird && (
-                              <Badge className="bg-yellow-100 text-yellow-800 text-xs">
-                                ⚡ Early Bird
-                              </Badge>
-                            )}
                             <Badge className={`text-xs font-bold ${getTierColor(entry.tier)}`}>
                               {getTierIcon(entry.tier)} {entry.tier}
                             </Badge>
@@ -279,31 +269,26 @@ export default function LeaderboardPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
                 🏆 Niveaux de Classement
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">🌱</div>
+                  <div className="text-2xl mb-1">✦</div>
                   <div className="font-semibold text-xs mb-1">Glow Starter</div>
-                  <div className="text-xs text-gray-600">0-19 points</div>
+                  <div className="text-xs text-gray-600">10 points</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">⭐</div>
-                  <div className="font-semibold text-xs mb-1">Rising Star</div>
-                  <div className="text-xs text-gray-600">20-49 points</div>
+                  <div className="text-2xl mb-1">🔑</div>
+                  <div className="font-semibold text-xs mb-1">Circle Insiders</div>
+                  <div className="text-xs text-gray-600">50 points</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">✨</div>
-                  <div className="font-semibold text-xs mb-1">Top Glower</div>
-                  <div className="text-xs text-gray-600">50-99 points</div>
-                </div>
-                <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">💎</div>
-                  <div className="font-semibold text-xs mb-1">Elite Influencer</div>
-                  <div className="text-xs text-gray-600">100-199 points</div>
+                  <div className="text-2xl mb-1">🏆</div>
+                  <div className="font-semibold text-xs mb-1">Glow Icons</div>
+                  <div className="text-xs text-gray-600">100 points</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
                   <div className="text-2xl mb-1">👑</div>
-                  <div className="font-semibold text-xs mb-1">Legend</div>
-                  <div className="text-xs text-gray-600">200+ points</div>
+                  <div className="font-semibold text-xs mb-1">Leader Circle</div>
+                  <div className="text-xs text-gray-600">200 points</div>
                 </div>
               </div>
             </CardContent>
@@ -314,7 +299,7 @@ export default function LeaderboardPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
                 🎁 Récompenses
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="bg-white/50 rounded p-3 text-center">
                   <div className="text-2xl mb-1">🥇</div>
                   <div className="font-semibold">Rang 1</div>
@@ -323,12 +308,7 @@ export default function LeaderboardPage() {
                 <div className="bg-white/50 rounded p-3 text-center">
                   <div className="text-2xl mb-1">💰</div>
                   <div className="font-semibold">100+ points</div>
-                  <div className="text-xs text-gray-600">Jackpot €3,500</div>
-                </div>
-                <div className="bg-white/50 rounded p-3 text-center">
-                  <div className="text-2xl mb-1">⚡</div>
-                  <div className="font-semibold">Early Birds</div>
-                  <div className="text-xs text-gray-600">+50 points bonus</div>
+                  <div className="text-xs text-gray-600">Jackpot 2 000 €</div>
                 </div>
               </div>
             </CardContent>

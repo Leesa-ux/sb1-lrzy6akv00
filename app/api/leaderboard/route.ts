@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   try {
     let query = supabase
       .from('User')
-      .select('id, firstName, email, role, points, ref_count, earlyBird, isBlocked')
+      .select('id, firstName, email, role, points, ref_count, isBlocked')
       .eq('isBlocked', false)
       .order('points', { ascending: false })
       .limit(50);
@@ -44,11 +44,11 @@ export async function GET(request: Request) {
     }
 
     const getTier = (points: number): string => {
-      if (points >= 200) return 'Legend';
-      if (points >= 100) return 'Elite Influencer';
-      if (points >= 50)  return 'Top Glower';
-      if (points >= 20)  return 'Rising Star';
-      return 'Glow Starter';
+      if (points >= 200) return 'Leader Circle';
+      if (points >= 100) return 'Glow Icons';
+      if (points >= 50)  return 'Circle Insiders';
+      if (points >= 10)  return 'Glow Starter';
+      return 'En route';
     };
 
     const maskEmail = (email: string): string => {
@@ -64,7 +64,6 @@ export async function GET(request: Request) {
       role:           u.role,
       referralsCount: u.ref_count ?? 0,
       points:         u.points ?? 0,
-      earlyBird:      u.earlyBird ?? false,
       tier:           getTier(u.points ?? 0),
     }));
 
