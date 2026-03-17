@@ -156,7 +156,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
       }
       if (!r.ok) throw new Error("sms");
       setSmsState("sent");
-      setSmsExpiresAt(Date.now() + 2 * 60 * 1000);
+      setSmsExpiresAt(Date.now() + 30 * 60 * 1000);
     } catch {
       setSmsState("error");
     }
