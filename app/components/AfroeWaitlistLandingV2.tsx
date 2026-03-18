@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import HeroSectionV2 from "./HeroSectionV2";
 import { PhoneInputBelgiumDark } from "./PhoneInputBelgiumDark";
 import { Sparkle, Gift, ChartLine, Camera, HandHeart, Trophy, Calculator } from "@phosphor-icons/react";
@@ -110,6 +111,7 @@ type SmsState =
   | "error";
 
 export default function AfroeWaitlistLandingV2(): JSX.Element {
+  const router = useRouter();
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -117,6 +119,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   const [role, setRole] = useState<RoleType>(null);
   const [consentSMS, setConsentSMS] = useState<boolean>(true);
   const [submit, setSubmit] = useState<SubmitState>("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [devSkipSms, setDevSkipSms] = useState<boolean>(false);
   const [skillAnswer, setSkillAnswer] = useState<string>("");
   const [consentGDPR, setConsentGDPR] = useState<boolean>(false);
@@ -204,52 +207,57 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
     }
 
     setSubmit("loading");
+    setSubmitError(null);
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     try {
-      const res = await fetch("/api/join-waitlist", {
+      const r = await fetch("/api/join-waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           phone,
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
           role:
             role === "client"
               ? "client"
               : role === "influencer"
                 ? "influencer"
                 : "beautypro",
-          skillAnswerCorrect: true,
+          skillAnswer: skillAnswer,
+          consent: consentGDPR,
         }),
       });
-      if (!res.ok) throw new Error("signup failed");
 
-      const data = await res.json();
+      const data = await r.json();
 
-      try {
-        await fetch("/api/save-lead", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            email,
-            phone,
-            role,
-            referralCode: data.referralCode,
-            status: "subscribed",
-            source: "landing_v2",
-          }),
+      if (r.status === 409 && data.error === 'already_registered') {
+        const params = new URLSearchParams({
+          ref:       data.referralCode,
+          shareUrl:  data.shareUrl,
+          firstName: data.firstName || firstName,
+          returning: 'true',
         });
-      } catch {}
-
-      if (data.success && data.referralCode) {
-        window.location.href = `/success?ref=${data.referralCode}`;
-      } else {
-        setSubmit("done");
+        router.push(`/success?${params.toString()}`);
+        return;
       }
+
+      if (!r.ok) {
+        setSubmit('error');
+        setSubmitError(data.error || 'Une erreur est survenue');
+        return;
+      }
+
+      const params = new URLSearchParams({
+        ref:       data.referralCode,
+        shareUrl:  data.shareUrl,
+        firstName: data.firstName || firstName,
+        role:      data.role || role,
+      });
+      router.push(`/success?${params.toString()}`);
     } catch {
       setSubmit("error");
+      setSubmitError("Une erreur est survenue");
     }
   }
 
@@ -614,6 +622,10 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                     </>
                   )}
             </button>
+
+            {submit === 'error' && submitError && (
+              <p className="text-red-400 text-sm text-center mt-2">{submitError}</p>
+            )}
 
             <p className="text-xs text-slate-400 text-center">
               On t'enverra le top départ par email / SMS. Tu
