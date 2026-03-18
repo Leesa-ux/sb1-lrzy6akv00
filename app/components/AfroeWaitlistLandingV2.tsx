@@ -174,8 +174,12 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, code: smsCode }),
       });
-      if (!r.ok) throw new Error("verify");
-      setSmsState("verified");
+      const data = await r.json();
+      if (r.ok || data.verified || data.ok || data.success) {
+        setSmsState("verified");
+        return;
+      }
+      throw new Error("verify failed");
     } catch {
       setSmsState(smsRemaining === 0 ? "expired" : "error");
     }
