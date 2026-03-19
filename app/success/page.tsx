@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import GlowListSuccessScreen from "@/app/components/GlowListSuccessScreen";
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import GlowListSuccessScreen from '@/app/components/GlowListSuccessScreen';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -20,10 +20,10 @@ function SuccessContent() {
 
   useEffect(() => {
     setParams({
-      ref: searchParams.get("ref"),
-      shareUrl: searchParams.get("shareUrl"),
-      firstName: searchParams.get("firstName"),
-      role: searchParams.get("role"),
+      ref: searchParams.get('ref'),
+      shareUrl: searchParams.get('shareUrl'),
+      firstName: searchParams.get('firstName'),
+      role: searchParams.get('role'),
     });
   }, [searchParams]);
 
@@ -57,12 +57,12 @@ function SuccessContent() {
 export default function SuccessPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white font-sans flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="text-4xl mb-4">✨</div>
-          <p className="text-slate-300">Chargement...</p>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full mx-auto mb-4" />
+          <p>Chargement...</p>
         </div>
-      </main>
+      </div>
     }>
       <SuccessContent />
     </Suspense>
