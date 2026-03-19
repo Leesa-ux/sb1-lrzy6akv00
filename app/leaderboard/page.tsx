@@ -97,10 +97,51 @@ export default function LeaderboardPage() {
   };
 
   const getRankEmoji = (rank: number) => {
-    if (rank === 1) return <Medal weight="thin" className="text-amber-400" />;
+    if (rank === 1) return <Crown weight="thin" className="text-amber-400" />;
     if (rank === 2) return <Medal weight="thin" className="text-slate-400" />;
     if (rank === 3) return <Medal weight="thin" className="text-orange-400" />;
     return null;
+  };
+
+  const getRankNumberColor = (rank: number) => {
+    if (rank === 1) return 'text-amber-500 font-bold';
+    if (rank === 2) return 'text-slate-500 font-bold';
+    if (rank === 3) return 'text-orange-500 font-bold';
+    return 'text-gray-400';
+  };
+
+  const getProgressBarColor = (role: string) => {
+    switch (role) {
+      case 'client':
+        return 'bg-fuchsia-400';
+      case 'influencer':
+        return 'bg-blue-400';
+      case 'beautypro':
+        return 'bg-amber-400';
+      default:
+        return 'bg-gray-400';
+    }
+  };
+
+  const getNextTierThreshold = (tier: string) => {
+    switch (tier) {
+      case 'Glow Starter':
+        return 50;
+      case 'Circle Insiders':
+        return 100;
+      case 'Glow Icons':
+        return 200;
+      case 'Leader Circle':
+        return null;
+      default:
+        return 50;
+    }
+  };
+
+  const calculateProgressPercentage = (points: number, tier: string) => {
+    const nextThreshold = getNextTierThreshold(tier);
+    if (!nextThreshold) return 100;
+    return Math.min((points / nextThreshold) * 100, 100);
   };
 
   const getTierColor = (tier: string) => {
@@ -227,55 +268,73 @@ export default function LeaderboardPage() {
           <Card>
             <CardContent className="p-0">
               <div className="divide-y">
-                {leaderboard.map((entry) => (
-                  <div
-                    key={`${entry.rank}-${entry.firstName}`}
-                    className={`p-4 hover:bg-gray-50 transition-colors ${
-                      entry.rank <= 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="w-12 text-center">
-                          <div className="text-2xl font-bold text-gray-900">
-                            {entry.rank}
+                {leaderboard.map((entry) => {
+                  const progressPercentage = calculateProgressPercentage(entry.points, entry.tier);
+                  const rank1Points = leaderboard[0]?.points || 0;
+                  const gapToIphone = rank1Points - entry.points;
+
+                  return (
+                    <div
+                      key={`${entry.rank}-${entry.firstName}`}
+                      className={`p-4 hover:bg-gray-50 transition-colors ${
+                        entry.rank <= 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="w-12 text-center">
+                            <div className={`text-2xl flex items-center justify-center gap-1 ${getRankNumberColor(entry.rank)}`}>
+                              {entry.rank}
+                              {getRankEmoji(entry.rank) && (
+                                <span className="inline-flex">{getRankEmoji(entry.rank)}</span>
+                              )}
+                            </div>
                           </div>
-                          <div className="text-xl">
-                            {getRankEmoji(entry.rank)}
+
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="font-semibold text-gray-900">
+                                {entry.firstName}
+                              </span>
+                              <Badge className={`text-xs font-bold flex items-center gap-1 ${getTierColor(entry.tier)}`}>
+                                <span className="inline-flex">{getTierIcon(entry.tier)}</span> {entry.tier}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+                              <Badge className={getRoleBadgeColor(entry.role)}>
+                                {getRoleLabel(entry.role)}
+                              </Badge>
+                              {entry.emailMasked && (
+                                <span className="text-xs text-gray-500">{entry.emailMasked}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className="font-semibold text-gray-900">
-                              {entry.firstName}
-                            </span>
-                            <Badge className={`text-xs font-bold flex items-center gap-1 ${getTierColor(entry.tier)}`}>
-                              <span className="inline-flex">{getTierIcon(entry.tier)}</span> {entry.tier}
-                            </Badge>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-purple-600">
+                            {entry.points}
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-                            <Badge className={getRoleBadgeColor(entry.role)}>
-                              {getRoleLabel(entry.role)}
-                            </Badge>
-                            {entry.emailMasked && (
-                              <span className="text-xs text-gray-500">{entry.emailMasked}</span>
-                            )}
+                          <div className="text-xs text-gray-500">
+                            {entry.referralsCount} referral{entry.referralsCount > 1 ? 's' : ''}
                           </div>
+                          {entry.rank > 1 && entry.rank <= 3 && gapToIphone > 0 && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {gapToIphone} pts de l'iPhone
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-purple-600">
-                          {entry.points}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {entry.referralsCount} referral{entry.referralsCount > 1 ? 's' : ''}
-                        </div>
+                      <div className="mt-2 w-full bg-gray-200 rounded-full h-0.5 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full opacity-40 ${getProgressBarColor(entry.role)}`}
+                          style={{ width: `${progressPercentage}%` }}
+                        />
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
