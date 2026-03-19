@@ -6,16 +6,28 @@ import GlowListSuccessScreen from "@/app/components/GlowListSuccessScreen";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [params, setParams] = useState<{
+    ref: string | null;
+    shareUrl: string | null;
+    firstName: string | null;
+    role: string | null;
+  }>({
+    ref: null,
+    shareUrl: null,
+    firstName: null,
+    role: null,
+  });
 
   useEffect(() => {
-    const code = searchParams.get("ref");
-    if (code) {
-      setReferralCode(code);
-    }
+    setParams({
+      ref: searchParams.get("ref"),
+      shareUrl: searchParams.get("shareUrl"),
+      firstName: searchParams.get("firstName"),
+      role: searchParams.get("role"),
+    });
   }, [searchParams]);
 
-  if (!referralCode) {
+  if (!params.ref) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white font-sans flex items-center justify-center p-4">
         <div className="text-center">
@@ -32,7 +44,14 @@ function SuccessContent() {
     );
   }
 
-  return <GlowListSuccessScreen referralCode={referralCode} />;
+  return (
+    <GlowListSuccessScreen
+      referralCode={params.ref}
+      shareUrl={params.shareUrl}
+      firstName={params.firstName}
+      role={params.role}
+    />
+  );
 }
 
 export default function SuccessPage() {

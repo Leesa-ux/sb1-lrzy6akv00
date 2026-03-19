@@ -1,24 +1,36 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Copy, Check } from "lucide-react";
-import PostSignupShareBar from "@/components/PostSignupShareBar";
+import {
+  CheckCircle,
+  CopySimple,
+  WhatsappLogo,
+  InstagramLogo,
+  ChatCircleDots,
+  ArrowRight,
+} from "@phosphor-icons/react";
 
 interface GlowListSuccessScreenProps {
   referralCode: string;
-  firstName?: string;
+  shareUrl?: string | null;
+  firstName?: string | null;
+  role?: string | null;
 }
 
 export default function GlowListSuccessScreen({
   referralCode,
+  shareUrl: providedShareUrl,
   firstName,
+  role,
 }: GlowListSuccessScreenProps) {
   const [linkCopied, setLinkCopied] = useState(false);
+  const [instaCopied, setInstaCopied] = useState(false);
 
   const shareUrl = useMemo(() => {
+    if (providedShareUrl) return providedShareUrl;
     if (typeof window === "undefined") return "";
     return `${window.location.origin}/?ref=${referralCode}`;
-  }, [referralCode]);
+  }, [referralCode, providedShareUrl]);
 
   async function copyLink() {
     try {
@@ -30,94 +42,151 @@ export default function GlowListSuccessScreen({
     }
   }
 
+  async function copyForInsta() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setInstaCopied(true);
+      setTimeout(() => setInstaCopied(false), 2000);
+    } catch (err) {
+      console.error("Erreur copie:", err);
+    }
+  }
+
+  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(
+    `Rejoins la Glow List Afroé 🌟 ${shareUrl}`
+  )}`;
+
+  const smsHref = `sms:?body=${encodeURIComponent(
+    `Rejoins la Glow List Afroé ${shareUrl}`
+  )}`;
+
+  const displayName = firstName || "toi";
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl space-y-6">
-        <div className="glassy neon-fuchsia rounded-2xl p-6 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="text-4xl">🎉</div>
-            <h2 className="text-xl font-bold">Bienvenue sur la Glow List</h2>
-            <p className="text-sm text-slate-300">
-              Ton lien est actif.
-              <br />
-              Partage-le maintenant pour gagner des points.
+    <main className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black text-white font-sans flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl space-y-8 py-8">
+        <section className="text-center space-y-4">
+          <div className="flex justify-center">
+            <CheckCircle
+              size={64}
+              weight="thin"
+              className="text-green-400"
+            />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold">
+            🎉 Tu es sur la Glow List, {displayName} !
+          </h1>
+          <p className="text-base sm:text-lg text-slate-300">
+            Ton lien est actif. Partage-le et grimpe dans le classement.
+          </p>
+        </section>
+
+        <section className="glassy neon-gold rounded-2xl p-6 sm:p-8 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-amber-300 text-center">
+            Ton lien de parrainage
+          </h2>
+          <div className="bg-slate-900/60 border border-amber-300/30 rounded-xl p-4">
+            <p className="text-sm sm:text-base text-slate-200 font-mono break-all text-center mb-4">
+              {shareUrl}
+            </p>
+            <button
+              onClick={copyLink}
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-bold text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {linkCopied ? (
+                <>
+                  <CheckCircle size={24} weight="thin" />
+                  Copié ✓
+                </>
+              ) : (
+                <>
+                  <CopySimple size={24} weight="thin" />
+                  📋 Copier mon lien
+                </>
+              )}
+            </button>
+          </div>
+        </section>
+
+        <section className="glassy neon-fuchsia rounded-2xl p-6 sm:p-8 space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-center">
+            Partage maintenant
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-[#25D366] hover:bg-[#1fb856] text-white font-bold text-sm sm:text-base transition-all hover:scale-[1.02]"
+            >
+              <WhatsappLogo size={24} weight="thin" />
+              WhatsApp
+            </a>
+
+            <button
+              onClick={copyForInsta}
+              className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:brightness-110 text-white font-bold text-sm sm:text-base transition-all hover:scale-[1.02]"
+            >
+              <InstagramLogo size={24} weight="thin" />
+              {instaCopied ? "Copié !" : "Instagram"}
+            </button>
+
+            <a
+              href={smsHref}
+              className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm sm:text-base transition-all hover:scale-[1.02]"
+            >
+              <ChatCircleDots size={24} weight="thin" />
+              SMS
+            </a>
+          </div>
+          {instaCopied && (
+            <p className="text-xs text-center text-emerald-400 font-medium">
+              ✓ Lien copié — colle-le dans ta bio !
+            </p>
+          )}
+        </section>
+
+        <section className="glassy neon-blue rounded-2xl p-6 space-y-4">
+          <h2 className="text-lg font-bold text-center">Tes points</h2>
+          <div className="text-center">
+            <p className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-amber-300">
+              0 pts
+            </p>
+            <p className="text-sm text-slate-300 mt-2">
+              Chaque personne que tu invites = +5 à +25 pts
             </p>
           </div>
 
-          <div className="space-y-3">
-            <div className="bg-slate-900/60 border border-amber-300/20 rounded-xl p-4">
-              <p className="text-xs text-slate-400 mb-2 uppercase tracking-wide">
-                Ton lien personnel
-              </p>
-              <p className="text-sm text-amber-300 font-mono break-all mb-3">
-                {shareUrl}
-              </p>
-              <button
-                onClick={copyLink}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
-                aria-label="Copier le lien de parrainage"
-              >
-                {linkCopied ? (
-                  <>
-                    <Check className="w-5 h-5" />
-                    Copié !
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-5 h-5" />
-                    Copier le lien
-                  </>
-                )}
-              </button>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span>Progression vers Glow Starter</span>
+              <span>0 / 10 pts</span>
+            </div>
+            <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-800">
+              <div
+                className="absolute left-0 top-0 h-full rounded-full transition-all duration-700 bg-gradient-to-r from-fuchsia-500 to-amber-500"
+                style={{ width: "0%" }}
+              />
             </div>
           </div>
+        </section>
 
-          <div className="border-t border-slate-700/50 pt-6">
-            <PostSignupShareBar
-              referralLink={shareUrl}
-              onCopied={() => {
-                setLinkCopied(true);
-                setTimeout(() => setLinkCopied(false), 2000);
-              }}
-            />
-          </div>
-
-          <div className="bg-gradient-to-br from-fuchsia-900/30 to-amber-900/30 border border-fuchsia-400/20 rounded-xl p-4 space-y-3">
-            <h4 className="text-sm font-bold text-center flex items-center justify-center gap-2">
-              <span className="text-lg">🏆</span>
-              Rappel motivation
-            </h4>
-            <div className="space-y-2 text-center">
-              <p className="text-sm font-semibold text-amber-300">
-                🎁 iPhone 17 Pro ou 2 000 € cash
-              </p>
-              <p className="text-xs text-slate-300">
-                ⏱️ Classement mis à jour en temps réel
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center">
-          <p className="text-xs text-slate-500">
-            Zéro spam. Tu contrôles tout. Désinscription quand tu veux.
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+        <section className="flex flex-col sm:flex-row gap-4 items-center justify-center text-sm sm:text-base">
           <a
             href="/leaderboard"
-            className="inline-block px-6 py-3 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl font-bold transition-all text-sm"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-amber-500 hover:brightness-110 rounded-xl font-bold transition-all"
           >
             Voir le classement
+            <ArrowRight size={20} weight="thin" />
           </a>
           <a
             href="/"
-            className="text-sm text-slate-400 hover:text-white underline transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
           >
             Retour à l'accueil
+            <ArrowRight size={20} weight="thin" />
           </a>
-        </div>
+        </section>
       </div>
     </main>
   );
