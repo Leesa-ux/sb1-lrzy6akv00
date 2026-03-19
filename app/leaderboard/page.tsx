@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Medal, Star, Sparkle, Target, Crown, Diamond, Gift, User, DeviceMobile, Camera, Key, CurrencyDollar } from '@phosphor-icons/react';
+import GlowNav from '../components/GlowNav';
 
 interface LeaderboardEntry {
   rank: number;
@@ -175,7 +176,7 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 py-12 px-4 pb-20">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
@@ -413,6 +414,8 @@ export default function LeaderboardPage() {
           </Button>
         </div>
       </div>
+
+      <GlowNav />
     </div>
   );
 }

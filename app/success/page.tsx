@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { CheckCircle, Copy, WhatsappLogo, InstagramLogo, ChatCircle, Trophy, ArrowRight } from '@phosphor-icons/react';
 import Link from 'next/link';
+import GlowNav from '../components/GlowNav';
 
 function SuccessContent() {
   const params = useSearchParams();
@@ -25,7 +26,7 @@ function SuccessContent() {
   const smsText = encodeURIComponent(`Rejoins la Glow List Afroé ${shareUrl}`);
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-start px-4 py-12 gap-8">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-start px-4 py-12 pb-20 gap-8">
 
       {/* HERO */}
       <div className="flex flex-col items-center text-center gap-4 max-w-lg">
@@ -108,6 +109,7 @@ function SuccessContent() {
         </Link>
       </div>
 
+      <GlowNav />
     </div>
   );
 }
