@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Trophy, Medal, Star, Sparkle, Target, Crown, Diamond, Gift, User, DeviceMobile, Camera, Key, CurrencyDollar } from '@phosphor-icons/react';
 
 interface LeaderboardEntry {
   rank: number;
@@ -60,11 +61,23 @@ export default function LeaderboardPage() {
   const getRoleLabel = (role: string) => {
     switch (role) {
       case 'client':
-        return '👤 Client';
+        return (
+          <>
+            <User weight="thin" className="inline-block" /> Client
+          </>
+        );
       case 'influencer':
-        return '⭐ Influenceur';
+        return (
+          <>
+            <Star weight="thin" className="inline-block text-amber-400" /> Influenceur
+          </>
+        );
       case 'beautypro':
-        return '💅 Beauty Pro';
+        return (
+          <>
+            <Sparkle weight="thin" className="inline-block text-amber-400" /> Beauty Pro
+          </>
+        );
       default:
         return role;
     }
@@ -84,10 +97,10 @@ export default function LeaderboardPage() {
   };
 
   const getRankEmoji = (rank: number) => {
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
-    return '';
+    if (rank === 1) return <Medal weight="thin" className="text-amber-400" />;
+    if (rank === 2) return <Medal weight="thin" className="text-slate-400" />;
+    if (rank === 3) return <Medal weight="thin" className="text-orange-400" />;
+    return null;
   };
 
   const getTierColor = (tier: string) => {
@@ -108,15 +121,15 @@ export default function LeaderboardPage() {
   const getTierIcon = (tier: string) => {
     switch (tier) {
       case 'Leader Circle':
-        return '👑';
+        return <Crown weight="thin" />;
       case 'Glow Icons':
-        return '🏆';
+        return <Trophy weight="thin" />;
       case 'Circle Insiders':
-        return '🔑';
+        return <Key weight="thin" />;
       case 'Glow Starter':
-        return '✦';
+        return <Sparkle weight="thin" />;
       default:
-        return '🌱';
+        return <Sparkle weight="thin" />;
     }
   };
 
@@ -124,8 +137,8 @@ export default function LeaderboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            🏆 Glow List Leaderboard
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
+            <Trophy weight="thin" className="text-amber-400" /> Glow List Leaderboard
           </h1>
           <p className="text-gray-600">
             Les meilleurs ambassadeurs Afroé
@@ -149,22 +162,25 @@ export default function LeaderboardPage() {
                 variant={selectedRole === 'client' ? 'default' : 'outline'}
                 onClick={() => setSelectedRole('client')}
                 disabled={loading}
+                className="flex items-center gap-1"
               >
-                👤 Clients
+                <User weight="thin" className="text-fuchsia-400" /> Client.e
               </Button>
               <Button
                 variant={selectedRole === 'influencer' ? 'default' : 'outline'}
                 onClick={() => setSelectedRole('influencer')}
                 disabled={loading}
+                className="flex items-center gap-1"
               >
-                ⭐ Influenceurs
+                <Camera weight="thin" className="text-blue-400" /> Influenceur.euse
               </Button>
               <Button
                 variant={selectedRole === 'beautypro' ? 'default' : 'outline'}
                 onClick={() => setSelectedRole('beautypro')}
                 disabled={loading}
+                className="flex items-center gap-1"
               >
-                💅 Beauty Pros
+                <Sparkle weight="thin" className="text-amber-400" /> Beauty Pro
               </Button>
             </div>
           </CardContent>
@@ -193,7 +209,9 @@ export default function LeaderboardPage() {
           <Card>
             <CardContent className="py-12">
               <div className="text-center">
-                <div className="text-6xl mb-4">🎯</div>
+                <div className="mb-4 flex justify-center">
+                  <Target weight="thin" className="text-red-400" size={64} />
+                </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Aucun participant pour le moment
                 </h3>
@@ -232,8 +250,8 @@ export default function LeaderboardPage() {
                             <span className="font-semibold text-gray-900">
                               {entry.firstName}
                             </span>
-                            <Badge className={`text-xs font-bold ${getTierColor(entry.tier)}`}>
-                              {getTierIcon(entry.tier)} {entry.tier}
+                            <Badge className={`text-xs font-bold flex items-center gap-1 ${getTierColor(entry.tier)}`}>
+                              <span className="inline-flex">{getTierIcon(entry.tier)}</span> {entry.tier}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
@@ -266,27 +284,35 @@ export default function LeaderboardPage() {
         <div className="mt-8 space-y-4">
           <Card className="bg-gradient-to-r from-blue-50 to-cyan-50">
             <CardContent className="py-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                🏆 Niveaux de Classement
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center flex items-center justify-center gap-2">
+                <Trophy weight="thin" className="text-amber-400" /> Niveaux de Classement
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">✦</div>
+                  <div className="mb-1 flex justify-center">
+                    <Sparkle weight="thin" size={24} />
+                  </div>
                   <div className="font-semibold text-xs mb-1">Glow Starter</div>
                   <div className="text-xs text-gray-600">10 points</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">🔑</div>
+                  <div className="mb-1 flex justify-center">
+                    <Key weight="thin" size={24} />
+                  </div>
                   <div className="font-semibold text-xs mb-1">Circle Insiders</div>
                   <div className="text-xs text-gray-600">50 points</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">🏆</div>
+                  <div className="mb-1 flex justify-center">
+                    <Trophy weight="thin" size={24} />
+                  </div>
                   <div className="font-semibold text-xs mb-1">Glow Icons</div>
                   <div className="text-xs text-gray-600">100 points</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-2xl mb-1">👑</div>
+                  <div className="mb-1 flex justify-center">
+                    <Crown weight="thin" size={24} />
+                  </div>
                   <div className="font-semibold text-xs mb-1">Leader Circle</div>
                   <div className="text-xs text-gray-600">200 points</div>
                 </div>
@@ -296,17 +322,21 @@ export default function LeaderboardPage() {
 
           <Card className="bg-gradient-to-r from-purple-100 to-pink-100">
             <CardContent className="py-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
-                🎁 Récompenses
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center flex items-center justify-center gap-2">
+                <Gift weight="thin" className="text-pink-400" /> Récompenses
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="bg-white/50 rounded p-3 text-center">
-                  <div className="text-2xl mb-1">🥇</div>
+                  <div className="mb-1 flex justify-center">
+                    <Medal weight="thin" className="text-amber-400" size={24} />
+                  </div>
                   <div className="font-semibold">Rang 1</div>
                   <div className="text-xs text-gray-600">iPhone 17 Pro</div>
                 </div>
                 <div className="bg-white/50 rounded p-3 text-center">
-                  <div className="text-2xl mb-1">💰</div>
+                  <div className="mb-1 flex justify-center">
+                    <CurrencyDollar weight="thin" className="text-green-500" size={24} />
+                  </div>
                   <div className="font-semibold">100+ points</div>
                   <div className="text-xs text-gray-600">Jackpot 2 000 €</div>
                 </div>
