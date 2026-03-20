@@ -102,7 +102,7 @@ function Simulateur() {
 const faqs = [
   {
     q: "Quels sont les prérequis pour rejoindre Afroé ?",
-    a: "Tu dois avoir un diplôme ou minimum 2 ans d'expérience en soins capillaires afro, être en ordre de statut indépendant·e (ou en cours de démarches), et exercer ou souhaiter exercer dans la zone Bruxelles, Liège ou Anvers. Tu as besoin d'un smartphone iOS ou Android pour utiliser l'application."
+    a: "Tu dois avoir un diplôme ou minimum 2 ans d'expérience en soins capillaires afro, soin esthétiques, maquillage, etc ... être en ordre de statut indépendant·e (ou en cours de démarches), et exercer ou souhaiter exercer dans la zone Bruxelles, Liège ou Anvers. Tu as besoin d'un smartphone iOS ou Android pour utiliser l'application."
   },
   {
     q: "Combien gagne un·e Beauty Pro Afroé ?",
@@ -110,7 +110,7 @@ const faqs = [
   },
   {
     q: "Comment suis-je payé·e ?",
-    a: "Le paiement est traité via l'application, directement par la cliente au moment de la réservation. Le montant (moins la commission Afroé) est versé sur ton compte bancaire toutes les 2 semaines. Tu reçois un récapitulatif détaillé de chaque prestation et toutes tes factures sont générées automatiquement."
+    a: "Le paiement est traité via l'application, directement par les client.e.s au moment de la réservation. Le montant (moins la commission Afroé) est versé sur ton compte bancaire toutes les 2 semaines. Tu reçois un récapitulatif détaillé de chaque prestation et toutes tes factures sont générées automatiquement."
   },
   {
     q: "Comment fonctionne le soutien administratif ?",
@@ -178,7 +178,7 @@ export default function BeautyProPage() {
   ];
 
   const prerequis = [
-    "Diplôme ou 2 ans d'expérience en soins capillaires afro",
+    "Diplôme ou 2 ans d'expérience en soins capillaires afro, soins esthétiques, maquillage, etc ...",
     "Statut indépendant·e ou démarches en cours",
     "Smartphone iOS ou Android",
     "Zone Bruxelles, Liège ou Anvers",
@@ -200,7 +200,7 @@ export default function BeautyProPage() {
     },
     {
       num: "03",
-      titre: "Tu accèdes aux clientes",
+      titre: "Tu accèdes aux client.e.s",
       desc: "Dès le lancement, ton profil est visible. Les clientes te trouvent, tu choisis tes missions.",
       icon: <ChartLineUp weight="thin" size={28} className="text-green-400" />,
     },
@@ -226,7 +226,7 @@ export default function BeautyProPage() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-300">
               Afroé te connecte
             </span><br />
-            à tes prochaines clientes.
+            à tes prochaines client.e.s.
           </h1>
 
           <p className="text-lg text-purple-200 max-w-2xl mx-auto mb-10 leading-relaxed">
@@ -293,7 +293,7 @@ export default function BeautyProPage() {
               <p className="text-amber-400 text-sm font-bold uppercase tracking-widest mb-3">Conditions</p>
               <h2 className="text-3xl font-black text-white mb-4">Les prérequis</h2>
               <p className="text-purple-300 leading-relaxed">
-                On cherche des professionnelles passionnées, expérimentées, prêtes à offrir une expérience premium aux clientes afro de Belgique.
+                On cherche des professionnelles passionnées, expérimentées, prêtes à offrir une expérience premium aux client.e.s afro de Belgique.
               </p>
             </div>
             <div className="space-y-4">
@@ -364,7 +364,7 @@ export default function BeautyProPage() {
       {/* ══ CTA FINAL ══ */}
       <section id="dossier" className="bg-gradient-to-br from-purple-950 to-purple-900 py-24">
         <div className="max-w-2xl mx-auto px-6 text-center">
-          <p className="text-amber-400 text-sm font-bold uppercase tracking-widest mb-4">Prête à rejoindre Afroé ?</p>
+          <p className="text-amber-400 text-sm font-bold uppercase tracking-widest mb-4">Prêt.e à rejoindre Afroé ?</p>
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Dépose ton dossier Beauty Pro
           </h2>
