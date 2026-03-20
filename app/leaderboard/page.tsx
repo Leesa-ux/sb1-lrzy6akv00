@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,7 @@ interface LeaderboardResponse {
   error?: string;
 }
 
-export default function LeaderboardPage() {
+function LeaderboardContent() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -417,5 +417,26 @@ export default function LeaderboardPage() {
 
       <GlowNav />
     </div>
+  );
+}
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 py-12 px-4 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center text-gray-500">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                Chargement...
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <LeaderboardContent />
+    </Suspense>
   );
 }
