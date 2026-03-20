@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ShareNetwork, Trophy, House } from '@phosphor-icons/react';
 
-export default function GlowNav() {
+function GlowNavInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -53,5 +54,13 @@ export default function GlowNav() {
         })}
       </div>
     </nav>
+  );
+}
+
+export default function GlowNav() {
+  return (
+    <Suspense fallback={null}>
+      <GlowNavInner />
+    </Suspense>
   );
 }
