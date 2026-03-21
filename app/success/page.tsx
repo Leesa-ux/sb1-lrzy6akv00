@@ -42,9 +42,16 @@ function SuccessContent() {
       {/* REFERRAL LINK */}
       <div className="w-full max-w-lg bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
         <p className="text-white/40 text-xs uppercase tracking-widest">Ton lien Glow</p>
-        <div className="bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-purple-300 break-all">
-          {shareUrl}
-        </div>
+       <div className="bg-black/40 border border-white/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+  <div>
+    <p className="text-white/40 text-xs mb-0.5">Ton code de parrainage</p>
+    <p className="text-2xl font-bold tracking-widest text-purple-300">{ref || 'GLOW'}</p>
+  </div>
+  <div className="text-white/20 text-xs text-right">
+    <p>afroe.studio</p>
+    <p>?ref={ref || 'GLOW'}</p>
+  </div>
+</div>
         <button
           onClick={() => copy()}
           className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-purple-600 to-amber-500 hover:opacity-90 transition"
