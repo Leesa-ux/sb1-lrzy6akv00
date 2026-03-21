@@ -8,7 +8,8 @@ export type SMSType =
   | "reminder_5d"
   | "launch_day"
   | "welcome_beauty_pro"
-  | "activation_pro_irl";
+  | "activation_pro_irl"
+  | "welcome_with_glow_link";
 
 export type Role = "client" | "influencer" | "pro";
 
@@ -16,6 +17,7 @@ interface SMSVariables {
   code?: string;
   ttl?: number;
   refLink?: string;
+  myGlowLink?: string;
   firstName?: string;
   milestone?: number;
   points?: number;
@@ -53,8 +55,19 @@ export const SMS_TEMPLATES: Record<
 
   launch_day: `🚀 C'est le JOUR J ! Afroé est lancée ! Tous les points gagnés aujourd'hui sont DOUBLÉS ! Partage ton lien maintenant ! 🔥`,
 
+  welcome_with_glow_link: {
+    client: (vars: SMSVariables) =>
+      `Afroé ✨ Merci ${vars.firstName || ""}! Tu es sur la Glow List 🎉\nRetrouve ton lien perso ici : ${vars.myGlowLink}\n(Partage-le et grimpe dans le classement !)`,
+
+    influencer: (vars: SMSVariables) =>
+      `Afroé ✨ Merci ${vars.firstName || ""}! Tu es sur la Glow List 🎉\nRetrouve ton lien perso ici : ${vars.myGlowLink}\n(Vise 50–100 pts pour le Jackpot 2 000 € !)`,
+
+    pro: (vars: SMSVariables) =>
+      `Afroé ✨ Merci ${vars.firstName || ""} Beauty Pro ! Tu es sur la Glow List 🎉\nRetrouve ton lien perso ici : ${vars.myGlowLink}\n(À 100 pts : Glow Kit + coaching !)`,
+  },
+
   welcome_beauty_pro: (vars: SMSVariables) =>
-    `Afroé ✨ Bienvenue Beauty Pro !\nProchaine étape : envoie ton portfolio à pro@afroe.com\nChaque pro que tu invites = +25 pts.\nTon lien : ${vars.refLink}`,
+    `Afroé ✨ Bienvenue Beauty Pro !\nRetrouve ta page Glow : ${vars.myGlowLink || vars.refLink}\nProchaine étape : envoie ton portfolio à pro@afroe.com`,
 
   activation_pro_irl: `Afroé 💼 Ton profil Beauty Pro est en revue !\nProchaine étape : test IRL (Bruxelles/Anvers/Paris).\nComplète ton portfolio → pro@afroe.com\n99€/mois · 0% commission 2 mois`,
 };
