@@ -9,6 +9,7 @@ export interface BrevoContact {
   attributes: {
     ROLE: Role;
     REF_LINK: string;
+    MY_GLOW_LINK?: string;
     RANK: number;
     POINTS: number;
     PROVISIONAL_POINTS?: number;
