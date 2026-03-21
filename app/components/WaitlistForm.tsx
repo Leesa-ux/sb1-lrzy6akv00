@@ -381,7 +381,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
             className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
           />
           <Label htmlFor="consent" className="text-sm text-gray-600">
-            ☑ J'accepte les{" "}
+            J'accepte les{" "}
             <a
               href="/cgu"
               target="_blank"
