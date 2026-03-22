@@ -6,6 +6,7 @@ export interface BrevoContact {
   email: string;
   firstName?: string;
   phone?: string;
+  listIds?: number[];
   attributes: {
     ROLE: Role;
     REF_LINK: string;

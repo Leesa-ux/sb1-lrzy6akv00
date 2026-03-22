@@ -33,7 +33,7 @@ export function calculatePointsForRole(role: Role, isLaunchDay = false): number 
   return isLaunchDay ? basePoints * 2 : basePoints;
 }
 
-export async function syncUserToBrevo(userId: string): Promise<void> {
+export async function syncUserToBrevo(userId: string, listIds?: number[]): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
 
@@ -44,6 +44,7 @@ export async function syncUserToBrevo(userId: string): Promise<void> {
     email: user.email,
     firstName: user.firstName || undefined,
     phone: user.phone || undefined,
+    ...(listIds ? { listIds } : {}),
     attributes: {
       ROLE: (user.role === 'beauty_pro' ? 'pro' : user.role) as Role,
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,

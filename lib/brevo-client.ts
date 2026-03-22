@@ -26,6 +26,7 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
         SMS: contact.phone || "",
         ...contact.attributes,
       },
+      ...(contact.listIds ? { listIds: contact.listIds } : {}),
       updateEnabled: true,
     }),
   });
