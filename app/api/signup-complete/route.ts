@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Normalize role names (handle "pro" as "beauty_pro")
-    const normalizedRole = role === "pro" ? "beauty_pro" : role;
+    // Normalize role names
+    const normalizedRole = (role === "pro" || role === "beautypro") ? "beauty_pro" : role;
 
     const ipAddress = getClientIp(req);
     const userAgent = req.headers.get("user-agent") || "unknown";

@@ -295,7 +295,7 @@ export async function updateUserPoints(
 
 export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || user.role !== "pro") return;
+  if (!user || user.role !== "beauty_pro") return;
 
   const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
 
@@ -325,7 +325,7 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
 
 export async function sendActivationProIRLEmail(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || user.role !== "pro") return;
+  if (!user || user.role !== "beauty_pro") return;
 
   const timeSinceSignup = Date.now() - user.createdAt.getTime();
   if (timeSinceSignup < 172800000) return;
