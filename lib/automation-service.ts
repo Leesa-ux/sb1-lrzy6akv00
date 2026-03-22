@@ -45,7 +45,7 @@ export async function syncUserToBrevo(userId: string): Promise<void> {
     firstName: user.firstName || undefined,
     phone: user.phone || undefined,
     attributes: {
-      ROLE: user.role as Role,
+      ROLE: (user.role === 'beauty_pro' ? 'pro' : user.role) as Role,
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       RANK: user.rank,
       POINTS: currentPoints, // Use current phase points
@@ -83,7 +83,7 @@ export async function sendWelcomeEmail(userId: string): Promise<void> {
     params: {
       FIRSTNAME: user.firstName || "Glow Friend",
       REF_LINK: refLink,
-      ROLE: user.role,
+      ROLE: user.role === 'beauty_pro' ? 'pro' : user.role,
       POINTS: user.points,
       NEXT_MILESTONE: getNextMilestone(user.points),
     },
@@ -120,7 +120,7 @@ export async function sendFollowupEmail(userId: string): Promise<void> {
       FIRSTNAME: user.firstName || "Glow Friend",
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       POINTS: user.points,
-      ROLE: user.role,
+      ROLE: user.role === 'beauty_pro' ? 'pro' : user.role,
     },
   });
 
@@ -147,7 +147,7 @@ export async function sendActivation48hEmail(userId: string): Promise<void> {
         FIRSTNAME: user.firstName || "Glow Friend",
         REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
         POINTS: user.points,
-        ROLE: user.role,
+        ROLE: user.role === 'beauty_pro' ? 'pro' : user.role,
       },
     });
 
@@ -305,7 +305,7 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
     params: {
       FIRSTNAME: user.firstName || "Beauty Pro",
       REF_LINK: refLink,
-      ROLE: user.role,
+      ROLE: 'pro',
       POINTS: user.points,
     },
   });
@@ -339,7 +339,7 @@ export async function sendActivationProIRLEmail(userId: string): Promise<void> {
       params: {
         FIRSTNAME: user.firstName || "Beauty Pro",
         REF_LINK: refLink,
-        ROLE: user.role,
+        ROLE: 'pro',
         POINTS: user.points,
         REF_COUNT: user.refCount,
       },
