@@ -10,9 +10,12 @@ import {
   MILESTONES,
   POINT_RULES,
   getSMSByRole,
+  mapRoleForBrevo,
   type Role,
   type Milestone,
 } from "./brevo-types";
+
+const BREVO_GLOW_LIST_ID = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
 import { getSMSTemplate } from "./sms-templates";
 
 const LAUNCH_DATE = new Date("2026-01-15T00:00:00Z");
@@ -46,7 +49,7 @@ export async function syncUserToBrevo(userId: string, listIds?: number[]): Promi
     phone: user.phone || undefined,
     ...(listIds ? { listIds } : {}),
     attributes: {
-      ROLE: (user.role === 'beauty_pro' ? 'pro' : user.role) as Role,
+      ROLE: mapRoleForBrevo(user.role),
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
       RANK: user.rank,
       REFERRAL_POINTS: currentPoints, // Used by Brevo automations (Palier 10/50/100/200)
@@ -85,7 +88,7 @@ export async function sendWelcomeEmail(userId: string): Promise<void> {
     params: {
       FIRSTNAME: user.firstName || "Glow Friend",
       REF_LINK: refLink,
-      ROLE: user.role === 'beauty_pro' ? 'pro' : user.role,
+      ROLE: mapRoleForBrevo(user.role),
       POINTS: user.points,
       NEXT_MILESTONE: getNextMilestone(user.points),
     },
@@ -94,7 +97,7 @@ export async function sendWelcomeEmail(userId: string): Promise<void> {
   if (user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: getSMSByRole(user.role as Role, refLink),
+      message: getSMSByRole(user.role, refLink),
     });
   }
 
@@ -122,7 +125,7 @@ export async function sendFollowupEmail(userId: string): Promise<void> {
       FIRSTNAME: user.firstName || "Glow Friend",
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
       POINTS: user.points,
-      ROLE: user.role === 'beauty_pro' ? 'pro' : user.role,
+      ROLE: mapRoleForBrevo(user.role),
     },
   });
 
@@ -149,7 +152,7 @@ export async function sendActivation48hEmail(userId: string): Promise<void> {
         FIRSTNAME: user.firstName || "Glow Friend",
         REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
         POINTS: user.points,
-        ROLE: user.role === 'beauty_pro' ? 'pro' : user.role,
+        ROLE: mapRoleForBrevo(user.role),
       },
     });
 

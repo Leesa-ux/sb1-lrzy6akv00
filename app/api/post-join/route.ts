@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ skipped: true });
     }
 
-    await syncUserToBrevo(user.id, [5]);
+    const listId = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
+    await syncUserToBrevo(user.id, [listId]);
     await sendWelcomeEmail(user.id);
 
     return NextResponse.json({ success: true });

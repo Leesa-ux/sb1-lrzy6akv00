@@ -1,5 +1,18 @@
 export type Role = "client" | "pro" | "influencer";
 
+/** Values that Brevo automation branches actually check */
+export type BrevoRole = "client" | "pro" | "amb";
+
+/**
+ * Maps internal DB role → Brevo ROLE attribute value.
+ * Brevo automation branches use: client | pro | amb
+ */
+export function mapRoleForBrevo(dbRole: string): BrevoRole {
+  if (dbRole === "beauty_pro" || dbRole === "beautypro" || dbRole === "pro") return "pro";
+  if (dbRole === "influencer") return "amb";
+  return "client";
+}
+
 export type Milestone = 10 | 50 | 100 | 200;
 
 export interface BrevoContact {
@@ -8,7 +21,7 @@ export interface BrevoContact {
   phone?: string;
   listIds?: number[];
   attributes: {
-    ROLE: Role;
+    ROLE: BrevoRole;
     REF_LINK: string;
     RANK: number;
     REFERRAL_POINTS: number;
@@ -77,7 +90,12 @@ export const POINT_RULES = {
 
 export const MILESTONES: Milestone[] = [10, 50, 100, 200];
 
-export function getSMSByRole(role: Role, refLink: string): string {
+export function getSMSByRole(dbRole: string, refLink: string): string {
   const { getSMSTemplate } = require("./sms-templates");
-  return getSMSTemplate("welcome", role, { refLink });
+  // SMS templates use keys: client | influencer | pro
+  const smsRole: Role =
+    dbRole === "beauty_pro" || dbRole === "beautypro" ? "pro"
+    : dbRole === "influencer" ? "influencer"
+    : "client";
+  return getSMSTemplate("welcome", smsRole, { refLink });
 }

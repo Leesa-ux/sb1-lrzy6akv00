@@ -155,7 +155,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Sync to Brevo and add to Glow List, then send welcome email/SMS
-    await syncUserToBrevo(user.id, [5]);
+    const listId = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
+    await syncUserToBrevo(user.id, [listId]);
     await sendWelcomeEmail(user.id);
 
     const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
