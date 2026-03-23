@@ -2,9 +2,25 @@ import { BrevoContact, BrevoEmailParams, BrevoSMSParams } from "./brevo-types";
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const BREVO_API_URL = "https://api.brevo.com/v3";
+const BREVO_GLOW_LIST_ID = Number(process.env.BREVO_GLOW_LIST_ID || "5");
 
 if (!BREVO_API_KEY) {
   console.warn("Warning: BREVO_API_KEY is not set");
+}
+
+function mapRoleForBrevo(role?: string): string {
+  if (!role) return "";
+
+  switch (role) {
+    case "beautypro":
+      return "pro";
+    case "influencer":
+      return "amb";
+    case "client":
+      return "client";
+    default:
+      return role;
+  }
 }
 
 export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
@@ -13,24 +29,28 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
     return;
   }
 
+  const payload = {
+    email: contact.email,
+    attributes: {
+      FIRSTNAME: contact.firstName || "",
+      SMS: contact.phone || "",
+      ROLE: mapRoleForBrevo(contact.attributes?.ROLE || contact.attributes?.role),
+      ...contact.attributes,
+    },
+    listIds: [BREVO_GLOW_LIST_ID],
+    updateEnabled: true,
+  };
+
   const response = await fetch(`${BREVO_API_URL}/contacts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "api-key": BREVO_API_KEY,
     },
-    body: JSON.stringify({
-      email: contact.email,
-      attributes: {
-        FIRSTNAME: contact.firstName || "",
-        SMS: contact.phone || "",
-        ...contact.attributes,
-      },
-      updateEnabled: true,
-    }),
+    body: JSON.stringify(payload),
   });
 
-  if (!response.ok && response.status !== 400) {
+  if (!response.ok) {
     const error = await response.text();
     throw new Error(`Failed to upsert Brevo contact: ${error}`);
   }
