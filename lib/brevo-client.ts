@@ -29,17 +29,12 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
     return;
   }
 
-  const payload = {
-    email: contact.email,
-    attributes: {
-      FIRSTNAME: contact.firstName || "",
-      SMS: contact.phone || "",
-      ROLE: mapRoleForBrevo(contact.attributes?.ROLE || contact.attributes?.role),
-      ...contact.attributes,
-    },
-    listIds: [BREVO_GLOW_LIST_ID],
-    updateEnabled: true,
-  };
+  const mappedRole = mapRoleForBrevo(
+    contact.attributes?.ROLE || contact.attributes?.role
+  );
+
+  // Remove ROLE duplicates from attributes
+  const { ROLE, role, ...restAttributes } = contact.attributes || {};
 
   const response = await fetch(`${BREVO_API_URL}/contacts`, {
     method: "POST",
@@ -47,7 +42,17 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
       "Content-Type": "application/json",
       "api-key": BREVO_API_KEY,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      email: contact.email,
+      attributes: {
+        FIRSTNAME: contact.firstName || "",
+        SMS: contact.phone || "",
+        ...restAttributes,
+        ROLE: mappedRole,
+      },
+      listIds: [BREVO_GLOW_LIST_ID],
+      updateEnabled: true,
+    }),
   });
 
   if (!response.ok) {
@@ -129,6 +134,9 @@ export async function checkEmailOpened(
     return data.statistics?.opened > 0 || data.statistics?.clicked > 0;
   } catch (error) {
     console.error("Error checking email opened status:", error);
+    return false;
+  }
+}
     return false;
   }
 }
