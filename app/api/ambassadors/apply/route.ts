@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { generateReferralCode, getReferralLink } from "@/lib/referral-code";
+import { sendBrevoEmail } from "@/lib/brevo-client";
+import { EMAIL_TEMPLATE_IDS } from "@/lib/brevo-types";
 
 export const runtime = "nodejs";
 
@@ -195,6 +197,19 @@ export async function POST(req: Request) {
           const error = await response.text();
           console.error("Brevo API error:", error);
         }
+
+        // Send transactional welcome email with contract link (J0)
+        await sendBrevoEmail({
+          to: [{ email, name: full_name }],
+          templateId: EMAIL_TEMPLATE_IDS.AMBASSADOR_WELCOME,
+          params: {
+            FIRSTNAME: first_name,
+            REFERRAL_CODE: referral_code,
+            REFERRAL_LINK: referral_link,
+            CONTRACT_LINK: "https://afroe.studio/ambassadors/apply",
+          },
+        });
+        console.log(`Ambassador welcome email sent to ${email}`);
       }
     } catch (brevoError) {
       console.error("Brevo integration failed (non-critical):", brevoError);

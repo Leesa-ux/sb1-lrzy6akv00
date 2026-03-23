@@ -49,14 +49,20 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
         ...restAttributes,
         ROLE: mappedRole,
       },
-      listIds: [BREVO_GLOW_LIST_ID],
+      listIds: contact.listIds ?? [BREVO_GLOW_LIST_ID],
       updateEnabled: true,
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Failed to upsert Brevo contact: ${error}`);
+    if (response.status === 400) {
+      console.error(`Brevo contact upsert 400 error for ${contact.email}:`, error);
+    } else {
+      throw new Error(`Failed to upsert Brevo contact: ${error}`);
+    }
+  } else {
+    console.log(`Brevo contact upserted OK for ${contact.email}`, contact.listIds ? `(listIds: ${contact.listIds})` : "");
   }
 }
 

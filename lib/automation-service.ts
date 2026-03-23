@@ -9,10 +9,11 @@ import {
   EMAIL_TEMPLATE_IDS,
   MILESTONES,
   POINT_RULES,
-  getSMSByRole,
   type Role,
   type Milestone,
 } from "./brevo-types";
+
+const BREVO_GLOW_LIST_ID = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
 import { getSMSTemplate } from "./sms-templates";
 
 const LAUNCH_DATE = new Date("2026-01-15T00:00:00Z");
@@ -45,7 +46,7 @@ export function calculatePointsForRole(role: Role, isLaunchDay = false): number 
   return isLaunchDay ? basePoints * 2 : basePoints;
 }
 
-export async function syncUserToBrevo(userId: string): Promise<void> {
+export async function syncUserToBrevo(userId: string, listIds?: number[]): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
 
@@ -56,11 +57,13 @@ export async function syncUserToBrevo(userId: string): Promise<void> {
     email: user.email,
     firstName: user.firstName || undefined,
     phone: user.phone || undefined,
+    ...(listIds ? { listIds } : {}),
     attributes: {
       ROLE: user.role as Role,
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       MY_GLOW_LINK: buildMyGlowLink(user),
       RANK: user.rank,
+      REFERRAL_POINTS: currentPoints, // Used by Brevo automations (Palier 10/50/100/200)
       POINTS: currentPoints, // Use current phase points
       PROVISIONAL_POINTS: user.provisionalPoints, // NEW: Waitlist phase points
       FINAL_POINTS: user.finalPoints, // NEW: Launch phase points
@@ -133,9 +136,9 @@ export async function sendFollowupEmail(userId: string): Promise<void> {
     templateId: EMAIL_TEMPLATE_IDS.FOLLOWUP_1H,
     params: {
       FIRSTNAME: user.firstName || "Glow Friend",
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
       POINTS: user.points,
-      ROLE: user.role,
+      ROLE: mapRoleForBrevo(user.role),
     },
   });
 
@@ -160,9 +163,9 @@ export async function sendActivation48hEmail(userId: string): Promise<void> {
       templateId: EMAIL_TEMPLATE_IDS.ACTIVATION_48H,
       params: {
         FIRSTNAME: user.firstName || "Glow Friend",
-        REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+        REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
         POINTS: user.points,
-        ROLE: user.role,
+        ROLE: mapRoleForBrevo(user.role),
       },
     });
 
@@ -193,7 +196,7 @@ export async function sendMilestoneEmail(
       POINTS: user.points,
       RANK: user.rank,
       NEXT_MILESTONE: getNextMilestone(user.points),
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
     },
   });
 
@@ -223,7 +226,7 @@ export async function sendGlowEliteEmail(userId: string): Promise<void> {
       FIRSTNAME: user.firstName || "Glow Elite",
       POINTS: user.points,
       RANK: user.rank,
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
     },
   });
 
@@ -271,7 +274,7 @@ export async function sendInactivityReminder(userId: string): Promise<void> {
         FIRSTNAME: user.firstName || "Glow Friend",
         POINTS: user.points,
         RANK: user.rank,
-        REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+        REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
         NEXT_MILESTONE: getNextMilestone(user.points),
       },
     });
@@ -310,7 +313,7 @@ export async function updateUserPoints(
 
 export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || user.role !== "pro") return;
+  if (!user || user.role !== "beauty_pro") return;
 
   const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
   const myGlowLink = buildMyGlowLink(user);
@@ -342,13 +345,13 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
 
 export async function sendActivationProIRLEmail(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || user.role !== "pro") return;
+  if (!user || user.role !== "beauty_pro") return;
 
   const timeSinceSignup = Date.now() - user.createdAt.getTime();
   if (timeSinceSignup < 172800000) return;
 
   if (user.refCount === 0) {
-    const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
+    const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`;
 
     await sendBrevoEmail({
       to: [{ email: user.email, name: user.firstName || undefined }],
@@ -356,7 +359,7 @@ export async function sendActivationProIRLEmail(userId: string): Promise<void> {
       params: {
         FIRSTNAME: user.firstName || "Beauty Pro",
         REF_LINK: refLink,
-        ROLE: user.role,
+        ROLE: 'pro',
         POINTS: user.points,
         REF_COUNT: user.refCount,
       },

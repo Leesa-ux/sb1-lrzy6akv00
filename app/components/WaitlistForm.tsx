@@ -150,14 +150,18 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     }
 
     try {
-      const response = await fetch('/api/join-waitlist', {
+      const response = await fetch('/api/signup-complete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          referral_code: referralCode
+          email: formData.email,
+          phone: formData.phone,
+          firstName: formData.first_name,
+          lastName: formData.last_name,
+          role: formData.role,
+          referredBy: referralCode,
         }),
       });
 
@@ -168,7 +172,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
       }
 
       setSuccess(true);
-      setShareUrl(data.shareUrl);
+      setShareUrl(data.refLink);
 
       if (onSuccess) {
         onSuccess({
