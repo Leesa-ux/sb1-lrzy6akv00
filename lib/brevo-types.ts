@@ -11,6 +11,7 @@ export interface BrevoContact {
     ROLE: Role;
     REF_LINK: string;
     RANK: number;
+    REFERRAL_POINTS: number;
     POINTS: number;
     PROVISIONAL_POINTS?: number;
     FINAL_POINTS?: number;
