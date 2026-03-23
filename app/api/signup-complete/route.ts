@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { syncUserToBrevo } from "@/lib/automation-service";
+import { syncUserToBrevo, sendWelcomeEmail } from "@/lib/automation-service";
 import { getClientIp } from "@/lib/get-client-ip";
 import { isTempEmail } from "@/lib/temp-email-domains";
 import { genReferralCode, resolveReferrer, handleReferralEvent, recalculateUserRank } from "@/lib/referrals";
@@ -154,8 +154,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Sync to Brevo and add to Glow List to trigger the welcome automation
+    // Sync to Brevo and add to Glow List, then send welcome email/SMS
     await syncUserToBrevo(user.id, [5]);
+    await sendWelcomeEmail(user.id);
 
     const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
 

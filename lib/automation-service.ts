@@ -49,6 +49,7 @@ export async function syncUserToBrevo(userId: string, listIds?: number[]): Promi
       ROLE: (user.role === 'beauty_pro' ? 'pro' : user.role) as Role,
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
       RANK: user.rank,
+      REFERRAL_POINTS: currentPoints, // Used by Brevo automations (Palier 10/50/100/200)
       POINTS: currentPoints, // Use current phase points
       PROVISIONAL_POINTS: user.provisionalPoints, // NEW: Waitlist phase points
       FINAL_POINTS: user.finalPoints, // NEW: Launch phase points
