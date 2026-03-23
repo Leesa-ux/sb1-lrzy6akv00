@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useFeature } from "@/lib/feature-flags";
 import Countdown from "./Countdown";
 import { POINTS_CONFIG } from "@/lib/points";
@@ -106,10 +107,13 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           {/* Image hero du crew */}
           <div className="mt-10 max-w-3xl mx-auto px-4">
             <div className="relative rounded-xl overflow-hidden shadow-xl shadow-fuchsia-500/10 border border-white/5">
-              <img
-                src="https://cdn.leonardo.ai/users/56984aae-8cef-47a1-910e-e982eaa6bdbe/generations/1b02171f-67d6-44ff-b7c7-9540d4ae559c/segments/3:4:1/Lucid_Origin_Hero_Crew_Beaut_Afro__domicile_Ultradetailed_edit_2.jpg"
+              <Image
+                src="/images/lucid_origin_hero_crew_beaut_afro__domicile_ultradetailed_edit_2.jpg"
                 alt="Professionnels de la beauté Afro au travail - Afroé"
+                width={900}
+                height={400}
                 className="w-full h-auto max-h-[400px] object-cover object-center"
+                priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
             </div>
