@@ -252,6 +252,13 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
         return;
       }
 
+      // Fire welcome email + Brevo sync (non-blocking)
+      fetch("/api/post-join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      }).catch(() => {});
+
       const params = new URLSearchParams({
         ref:       data.referralCode,
         shareUrl:  data.shareUrl,
