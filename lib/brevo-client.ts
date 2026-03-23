@@ -33,7 +33,6 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
     contact.attributes?.ROLE || contact.attributes?.role
   );
 
-  // Remove ROLE duplicates from attributes
   const { ROLE, role, ...restAttributes } = contact.attributes || {};
 
   const response = await fetch(`${BREVO_API_URL}/contacts`, {
@@ -131,12 +130,10 @@ export async function checkEmailOpened(
     }
 
     const data = await response.json();
+
     return data.statistics?.opened > 0 || data.statistics?.clicked > 0;
   } catch (error) {
     console.error("Error checking email opened status:", error);
-    return false;
-  }
-}
     return false;
   }
 }
