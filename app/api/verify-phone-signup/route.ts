@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { normalizePhone } from "@/lib/phone-utils";
 import { getClientIp } from "@/lib/get-client-ip";
 
@@ -26,6 +26,8 @@ function isLikelyBurnerOrVoip(phone: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getSupabaseClient();
+
     const body = await req.json();
     const { phone } = body;
 
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
       .eq("phone", normalized)
       .maybeSingle();
 
-    if (checkError && checkError.code !== 'PGRST116') {
+    if (checkError && checkError.code !== "PGRST116") {
       console.error("Database error:", checkError);
       return NextResponse.json(
         { error: "Database error" },

@@ -4,14 +4,24 @@ import { Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ShareNetwork, Trophy, House } from '@phosphor-icons/react';
+import { useEffect, useState } from 'react';
 
 function GlowNavInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [successHref, setSuccessHref] = useState<string>('/success');
 
-  // Preserve URL params for success page
-  const successParams = searchParams.toString();
-  const successHref = successParams ? `/success?${successParams}` : '/success';
+  useEffect(() => {
+    // Use current params if on success page, else fall back to sessionStorage
+    const current = searchParams.toString();
+    if (current) {
+      sessionStorage.setItem('glowSuccessParams', current);
+      setSuccessHref(`/success?${current}`);
+    } else {
+      const saved = sessionStorage.getItem('glowSuccessParams');
+      if (saved) setSuccessHref(`/success?${saved}`);
+    }
+  }, [searchParams]);
 
   const tabs = [
     {

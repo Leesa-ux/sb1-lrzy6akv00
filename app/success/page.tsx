@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { CheckCircle, Copy, WhatsappLogo, InstagramLogo, ChatCircle, Trophy, ArrowRight } from '@phosphor-icons/react';
+import { CheckCircle, Copy, LinkedinLogo, InstagramLogo, ChatCircle, Trophy, ArrowRight } from '@phosphor-icons/react';
 import Link from 'next/link';
 import GlowNav from '../components/GlowNav';
 
@@ -12,6 +12,11 @@ function SuccessContent() {
   const firstName = params.get('firstName') || 'Toi';
   const shareUrl  = params.get('shareUrl')  || 'https://afroe.studio';
   const ref       = params.get('ref')       || '';
+
+  // Persist params so the leaderboard can navigate back here
+  if (typeof window !== 'undefined' && params.toString()) {
+    sessionStorage.setItem('glowSuccessParams', params.toString());
+  }
 
   const [copied, setCopied]     = useState(false);
   const [igCopied, setIgCopied] = useState(false);
@@ -22,7 +27,7 @@ function SuccessContent() {
     else      { setCopied(true);   setTimeout(() => setCopied(false), 2500); }
   };
 
-  const waText = encodeURIComponent(`Rejoins la Glow List Afroé 🌟 ${shareUrl}`);
+  const liText = encodeURIComponent(`Je viens de rejoindre la Glow List Afroé — la plateforme beauté Afro-européenne 🌟 Rejoins-moi : ${shareUrl}`);
   const smsText = encodeURIComponent(`Rejoins la Glow List Afroé ${shareUrl}`);
 
   return (
@@ -37,13 +42,23 @@ function SuccessContent() {
         <p className="text-white/60 text-base">
           Ton lien est actif. Partage-le et grimpe dans le classement.
         </p>
+        <p className="text-white/30 text-xs border border-white/10 rounded-full px-4 py-1.5">
+          📩 Garde le SMS/email reçu — il te ramène ici à tout moment
+        </p>
       </div>
 
       {/* REFERRAL LINK */}
       <div className="w-full max-w-lg bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
         <p className="text-white/40 text-xs uppercase tracking-widest">Ton lien Glow</p>
-        <div className="bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-purple-300 break-all">
-          {shareUrl}
+        <div className="bg-black/40 border border-white/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-white/40 text-xs mb-0.5">Ton code de parrainage</p>
+            <p className="text-2xl font-bold tracking-widest text-purple-300">{ref || 'GLOW'}</p>
+          </div>
+          <div className="text-white/20 text-xs text-right">
+            <p>afroe.studio</p>
+            <p>?ref={ref || 'GLOW'}</p>
+          </div>
         </div>
         <button
           onClick={() => copy()}
@@ -57,13 +72,13 @@ function SuccessContent() {
       {/* SHARE BUTTONS */}
       <div className="w-full max-w-lg flex gap-3">
         <a
-          href={`https://wa.me/?text=${waText}`}
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${liText}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 hover:bg-green-500 transition text-sm font-medium"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-700 hover:bg-blue-600 transition text-sm font-medium"
         >
-          <WhatsappLogo weight="thin" size={20} />
-          WhatsApp
+          <LinkedinLogo weight="thin" size={20} />
+          LinkedIn
         </a>
         <button
           onClick={() => copy('ig')}

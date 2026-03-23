@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,11 +25,19 @@ interface LeaderboardResponse {
   error?: string;
 }
 
-export default function LeaderboardPage() {
+function LeaderboardContent() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('all');
+  const [successHref, setSuccessHref] = useState<string>('/success');
+
+  useEffect(() => {
+    const saved = typeof window !== 'undefined'
+      ? sessionStorage.getItem('glowSuccessParams')
+      : null;
+    if (saved) setSuccessHref(`/success?${saved}`);
+  }, []);
 
   const fetchLeaderboard = async (role: string) => {
     setLoading(true);
@@ -405,17 +413,45 @@ export default function LeaderboardPage() {
           </Card>
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button
-            onClick={() => (window.location.href = '/')}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            onClick={() => (window.location.href = successHref)}
+            className="bg-gradient-to-r from-purple-600 to-amber-500 hover:opacity-90 w-full sm:w-auto"
           >
-            ← Retour à l'accueil
+            ← Mon lien Glow
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = '/')}
+            className="w-full sm:w-auto"
+          >
+            Retour à l'accueil
           </Button>
         </div>
       </div>
 
       <GlowNav />
     </div>
+  );
+}
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 py-12 px-4 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center text-gray-500">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                Chargement...
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <LeaderboardContent />
+    </Suspense>
   );
 }

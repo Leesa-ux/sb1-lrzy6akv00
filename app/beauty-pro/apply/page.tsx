@@ -28,6 +28,7 @@ import {
   MapPin,
   IdentificationCard,
 } from "@phosphor-icons/react";
+import Link from "next/link";
 import { submitProApplication, ProApplicationPayload } from "@/lib/submitProApplication";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -425,6 +426,32 @@ export default function BeautyProApplyPage() {
 
   return (
     <div style={S.page}>
+      {/* Back button + progress indicator */}
+      <div style={{ maxWidth: 700, margin: "0 auto", padding: "32px 20px 16px" }}>
+        <Link href="/beauty-pro" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none", transition: "color 0.2s", marginBottom: 24 }}
+          onMouseEnter={(e) => e.currentTarget.style.color = "rgba(255,255,255,1)"}
+          onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.5)"}>
+          <ArrowLeft weight="thin" size={18} />
+          Retour à la présentation
+        </Link>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, opacity: 0.5 }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#10B981", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <CheckCircle weight="fill" size={14} style={{ color: "#fff" }} />
+            </div>
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.5)" }}>Présentation</span>
+          </div>
+          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.2)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#6D28D9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "#fff", fontSize: 12, fontWeight: "bold" }}>2</span>
+            </div>
+            <span style={{ fontSize: 14, color: "#fff", fontWeight: 600 }}>Ton dossier</span>
+          </div>
+        </div>
+      </div>
+
       {/* Top nav */}
       <div style={S.formNav}>
         <button style={S.navBack} onClick={step === 1 ? () => setStep(0) : back}>

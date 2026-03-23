@@ -9,8 +9,6 @@ import {
   EMAIL_TEMPLATE_IDS,
   MILESTONES,
   POINT_RULES,
-  getSMSByRole,
-  mapRoleForBrevo,
   type Role,
   type Milestone,
 } from "./brevo-types";
@@ -20,6 +18,18 @@ import { getSMSTemplate } from "./sms-templates";
 
 const LAUNCH_DATE = new Date("2026-01-15T00:00:00Z");
 const IS_POST_LAUNCH = Date.now() >= LAUNCH_DATE.getTime();
+
+/** Magic link that takes the user directly back to their personal Glow success page */
+function buildMyGlowLink(user: { firstName: string | null; referralCode: string }): string {
+  const base = process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com";
+  const shareUrl = `${base}/?ref=${user.referralCode}`;
+  const params = new URLSearchParams({
+    ref:       user.referralCode,
+    shareUrl,
+    firstName: user.firstName || "Toi",
+  });
+  return `${base}/success?${params.toString()}`;
+}
 
 export function getNextMilestone(points: number): Milestone {
   for (const milestone of MILESTONES) {
@@ -49,8 +59,9 @@ export async function syncUserToBrevo(userId: string, listIds?: number[]): Promi
     phone: user.phone || undefined,
     ...(listIds ? { listIds } : {}),
     attributes: {
-      ROLE: mapRoleForBrevo(user.role),
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
+      ROLE: user.role as Role,
+      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+      MY_GLOW_LINK: buildMyGlowLink(user),
       RANK: user.rank,
       REFERRAL_POINTS: currentPoints, // Used by Brevo automations (Palier 10/50/100/200)
       POINTS: currentPoints, // Use current phase points
@@ -80,7 +91,8 @@ export async function sendWelcomeEmail(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
 
-  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`;
+  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
+  const myGlowLink = buildMyGlowLink(user);
 
   await sendBrevoEmail({
     to: [{ email: user.email, name: user.firstName || undefined }],
@@ -88,7 +100,8 @@ export async function sendWelcomeEmail(userId: string): Promise<void> {
     params: {
       FIRSTNAME: user.firstName || "Glow Friend",
       REF_LINK: refLink,
-      ROLE: mapRoleForBrevo(user.role),
+      MY_GLOW_LINK: myGlowLink,
+      ROLE: user.role,
       POINTS: user.points,
       NEXT_MILESTONE: getNextMilestone(user.points),
     },
@@ -97,7 +110,7 @@ export async function sendWelcomeEmail(userId: string): Promise<void> {
   if (user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: getSMSByRole(user.role, refLink),
+      message: getSMSTemplate("welcome_with_glow_link", user.role as Role, { refLink, myGlowLink, firstName: user.firstName || undefined }),
     });
   }
 
@@ -302,7 +315,8 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user || user.role !== "beauty_pro") return;
 
-  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`;
+  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
+  const myGlowLink = buildMyGlowLink(user);
 
   await sendBrevoEmail({
     to: [{ email: user.email, name: user.firstName || undefined }],
@@ -310,7 +324,8 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
     params: {
       FIRSTNAME: user.firstName || "Beauty Pro",
       REF_LINK: refLink,
-      ROLE: 'pro',
+      MY_GLOW_LINK: myGlowLink,
+      ROLE: user.role,
       POINTS: user.points,
     },
   });
@@ -318,7 +333,7 @@ export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
   if (user.phone) {
     await sendBrevoSMS({
       phone: user.phone,
-      message: getSMSTemplate("welcome_beauty_pro", undefined, { refLink }),
+      message: getSMSTemplate("welcome_beauty_pro", undefined, { refLink, myGlowLink }),
     });
   }
 

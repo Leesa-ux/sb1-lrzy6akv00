@@ -3,10 +3,12 @@ import { sendBrevoSMS } from "@/lib/brevo-client";
 import { generateOtp, putOTP } from "@/lib/otpStore";
 import { normalizePhone } from "@/lib/phone-utils";
 import { getClientIp } from "@/lib/get-client-ip";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getSupabaseClient();
+
     const body = await req.json();
     const { phone } = body;
 
@@ -52,11 +54,16 @@ export async function POST(req: NextRequest) {
     }
 
     const ipAddress = getClientIp(req);
-    await supabase.from("ip_activity").insert({
-      ip_address: ipAddress,
-      action_type: "sms_sent",
-      metadata: { phone: normalized }
-    });
+
+    try {
+      await supabase.from("ip_activity").insert({
+        ip_address: ipAddress,
+        action_type: "sms_sent",
+        metadata: { phone: normalized },
+      });
+    } catch (dbError) {
+      console.error("ip_activity insert error:", dbError);
+    }
 
     return NextResponse.json({
       success: true,
