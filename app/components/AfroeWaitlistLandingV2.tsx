@@ -135,10 +135,13 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
   const smsMin = Math.floor(smsRemaining / 60000);
   const smsSec = Math.floor((smsRemaining % 60000) / 1000);
 
+  const [refCode, setRefCode] = useState<string | null>(null);
+
   useEffect(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
       setDevSkipSms(sp.get("dev") === "1");
+      setRefCode(sp.get("ref") || null);
     } catch {}
   }, []);
 
@@ -214,7 +217,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
     setSubmitError(null);
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     try {
-      const r = await fetch("/api/join-waitlist", {
+      const r = await fetch("/api/signup-complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -228,6 +231,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
               : role === "influencer"
                 ? "influencer"
                 : "beautypro",
+          referredBy: refCode || undefined,
           skillAnswer: skillAnswer,
           consent: consentGDPR,
         }),
@@ -251,13 +255,6 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
         setSubmitError(data.error || 'Une erreur est survenue');
         return;
       }
-
-      // Fire welcome email + Brevo sync (non-blocking)
-      fetch("/api/post-join", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      }).catch(() => {});
 
       const params = new URLSearchParams({
         ref:       data.referralCode,

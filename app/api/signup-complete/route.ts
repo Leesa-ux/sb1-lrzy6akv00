@@ -68,8 +68,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingUser) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com";
+      const shareUrl = `${appUrl}/waitlist?ref=${existingUser.referralCode}`;
       return NextResponse.json(
-        { error: "Email already registered" },
+        {
+          error: "already_registered",
+          referralCode: existingUser.referralCode,
+          shareUrl,
+          firstName: existingUser.firstName,
+        },
         { status: 409 }
       );
     }
@@ -166,6 +173,7 @@ export async function POST(req: NextRequest) {
       success: true,
       userId: user.id,
       referralCode: user.referralCode,
+      shareUrl: refLink,
       refLink,
       earlyBird: isEarlyBird,
       earlyBirdBonus,
