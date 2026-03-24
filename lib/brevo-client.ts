@@ -1,4 +1,4 @@
-import { BrevoContact, BrevoEmailParams, BrevoSMSParams } from "./brevo-types";
+import { BrevoContact, BrevoEmailParams, BrevoSMSParams, mapRoleForBrevo } from "./brevo-types";
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const BREVO_API_URL = "https://api.brevo.com/v3";
@@ -8,32 +8,15 @@ if (!BREVO_API_KEY) {
   console.warn("Warning: BREVO_API_KEY is not set");
 }
 
-function mapRoleForBrevo(role?: string): string {
-  if (!role) return "";
-
-  switch (role) {
-    case "beautypro":
-      return "pro";
-    case "influencer":
-      return "amb";
-    case "client":
-      return "client";
-    default:
-      return role;
-  }
-}
-
 export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
   if (!BREVO_API_KEY) {
     console.log("Skipping Brevo contact upsert (no API key)");
     return;
   }
 
-  const mappedRole = mapRoleForBrevo(
-    contact.attributes?.ROLE || contact.attributes?.role
-  );
+  const mappedRole = mapRoleForBrevo(contact.attributes?.ROLE);
 
-  const { ROLE, role, ...restAttributes } = contact.attributes || {};
+  const { ROLE, ...restAttributes } = contact.attributes || {};
 
   const response = await fetch(`${BREVO_API_URL}/contacts`, {
     method: "POST",

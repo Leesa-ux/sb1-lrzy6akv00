@@ -1,60 +1,68 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { verifyOTP } from "@/lib/otpStore";
 
-export async function POST(req: NextRequest) {
+export const dynamic = "force-dynamic";
+
+const SUPABASE_FUNCTION_URL =
+  "https://yubmsrvzzcrubmshflpk.supabase.co/functions/v1/verify-sms-code";
+
+export async function POST(request: Request) {
+  console.log("[VERIFY-OTP] route hit");
+
   try {
-    const body = await req.json();
+    const body = await request.json();
+    console.log("[VERIFY-OTP] body received:", JSON.stringify(body));
+
     const { phone, code, userId } = body;
 
     if (!phone || !code) {
+      console.log("[VERIFY-OTP] missing phone or code");
       return NextResponse.json(
-        { error: "Phone number and code are required" },
+        { ok: false, error: "Phone and code are required" },
         { status: 400 }
       );
     }
 
-    const belgianPhoneRegex = /^\+32\d{9}$/;
-    if (!belgianPhoneRegex.test(phone)) {
+    console.log("[VERIFY-OTP] calling Supabase verify-sms-code for", phone);
+
+    const res = await fetch(SUPABASE_FUNCTION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, code }),
+    });
+
+    const rawText = await res.text();
+    console.log("[VERIFY-OTP] Supabase status:", res.status);
+    console.log("[VERIFY-OTP] Supabase response:", rawText);
+
+    let data: Record<string, unknown>;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      console.error("[VERIFY-OTP] Supabase returned non-JSON");
       return NextResponse.json(
-        { error: "Invalid Belgian phone number format" },
-        { status: 400 }
+        { ok: false, error: "Invalid response from verification service" },
+        { status: 502 }
       );
     }
 
-    const result = verifyOTP(phone, code);
-
-    if (!result.ok) {
-      let errorMessage = "Invalid verification code";
-
-      switch (result.reason) {
-        case "not-found":
-          errorMessage = "No verification code found. Please request a new one.";
-          break;
-        case "expired":
-          errorMessage = "Verification code has expired. Please request a new one.";
-          break;
-        case "too-many-attempts":
-          errorMessage = "Too many failed attempts. Please request a new code.";
-          break;
-        case "mismatch":
-          errorMessage = "Invalid verification code. Please try again.";
-          break;
-      }
-
+    if (!data.verified) {
+      console.log("[VERIFY-OTP] code not verified:", data.error);
       return NextResponse.json(
-        { ok: false, error: errorMessage },
-        { status: 400 }
+        { ok: false, error: (data.error as string) || "Code invalide" },
+        { status: res.status >= 400 ? res.status : 400 }
       );
     }
 
+    // Code is verified — update DB and award referral points if userId provided
     if (userId) {
       const existingUser = await db.user.findUnique({
         where: { id: userId },
-        select: { id: true, referredBy: true, phoneVerified: true, role: true }
+        select: { id: true, referredBy: true, phoneVerified: true, role: true },
       });
 
       if (!existingUser) {
+        console.warn("[VERIFY-OTP] userId not found:", userId);
         return NextResponse.json(
           { ok: false, error: "User not found" },
           { status: 404 }
@@ -63,110 +71,99 @@ export async function POST(req: NextRequest) {
 
       const user = await db.user.update({
         where: { id: userId },
-        data: {
-          phone: phone,
-          phoneVerified: true,
-        },
+        data: { phone, phoneVerified: true },
       });
 
-      // CRITICAL: Award referral points ONLY after phone verification
-      // IDEMPOTENCY: Create ReferralEvent FIRST before incrementing points
-      if (user.referredBy && user.phoneVerified) {
+      console.log("[VERIFY-OTP] phone verified for user", userId);
+
+      // Award referral points only after phone verification
+      if (user.referredBy && !existingUser.phoneVerified) {
         const referrer = await db.user.findUnique({
-          where: { referralCode: user.referredBy }
+          where: { referralCode: user.referredBy },
         });
 
         if (referrer) {
-          const { POINTS_CONFIG, calculateProvisionalPoints } = await import('@/lib/points');
+          const { POINTS_CONFIG } = await import("@/lib/points");
 
           let pointsAwarded = 0;
-          let counterField: 'waitlistClients' | 'waitlistInfluencers' | 'waitlistPros' = 'waitlistClients';
+          let counterField: "waitlistClients" | "waitlistInfluencers" | "waitlistPros" =
+            "waitlistClients";
 
           switch (user.role) {
-            case 'client':
+            case "client":
               pointsAwarded = POINTS_CONFIG.WAITLIST.CLIENT;
-              counterField = 'waitlistClients';
+              counterField = "waitlistClients";
               break;
-            case 'influencer':
+            case "influencer":
               pointsAwarded = POINTS_CONFIG.WAITLIST.INFLUENCER;
-              counterField = 'waitlistInfluencers';
+              counterField = "waitlistInfluencers";
               break;
-            case 'beautypro':
-            case 'pro':
+            case "beautypro":
+            case "beauty_pro":
+            case "pro":
               pointsAwarded = POINTS_CONFIG.WAITLIST.BEAUTY_PRO;
-              counterField = 'waitlistPros';
+              counterField = "waitlistPros";
               break;
           }
 
           const idempotencyKey = `${referrer.id}_${user.id}_waitlist_signup`;
 
           try {
-            // ATOMIC TRANSACTION: Create event + increment points in single transaction
-            // If any step fails, entire transaction rolls back (no partial credit)
             const updatedReferrer = await db.$transaction(async (tx) => {
-              // Step 1: Create ReferralEvent (idempotency check via unique constraint)
               await tx.referralEvent.create({
                 data: {
                   id: `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                   actorL1Id: referrer.id,
                   actorL2Id: user.id,
-                  type: 'waitlist_signup',
+                  type: "waitlist_signup",
                   roleAtSignup: user.role,
-                  pointsAwarded: pointsAwarded,
-                  idempotencyKey: idempotencyKey,
-                  createdAt: new Date()
-                }
+                  pointsAwarded,
+                  idempotencyKey,
+                  createdAt: new Date(),
+                },
               });
 
-              // Step 2: Atomically increment all counters + points in ONE update
-              // This prevents race conditions and ensures consistency
-              const updated = await tx.user.update({
+              return tx.user.update({
                 where: { id: referrer.id },
                 data: {
                   refCount: { increment: 1 },
                   [counterField]: { increment: 1 },
                   provisionalPoints: { increment: pointsAwarded },
                   points: { increment: pointsAwarded },
-                  lastRefAt: new Date()
-                }
+                  lastRefAt: new Date(),
+                },
               });
-
-              return updated;
             });
 
-            console.log(`✅ Referral transaction complete: ${pointsAwarded} pts awarded to ${referrer.id} for referring ${user.role} user ${user.id}`);
-            console.log(`   New totals: ${updatedReferrer.refCount} referrals, ${updatedReferrer.provisionalPoints} points`);
+            console.log(
+              `[VERIFY-OTP] referral awarded: ${pointsAwarded} pts to ${referrer.id}`,
+              `totals: ${updatedReferrer.refCount} refs, ${updatedReferrer.provisionalPoints} pts`
+            );
 
-            // Non-blocking automation (outside transaction)
             try {
-              const { syncUserToBrevo, checkAndSendMilestoneEmails } = await import('@/lib/automation-service');
-              await syncUserToBrevo(referrer.id);
-
+              const { syncUserToBrevo, checkAndSendMilestoneEmails } = await import(
+                "@/lib/automation-service"
+              );
               const oldPoints = referrer.provisionalPoints;
-              const newPoints = updatedReferrer.provisionalPoints;
-              await checkAndSendMilestoneEmails(referrer.id, oldPoints, newPoints);
-            } catch (error) {
-              console.error('⚠️ Error syncing to Brevo or sending milestone emails:', error);
+              await syncUserToBrevo(referrer.id);
+              await checkAndSendMilestoneEmails(referrer.id, oldPoints, updatedReferrer.provisionalPoints);
+            } catch (err) {
+              console.error("[VERIFY-OTP] Brevo sync error (non-blocking):", err);
             }
-
           } catch (err: any) {
-            if (err.code === 'P2002') {
-              console.log(`⚠️ Referral already processed (duplicate detected): ${idempotencyKey}`);
+            if (err.code === "P2002") {
+              console.log("[VERIFY-OTP] referral already processed:", idempotencyKey);
             } else {
-              console.error('❌ Referral transaction failed:', err);
-              throw err;
+              console.error("[VERIFY-OTP] referral transaction failed:", err);
             }
           }
         }
       }
     }
 
-    return NextResponse.json({
-      ok: true,
-      message: "Phone number verified successfully",
-    });
+    return NextResponse.json({ ok: true, message: "Phone number verified successfully" });
   } catch (error) {
-    console.error("Verify OTP error:", error);
+    console.error("[VERIFY-OTP] route error:", error);
     return NextResponse.json(
       { ok: false, error: "Internal server error" },
       { status: 500 }

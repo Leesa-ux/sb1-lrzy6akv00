@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { syncUserToBrevo, sendWelcomeEmail } from "@/lib/automation-service";
+import { syncUserToBrevo } from "@/lib/automation-service";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
 
     const listId = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
     await syncUserToBrevo(user.id, [listId]);
-    await sendWelcomeEmail(user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { syncUserToBrevo, sendWelcomeEmail } from "@/lib/automation-service";
+import { syncUserToBrevo } from "@/lib/automation-service";
 import { getClientIp } from "@/lib/get-client-ip";
 import { isTempEmail } from "@/lib/temp-email-domains";
 import { genReferralCode, resolveReferrer, handleReferralEvent, recalculateUserRank } from "@/lib/referrals";
@@ -68,8 +68,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingUser) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com";
+      const shareUrl = `${appUrl}/waitlist?ref=${existingUser.referralCode}`;
       return NextResponse.json(
-        { error: "Email already registered" },
+        {
+          error: "already_registered",
+          referralCode: existingUser.referralCode,
+          shareUrl,
+          firstName: existingUser.firstName,
+        },
         { status: 409 }
       );
     }
@@ -154,10 +161,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Sync to Brevo and add to Glow List, then send welcome email/SMS
+    // Sync to Brevo and add to Glow List — this triggers the "Follow Up email" automation
     const listId = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
     await syncUserToBrevo(user.id, [listId]);
-    await sendWelcomeEmail(user.id);
 
     const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
 
@@ -167,6 +173,7 @@ export async function POST(req: NextRequest) {
       success: true,
       userId: user.id,
       referralCode: user.referralCode,
+      shareUrl: refLink,
       refLink,
       earlyBird: isEarlyBird,
       earlyBirdBonus,
@@ -175,9 +182,10 @@ export async function POST(req: NextRequest) {
       fraudFlags: fraudFlags.length > 0 ? fraudFlags : undefined,
     });
   } catch (error) {
-    console.error("Signup complete error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("SIGNUP_ERROR_FULL:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: msg },
       { status: 500 }
     );
   }

@@ -1,20 +1,14 @@
 import { db } from "./db";
+import { upsertBrevoContact } from "./brevo-client";
 import {
-  upsertBrevoContact,
-  sendBrevoEmail,
-  sendBrevoSMS,
-  checkEmailOpened,
-} from "./brevo-client";
-import {
-  EMAIL_TEMPLATE_IDS,
   MILESTONES,
   POINT_RULES,
+  mapRoleForBrevo,
   type Role,
   type Milestone,
 } from "./brevo-types";
 
 const BREVO_GLOW_LIST_ID = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
-import { getSMSTemplate } from "./sms-templates";
 
 const LAUNCH_DATE = new Date("2026-01-15T00:00:00Z");
 const IS_POST_LAUNCH = Date.now() >= LAUNCH_DATE.getTime();
@@ -46,11 +40,15 @@ export function calculatePointsForRole(role: Role, isLaunchDay = false): number 
   return isLaunchDay ? basePoints * 2 : basePoints;
 }
 
+/**
+ * Syncs the user's contact data to Brevo.
+ * Adding to a list triggers the "Follow Up email" automation.
+ * Updating REFERRAL_POINTS triggers the PALIER automations (10/50/100/200).
+ */
 export async function syncUserToBrevo(userId: string, listIds?: number[]): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
 
-  // Use provisionalPoints for current leaderboard, but sync both
   const currentPoints = IS_POST_LAUNCH ? user.finalPoints : user.provisionalPoints;
 
   await upsertBrevoContact({
@@ -59,233 +57,29 @@ export async function syncUserToBrevo(userId: string, listIds?: number[]): Promi
     phone: user.phone || undefined,
     ...(listIds ? { listIds } : {}),
     attributes: {
-      ROLE: user.role as Role,
+      ROLE: mapRoleForBrevo(user.role),
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       MY_GLOW_LINK: buildMyGlowLink(user),
       RANK: user.rank,
-      REFERRAL_POINTS: currentPoints, // Used by Brevo automations (Palier 10/50/100/200)
-      POINTS: currentPoints, // Use current phase points
-      PROVISIONAL_POINTS: user.provisionalPoints, // NEW: Waitlist phase points
-      FINAL_POINTS: user.finalPoints, // NEW: Launch phase points
+      REFERRAL_POINTS: currentPoints,
+      POINTS: currentPoints,
+      PROVISIONAL_POINTS: user.provisionalPoints,
+      FINAL_POINTS: user.finalPoints,
       REF_COUNT: user.refCount,
       NEXT_MILESTONE: user.nextMilestone,
       LAST_REF_AT: user.lastRefAt?.toISOString() || new Date().toISOString(),
-      EARLY_BIRD: user.earlyBird, // NEW: Early-bird status
-      EARLY_BIRD_BONUS: user.earlyBirdBonus, // NEW: Bonus points amount
-      // Referral counters
+      EARLY_BIRD: user.earlyBird,
+      EARLY_BIRD_BONUS: user.earlyBirdBonus,
       WAITLIST_CLIENTS: user.waitlistClients,
       WAITLIST_INFLUENCERS: user.waitlistInfluencers,
       WAITLIST_PROS: user.waitlistPros,
-      // Validation counters (for post-launch)
       APP_DOWNLOADS: user.appDownloads,
       VALIDATED_INFLUENCERS: user.validatedInfluencers,
       VALIDATED_PROS: user.validatedPros,
-      // Prize eligibility
       ELIGIBLE_FOR_JACKPOT: user.eligibleForJackpot,
       IS_TOP_RANK: user.isTopRank,
     },
   });
-}
-
-export async function sendWelcomeEmail(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user) return;
-
-  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
-  const myGlowLink = buildMyGlowLink(user);
-
-  await sendBrevoEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    templateId: EMAIL_TEMPLATE_IDS.WELCOME,
-    params: {
-      FIRSTNAME: user.firstName || "Glow Friend",
-      REF_LINK: refLink,
-      MY_GLOW_LINK: myGlowLink,
-      ROLE: user.role,
-      POINTS: user.points,
-      NEXT_MILESTONE: getNextMilestone(user.points),
-    },
-  });
-
-  if (user.phone) {
-    await sendBrevoSMS({
-      phone: user.phone,
-      message: getSMSTemplate("welcome_with_glow_link", user.role as Role, { refLink, myGlowLink, firstName: user.firstName || undefined }),
-    });
-  }
-
-  await db.user.update({
-    where: { id: userId },
-    data: { emailSentAt: new Date() },
-  });
-}
-
-export async function sendFollowupEmail(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user) return;
-
-  const timeSinceSignup = Date.now() - user.createdAt.getTime();
-  if (timeSinceSignup < 3600000) return;
-
-  const emailOpened = user.emailOpenedAt
-    ? true
-    : await checkEmailOpened(user.email, user.createdAt);
-
-  await sendBrevoEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    templateId: EMAIL_TEMPLATE_IDS.FOLLOWUP_1H,
-    params: {
-      FIRSTNAME: user.firstName || "Glow Friend",
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
-      POINTS: user.points,
-      ROLE: mapRoleForBrevo(user.role),
-    },
-  });
-
-  if (!emailOpened && user.phone) {
-    await sendBrevoSMS({
-      phone: user.phone,
-      message: getSMSTemplate("followup_1h"),
-    });
-  }
-}
-
-export async function sendActivation48hEmail(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user) return;
-
-  const timeSinceSignup = Date.now() - user.createdAt.getTime();
-  if (timeSinceSignup < 172800000) return;
-
-  if (user.refCount === 0 && user.points < 10) {
-    await sendBrevoEmail({
-      to: [{ email: user.email, name: user.firstName || undefined }],
-      templateId: EMAIL_TEMPLATE_IDS.ACTIVATION_48H,
-      params: {
-        FIRSTNAME: user.firstName || "Glow Friend",
-        REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
-        POINTS: user.points,
-        ROLE: mapRoleForBrevo(user.role),
-      },
-    });
-
-    if (user.phone) {
-      await sendBrevoSMS({
-        phone: user.phone,
-        message: getSMSTemplate("activation_48h"),
-      });
-    }
-  }
-}
-
-export async function sendMilestoneEmail(
-  userId: string,
-  milestone: Milestone
-): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user) return;
-
-  if (user.lastMilestoneSent === milestone) return;
-
-  await sendBrevoEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    templateId: EMAIL_TEMPLATE_IDS.MILESTONE,
-    params: {
-      FIRSTNAME: user.firstName || "Glow Star",
-      MILESTONE: milestone,
-      POINTS: user.points,
-      RANK: user.rank,
-      NEXT_MILESTONE: getNextMilestone(user.points),
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
-    },
-  });
-
-  if (user.phone) {
-    await sendBrevoSMS({
-      phone: user.phone,
-      message: getSMSTemplate("milestone", undefined, { milestone }),
-    });
-  }
-
-  await db.user.update({
-    where: { id: userId },
-    data: { lastMilestoneSent: milestone },
-  });
-}
-
-export async function sendGlowEliteEmail(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user) return;
-
-  if (user.lastMilestoneSent === 200) return;
-
-  await sendBrevoEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    templateId: EMAIL_TEMPLATE_IDS.GLOW_ELITE,
-    params: {
-      FIRSTNAME: user.firstName || "Glow Elite",
-      POINTS: user.points,
-      RANK: user.rank,
-      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
-    },
-  });
-
-  if (user.phone) {
-    await sendBrevoSMS({
-      phone: user.phone,
-      message: getSMSTemplate("glow_elite"),
-    });
-  }
-
-  await db.user.update({
-    where: { id: userId },
-    data: { lastMilestoneSent: 200 },
-  });
-}
-
-export async function checkAndSendMilestoneEmails(
-  userId: string,
-  oldPoints: number,
-  newPoints: number
-): Promise<void> {
-  for (const milestone of MILESTONES) {
-    if (oldPoints < milestone && newPoints >= milestone) {
-      await sendMilestoneEmail(userId, milestone);
-    }
-  }
-
-  if (oldPoints < 200 && newPoints >= 200) {
-    await sendGlowEliteEmail(userId);
-  }
-}
-
-export async function sendInactivityReminder(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || !user.lastRefAt) return;
-
-  const daysSinceLastRef =
-    (Date.now() - user.lastRefAt.getTime()) / (1000 * 60 * 60 * 24);
-
-  if (daysSinceLastRef >= 5) {
-    await sendBrevoEmail({
-      to: [{ email: user.email, name: user.firstName || undefined }],
-      templateId: EMAIL_TEMPLATE_IDS.REMINDER_5D,
-      params: {
-        FIRSTNAME: user.firstName || "Glow Friend",
-        POINTS: user.points,
-        RANK: user.rank,
-        REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`,
-        NEXT_MILESTONE: getNextMilestone(user.points),
-      },
-    });
-
-    if (user.phone) {
-      await sendBrevoSMS({
-        phone: user.phone,
-        message: getSMSTemplate("reminder_5d"),
-      });
-    }
-  }
 }
 
 export async function updateUserPoints(
@@ -295,81 +89,31 @@ export async function updateUserPoints(
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) return;
 
-  const oldPoints = user.points;
-  const newPoints = oldPoints + pointsToAdd;
-
   await db.user.update({
     where: { id: userId },
     data: {
-      points: newPoints,
+      points: user.points + pointsToAdd,
       refCount: { increment: 1 },
       lastRefAt: new Date(),
     },
   });
 
+  // Syncing REFERRAL_POINTS to Brevo triggers the PALIER automations automatically
   await syncUserToBrevo(userId);
-  await checkAndSendMilestoneEmails(userId, oldPoints, newPoints);
 }
 
-export async function sendWelcomeBeautyProEmail(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || user.role !== "beauty_pro") return;
+// ---------------------------------------------------------------------------
+// The functions below are kept as no-ops for backward compatibility.
+// All welcome emails, follow-ups, nudges, and milestone emails are now
+// handled entirely by Brevo automations (Follow Up email + PALIER 10/50/100/200).
+// ---------------------------------------------------------------------------
 
-  const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`;
-  const myGlowLink = buildMyGlowLink(user);
-
-  await sendBrevoEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    templateId: EMAIL_TEMPLATE_IDS.WELCOME_BEAUTY_PRO,
-    params: {
-      FIRSTNAME: user.firstName || "Beauty Pro",
-      REF_LINK: refLink,
-      MY_GLOW_LINK: myGlowLink,
-      ROLE: user.role,
-      POINTS: user.points,
-    },
-  });
-
-  if (user.phone) {
-    await sendBrevoSMS({
-      phone: user.phone,
-      message: getSMSTemplate("welcome_beauty_pro", undefined, { refLink, myGlowLink }),
-    });
-  }
-
-  await db.user.update({
-    where: { id: userId },
-    data: { emailSentAt: new Date() },
-  });
-}
-
-export async function sendActivationProIRLEmail(userId: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { id: userId } });
-  if (!user || user.role !== "beauty_pro") return;
-
-  const timeSinceSignup = Date.now() - user.createdAt.getTime();
-  if (timeSinceSignup < 172800000) return;
-
-  if (user.refCount === 0) {
-    const refLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.studio"}/waitlist?ref=${user.referralCode}`;
-
-    await sendBrevoEmail({
-      to: [{ email: user.email, name: user.firstName || undefined }],
-      templateId: EMAIL_TEMPLATE_IDS.ACTIVATION_PRO_IRL,
-      params: {
-        FIRSTNAME: user.firstName || "Beauty Pro",
-        REF_LINK: refLink,
-        ROLE: 'pro',
-        POINTS: user.points,
-        REF_COUNT: user.refCount,
-      },
-    });
-
-    if (user.phone) {
-      await sendBrevoSMS({
-        phone: user.phone,
-        message: getSMSTemplate("activation_pro_irl"),
-      });
-    }
-  }
-}
+export async function sendWelcomeEmail(_userId: string): Promise<void> {}
+export async function sendFollowupEmail(_userId: string): Promise<void> {}
+export async function sendActivation48hEmail(_userId: string): Promise<void> {}
+export async function sendMilestoneEmail(_userId: string, _milestone: Milestone): Promise<void> {}
+export async function sendGlowEliteEmail(_userId: string): Promise<void> {}
+export async function checkAndSendMilestoneEmails(_userId: string, _oldPoints: number, _newPoints: number): Promise<void> {}
+export async function sendInactivityReminder(_userId: string): Promise<void> {}
+export async function sendWelcomeBeautyProEmail(_userId: string): Promise<void> {}
+export async function sendActivationProIRLEmail(_userId: string): Promise<void> {}
