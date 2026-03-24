@@ -9,6 +9,7 @@ import {
   EMAIL_TEMPLATE_IDS,
   MILESTONES,
   POINT_RULES,
+  mapRoleForBrevo,
   type Role,
   type Milestone,
 } from "./brevo-types";
@@ -59,7 +60,7 @@ export async function syncUserToBrevo(userId: string, listIds?: number[]): Promi
     phone: user.phone || undefined,
     ...(listIds ? { listIds } : {}),
     attributes: {
-      ROLE: user.role as Role,
+      ROLE: mapRoleForBrevo(user.role),
       REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       MY_GLOW_LINK: buildMyGlowLink(user),
       RANK: user.rank,
