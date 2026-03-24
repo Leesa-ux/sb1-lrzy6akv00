@@ -182,9 +182,10 @@ export async function POST(req: NextRequest) {
       fraudFlags: fraudFlags.length > 0 ? fraudFlags : undefined,
     });
   } catch (error) {
-    console.error("Signup complete error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("SIGNUP_ERROR_FULL:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: msg },
       { status: 500 }
     );
   }
