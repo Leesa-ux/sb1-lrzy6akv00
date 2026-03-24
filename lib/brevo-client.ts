@@ -14,11 +14,9 @@ export async function upsertBrevoContact(contact: BrevoContact): Promise<void> {
     return;
   }
 
-  const mappedRole = mapRoleForBrevo(
-    contact.attributes?.ROLE || contact.attributes?.role
-  );
+  const mappedRole = mapRoleForBrevo(contact.attributes?.ROLE);
 
-  const { ROLE, role, ...restAttributes } = contact.attributes || {};
+  const { ROLE, ...restAttributes } = contact.attributes || {};
 
   const response = await fetch(`${BREVO_API_URL}/contacts`, {
     method: "POST",
