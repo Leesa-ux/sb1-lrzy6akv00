@@ -13,9 +13,9 @@ export async function POST(request: Request) {
       lastName:      body.lastName,
       userType:      body.role || body.userType,
       followerCount: body.followerCount,
-      referralCode:  body.referralCode || body.ref,
-      skillAnswer:   Number(body.skillAnswer),
-      consent:       body.consent,
+      referralCode:  body.referredBy || body.referralCode || body.ref,
+      skillAnswer:   body.skillAnswer ?? 32,
+      consent:       body.consent ?? true,
     };
 
     const res = await fetch(
@@ -31,6 +31,8 @@ export async function POST(request: Request) {
     );
 
     const data = await res.json();
+    // Add refLink alias so WaitlistForm.tsx can read data.refLink
+    if (data.shareUrl) data.refLink = data.shareUrl;
     return NextResponse.json(data, { status: res.status });
 
   } catch (err) {

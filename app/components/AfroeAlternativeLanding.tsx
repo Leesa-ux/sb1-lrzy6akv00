@@ -881,7 +881,7 @@ export default function AfroeAlternativeLanding(): JSX.Element {
         formSubmitTime,
       };
 
-      const res = await fetch("/api/signup-complete", {
+      const res = await fetch("/api/join-waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signupPayload),

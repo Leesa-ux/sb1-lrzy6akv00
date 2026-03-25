@@ -217,7 +217,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
     setSubmitError(null);
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     try {
-      const r = await fetch("/api/signup-complete", {
+      const r = await fetch("/api/join-waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

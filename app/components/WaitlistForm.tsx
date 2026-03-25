@@ -150,7 +150,7 @@ export default function WaitlistForm({ onSuccess }: WaitlistFormProps) {
     }
 
     try {
-      const response = await fetch('/api/signup-complete', {
+      const response = await fetch('/api/join-waitlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
