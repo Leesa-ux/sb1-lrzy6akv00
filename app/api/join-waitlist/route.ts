@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       userType:      body.role || body.userType,
       followerCount: body.followerCount,
       referralCode:  body.referredBy || body.referralCode || body.ref,
-      skillAnswer:   body.skillAnswer ?? 32,
+      skillAnswer:   body.skillAnswer !== undefined ? Number(body.skillAnswer) : 32,
       consent:       body.consent ?? true,
     };
 
