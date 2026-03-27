@@ -71,9 +71,6 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
             <p className="text-amber-300 font-bold text-base sm:text-lg">
               🏆 iPhone 17 Pro pour le rang #1 + 2 000 € (tirage ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} pts)
             </p>
-            <p className="text-rose-200/90 text-sm sm:text-base">
-              Les <span className="font-semibold">{POINTS_CONFIG.EARLY_BIRD_LIMIT} premiers inscrits</span> : +{POINTS_CONFIG.EARLY_BIRD_BONUS} pts offerts.
-            </p>
           </div>
 
           {showCountdown && (
