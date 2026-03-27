@@ -534,7 +534,7 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
                 className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900/60 text-fuchsia-600 focus:ring-2 focus:ring-fuchsia-400"
               />
               <label htmlFor="consent-gdpr" className="text-xs text-slate-300">
-                ☑ J'accepte les{" "}
+                J'accepte les{" "}
                 <a
                   href="/cgu"
                   target="_blank"
