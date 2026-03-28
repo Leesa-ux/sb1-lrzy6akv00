@@ -833,6 +833,14 @@ export default function AfroeWaitlistLandingV2(): JSX.Element {
             followers. Un seul compte par personne. Fraude = exclusion
             définitive.
           </p>
+          <p className="text-xs text-slate-500 pt-2">
+            * Prix sous réserve des conditions du{" "}
+            <a href="/reglement" target="_blank" rel="noopener noreferrer"
+               className="underline hover:text-slate-400">
+              règlement complet
+            </a>
+            .
+          </p>
         </div>
       </section>
 
