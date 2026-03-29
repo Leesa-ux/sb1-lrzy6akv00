@@ -206,7 +206,7 @@ export async function POST(req: Request) {
             FIRSTNAME: first_name,
             REFERRAL_CODE: referral_code,
             REFERRAL_LINK: referral_link,
-            CONTRACT_LINK: "https://afroe.studio/ambassadors/apply",
+            CONTRACT_LINK: "https://afroe.studio/ambassadors/contrat",
           },
         });
         console.log(`Ambassador welcome email sent to ${email}`);
