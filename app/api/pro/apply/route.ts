@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       const buffer = Buffer.from(arrayBuffer);
 
       const { error: uploadError } = await supabase.storage
-        .from("applications")
+        .from("afroe-pro-portfolios")
         .upload(filePath, buffer, {
           contentType: file.type,
           upsert: false,

@@ -10,7 +10,7 @@ import {
 
 const BREVO_GLOW_LIST_ID = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
 
-const LAUNCH_DATE = new Date("2026-01-15T00:00:00Z");
+const LAUNCH_DATE = new Date("2026-05-15T22:59:00Z");
 const IS_POST_LAUNCH = Date.now() >= LAUNCH_DATE.getTime();
 
 /** Magic link that takes the user directly back to their personal Glow success page */

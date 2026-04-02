@@ -9,22 +9,65 @@ Afroé is a beauty services marketplace connecting clients with beauty professio
 - **Multi-tier referral tracking** (2-level deep)
 - **Role-based point system** (Client: 5pts waitlist / 10pts app, Influencer: 15pts / 50pts, Beauty Pro: 25pts / 100pts)
 - **Dual-phase scoring** (provisional points during waitlist + final points at launch)
-  
+- **Early-bird rewards** (first 100 signups get bonus points)
 - **Prize eligibility** (iPhone 17 Pro for rank 1, €2,000 jackpot for 100+ points)
-- **Automated email sequences** via Brevo (welcome, milestone progress, weekly updates)
+- **Automated email sequences** via Brevo (welcome, follow-up J+7, reminder J+45)
 - **Anti-fraud system** (IP tracking, device fingerprinting, rate limiting)
 
 ## Tech Stack
 
 - **Frontend**: Next.js 14, React, TypeScript, TailwindCSS
-- **Backend**: Next.js API Routes
+- **Backend**: Next.js API Routes + Supabase Edge Functions
 - **Database**: Supabase (PostgreSQL)
 - **ORM**: Prisma
-- **Email**: Brevo (Sendinblue)
-- **SMS**: Brevo Transactional SMS
+- **Email/SMS**: Brevo (transactional + automation)
 - **Rate Limiting**: Upstash Redis
+- **Storage**: Supabase Storage (public buckets for email images)
 
 ## Architecture
+
+### Signup Flow
+
+All waitlist signups go through the Supabase Edge Function `join-waitlist`:
+
+1. Phone OTP verification (`send-sms-code` + `verify-sms-code` edge functions)
+2. User created in Supabase `User` table
+3. Contact upserted in Brevo with role-mapped `ROLE` attribute
+4. Welcome email sent directly via Brevo transactional API
+5. Contact added to **Glow List #5** → triggers Brevo automation for follow-ups
+
+### Role Mapping (Brevo)
+
+| App role | Brevo ROLE attribute | Brevo automation branch |
+|----------|---------------------|------------------------|
+| `client` | `client` | Client (catch-all) |
+| `influencer` | `influenceur` | Amb |
+| `beautypro` | `pro` | Pro |
+
+### Brevo Automation — "Follow Up email"
+
+Trigger: **Ajouté à la liste Glow List #5**
+
+- Re-entry enabled (contacts can re-enter on new signup)
+- The edge function removes the contact from list 5 before re-adding to guarantee the trigger fires
+- **Branch Pro**: `ROLE = pro`
+- **Branch Amb**: `ROLE = influenceur` + membre de liste 5
+- **Branch Client**: catch-all
+
+Sequence per branch:
+- J0: Welcome email + SMS (sent directly by edge function as primary; automation = fallback)
+- J+7: Nudge email + SMS
+- J+45: Final reminder email + SMS
+
+### Email Templates (Brevo transactional)
+
+| Template ID | Usage |
+|-------------|-------|
+| 101 | Client welcome |
+| 107 | Beauty Pro welcome |
+| 115 | Ambassador/Influencer welcome |
+| 116 | Ambassador contract follow-up J+7 |
+| 117 | Ambassador contract reminder J+45 |
 
 ### Database Schema
 
@@ -62,6 +105,18 @@ Afroé is a beauty services marketplace connecting clients with beauty professio
 5. **Risk Scoring**: Cumulative fraud score per user
 6. **Rate Limiting**: Via Upstash Redis with sliding window
 
+## Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Main waitlist landing page |
+| `/success` | Post-signup confirmation with referral link |
+| `/leaderboard` | Public referral leaderboard |
+| `/ambassadors/apply` | Ambassador application form |
+| `/ambassadors/contrat` | Ambassador contract info page |
+| `/pro/apply` | Beauty Pro application form with portfolio upload |
+| `/reglement` | Contest rules |
+
 ## Setup
 
 ### 1. Environment Variables
@@ -78,9 +133,14 @@ Required variables:
 DATABASE_URL="postgresql://..."
 DIRECT_URL="postgresql://..."
 
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL="https://..."
+NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
+SUPABASE_SERVICE_ROLE_KEY="..."
+
 # Brevo (Email + SMS)
 BREVO_API_KEY="xkeysib-..."
-BREVO_SENDER_EMAIL="noreply@afroe.com"
+BREVO_SENDER_EMAIL="noreply@afroe.studio"
 BREVO_SENDER_NAME="Afroé"
 
 # Redis (Rate Limiting)
@@ -88,7 +148,7 @@ UPSTASH_REDIS_REST_URL="https://..."
 UPSTASH_REDIS_REST_TOKEN="..."
 
 # App Config
-NEXT_PUBLIC_APP_URL="https://afroe.com"
+NEXT_PUBLIC_APP_URL="https://afroe.studio"
 ```
 
 ### 2. Database Setup
@@ -100,15 +160,8 @@ Migrations are managed via Supabase. Applied migrations:
 4. `fix_lastrefat_column.sql` - Column rename fix
 5. `secure_rls_policies.sql` - RLS security hardening
 
-To apply migrations:
-```bash
-# Migrations are auto-applied via MCP Supabase tool
-# No manual action required
-```
-
 ### 3. Prisma Setup
 
-Generate Prisma client:
 ```bash
 npm run postinstall
 ```
@@ -123,150 +176,76 @@ Visit `http://localhost:3000`
 
 ## API Routes
 
-### User Signup Flow
+### Waitlist Signup (main flow)
 
-1. **POST /api/send-otp**
-   - Sends SMS verification code
-   - Rate limited: 3 per phone per hour
-   - Returns: `{ success: true }`
+The primary signup flow uses **Supabase Edge Functions** directly:
+- `POST /functions/v1/send-sms-code` — sends OTP
+- `POST /functions/v1/verify-sms-code` — verifies OTP
+- `POST /functions/v1/join-waitlist` — creates user, syncs to Brevo, sends welcome email
 
-2. **POST /api/verify-otp**
-   - Verifies SMS code
-   - Creates user if valid
-   - Returns: `{ success: true, referralCode: "ABC123" }`
+### Ambassador Applications
 
-3. **POST /api/save-lead**
-   - Saves complete user profile
-   - Triggers referral point calculation
-   - Sends welcome email
-   - Returns: `{ success: true, user: {...} }`
+- **POST /api/ambassadors/apply** — saves ambassador application, sends contract email, stores files in Supabase Storage (`ambassador-applications` bucket)
 
-### Referral Tracking
+### Beauty Pro Applications
 
-4. **POST /api/referral-track**
-   - Tracks referral click
-   - Records IP, device, timestamp
-   - Returns: `{ success: true }`
-
-5. **POST /api/webhook/referral-completed**
-   - Called when referral converts
-   - Awards points to referrer
-   - Checks fraud flags
-   - Returns: `{ success: true, pointsAwarded: 10 }`
-
-### Email Automation
-
-6. **POST /api/signup-complete**
-   - Sends welcome email with referral link
-   - Returns: `{ success: true }`
-
-7. **POST /api/progress-email**
-   - Sends milestone progress email
-   - Triggered at: 10, 25, 50, 100 points
-   - Returns: `{ success: true }`
+- **POST /api/pro/apply** — saves pro application, uploads portfolio to `afroe-pro-portfolios` bucket, sends welcome email
 
 ### Cron Jobs (Automated)
 
-8. **POST /api/cron/followup-1h** - Send 1-hour follow-up
-9. **POST /api/cron/activation-48h** - Send 48-hour activation reminder
-10. **POST /api/cron/progress-weekly** - Send weekly progress updates
-11. **POST /api/cron/nightly-risk-scan** - Scan for fraud patterns
-12. **POST /api/cron/launch-day** - Send launch day notifications
+- **POST /api/cron/launch-day** — sends launch day notifications to all users
 
 ### Admin Endpoints
 
-13. **POST /api/admin/recalculate-final-points**
-    - Recalculates all final points
-    - Updates rank and prize eligibility
-    - Returns: `{ success: true, updated: 1234 }`
+- **POST /api/admin/recalculate-final-points** — recalculates all final points and prize eligibility
+- **GET /api/leaderboard/export** — exports leaderboard as CSV
+- **GET /api/early-bird-count** — returns current early-bird count
 
-14. **GET /api/leaderboard/export**
-    - Exports leaderboard as CSV
-    - Returns: CSV file download
+## Supabase Storage Buckets
 
-15. **GET /api/early-bird-count**
-    - Returns current early-bird count
-    - Returns: `{ count: 42, limit: 100 }`
-
-## Email Templates
-
-Brevo templates are configured via web UI. Required templates:
-
-1. **Welcome Email** (ID: 1) - Sent after signup
-2. **Milestone Progress** (ID: 2) - Sent at 10/25/50/100 points
-3. **Weekly Progress** (ID: 3) - Sent every Monday
-4. **1-Hour Follow-up** (ID: 4) - Sent if no referrals after 1h
-5. **48-Hour Activation** (ID: 5) - Sent if inactive after 48h
-6. **Launch Day** (ID: 6) - Sent on app launch
-
-See `BEAUTY_PRO_EMAIL_SEQUENCE.md` for template content.
+| Bucket | Public | Usage |
+|--------|--------|-------|
+| `Image Amb email1` | yes | Hero image for ambassador welcome email |
+| `image Pro email1` | yes | Hero image for beauty pro welcome email |
+| `afroe-pro-portfolios` | no | Beauty pro portfolio uploads |
+| `ambassador-applications` | no | Ambassador application files |
 
 ## SMS Templates
 
 SMS messages are defined in `lib/sms-templates.ts`:
-
-- Verification codes (OTP)
-- Welcome messages with referral link
+- Welcome messages with referral link (per role)
 - Milestone achievements
 - Launch notifications
-
-See `SMS_TEMPLATES_GUIDE.md` for all templates.
-
-## Testing
-
-### Rate Limiter Test
-```bash
-npm run test:rate-limiter
-```
-
-### SMS Test (Dev Mode)
-Add `?dev=1` to skip SMS verification during development.
 
 ## Deployment
 
 ### Vercel (Recommended)
 
-1. Push to GitHub
+1. Push to GitHub branch `claude/fix-hero-image-m04Z3`
 2. Connect to Vercel
 3. Add environment variables
 4. Deploy
 
-### Environment-Specific Config
-
-Use `vercel.json` to configure:
-- Cron jobs (weekly/daily/hourly)
-- Redirects
-- Headers
+Production domain: `afroe.studio`
 
 ## Security Considerations
 
-1. **Never expose service_role key** - Only in API routes, never client-side
-2. **RLS policies** - All tables have restrictive policies
-3. **Rate limiting** - Applied to all public endpoints
-4. **Input validation** - Email, phone, referral codes validated
-5. **SQL injection** - Protected via Prisma parameterized queries
-6. **XSS** - React auto-escapes, no `dangerouslySetInnerHTML`
+1. **Never expose service_role key** — only in API routes and edge functions, never client-side
+2. **RLS policies** — all tables have restrictive policies
+3. **Rate limiting** — applied to all public endpoints
+4. **Input validation** — email, phone, referral codes validated
+5. **SQL injection** — protected via Prisma parameterized queries
+6. **XSS** — React auto-escapes, no `dangerouslySetInnerHTML`
 
-## Monitoring
+## Known Issues / Fixed Bugs
 
-Key metrics to track:
-- Signup conversion rate (OTP sent → user created)
-- Referral conversion rate (click → signup)
-- Fraud detection hit rate
-- Email open/click rates (via Brevo)
-- Points distribution (histogram)
-- Top referrers (leaderboard)
-
-## Documentation
-
-- `QUICK_START.md` - Fast setup guide
-- `AUTOMATION_SETUP.md` - Email automation config
-- `BREVO_SETUP.md` - Brevo integration guide
-- `BEAUTY_PRO_EMAIL_SEQUENCE.md` - Email templates
-- `SMS_TEMPLATES_GUIDE.md` - SMS templates
-- `ACCESSIBILITY_EXPLAINED_SIMPLE.md` - A11y features
+- **Double checkbox on landing page**: removed hardcoded `☑` emoji from label in `AfroeWaitlistLandingV2.tsx`
+- **Beauty Pro apply 500 error**: fixed wrong storage bucket (`applications` → `afroe-pro-portfolios`)
+- **Ambassador contract link**: fixed `CONTRACT_LINK` to point to `/ambassadors/contrat`
+- **Beauty Pro email domain**: fixed `afroebeauty.com` and `www.afroe.studio` → `afroe.studio` in Brevo templates
+- **Influencer automation branch**: fixed role mapping `influencer` → `influenceur` to match Brevo condition
+- **Brevo automation trigger**: edge function now removes contact from list before re-adding to guarantee trigger fires
 
 ## License
 
-Proprietary - Afroé Platform
-Deployment trigger
+Proprietary — Afroé Platform
