@@ -140,7 +140,7 @@ export default function ReglementPage() {
             <section>
               <h2 className="text-2xl font-bold mb-4 text-white">7. Désignation du gagnant rang #1 (tie-breaker)</h2>
               <p className="leading-relaxed mb-3">
-                Le rang #1 est déterminé au moment de la clôture (20 mars 2026 à 23h59 CET).
+                Le rang #1 est déterminé au moment de la clôture (15 mai 2026 à 23h59 CET).
               </p>
               <p className="leading-relaxed mb-3">
                 En cas d'égalité de points provisoires valides :

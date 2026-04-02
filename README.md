@@ -88,8 +88,8 @@ Sequence per branch:
 
 **Referral Points (Dual-phase)**
 - Pre-launch (waitlist): 5pts (client), 15pts (influencer), 25pts (beauty pro)
-- Post-launch (app): 10pts (client), 50pts (influencer), 100pts (beauty pro)
-- Early-bird bonus: 50pts (first 100 signups)
+- Post-launch (app): 10pts (client), 30pts (influencer), 50pts (beauty pro)
+
 
 **Provisional vs Final Points**
 - `provisionalPoints`: Earned during waitlist phase
