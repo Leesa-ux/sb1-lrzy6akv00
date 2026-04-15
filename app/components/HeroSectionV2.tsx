@@ -105,7 +105,7 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           <div className="mt-10 max-w-3xl mx-auto px-4">
             <div className="relative rounded-xl overflow-hidden shadow-xl shadow-fuchsia-500/10 border border-white/5">
               <Image
-                src="/images/MockUpimage_1.jpeg/ad10c8c6-0d6c-469b-b18e-e2c33703c72f.jpg"
+                src="/images/gemini-2.5-flash-image_change_the_color_of_the_female_model_into_8B004B-0_(1).jpg"
                 alt="Afroé — La beauté Afro autrement"
                 width={900}
                 height={900}
