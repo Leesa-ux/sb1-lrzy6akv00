@@ -29,42 +29,20 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
             </span>
           </div>
 
-          {showNewCopy && (
-            <div className="mb-4">
-              <p className="text-sm sm:text-base md:text-lg text-amber-300 font-bold">
-                iPhone 17 Pro + 2 000 € — juste en partageant.
-              </p>
-            </div>
-          )}
-
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-tight">
-            Tout commence avec{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 via-violet-400 to-amber-300">
-              Afroé.
+            Fini de galérer pour ta{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-amber-300">
+              beauté Afro.
             </span>
-            <br />
-            Tout se confirme en beauté.
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl text-slate-200/90 max-w-3xl mx-auto mb-4 leading-relaxed">
-            L'appli connecteur des soins afro-premium.
-            <br />
-            Chez toi ou en salon.
-            <br />
-            Sans compromis.
+          <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 leading-snug">
+            Les meilleurs pros, près de chez toi.
           </p>
 
-          <p className="text-sm sm:text-base text-slate-300/80 max-w-3xl mx-auto mb-6">
-            Inscris-toi. Partage. Gagne.
+          <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-slate-400 mb-8">
+            Cheveux&nbsp;&nbsp;·&nbsp;&nbsp;Grooming&nbsp;&nbsp;·&nbsp;&nbsp;Makeup
           </p>
-
-          {showNewCopy && (
-            <div className="mb-4">
-              <p className="text-xs sm:text-sm text-slate-400">
-                #1 = iPhone · 100 pts = tirage 2 000€
-              </p>
-            </div>
-          )}
 
           {/* Bonus lancement - style glassy neon-gold */}
           <div className="inline-flex flex-col items-center gap-2 mb-6 glassy neon-gold rounded-2xl px-6 py-4 max-w-2xl">
