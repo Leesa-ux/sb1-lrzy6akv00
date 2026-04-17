@@ -1,7 +1,8 @@
 export const CAMPAIGN_CONFIG = {
-  startDate: new Date("2026-03-15T00:00:00+01:00"),
-  endDate: new Date("2026-05-15T23:59:59+02:00"),
-  launchDate: new Date("2026-05-15T22:59:00Z"),
+  startDate: new Date("2026-04-18T00:00:00+02:00"),
+  endDate: new Date("2026-06-01T23:59:59+02:00"),
+  launchDate: new Date("2026-06-01T23:59:59+02:00"),
+  prizeDate: new Date("2026-06-29T00:00:00+02:00"), // 4 semaines après la fin
 };
 
 export const getCampaignStatus = (): "upcoming" | "active" | "ended" => {
