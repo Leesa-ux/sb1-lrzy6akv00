@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { nextMilestone, getRewardTier } from "@/lib/points";
 import { Resend } from "resend";
+import { CAMPAIGN_CONFIG } from "@/config/campaign";
 
 const getResend = () => process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const APP_URL = process.env.APP_URL || "https://afroe.app";
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
     }
 
     if (kind === "lastcall") {
-      const END = new Date(process.env.CAMPAIGN_END || "2025-10-01T23:59:59Z").getTime();
+      const END = CAMPAIGN_CONFIG.endDate.getTime();
       const diff = Math.max(0, END - Date.now());
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff / 3600000) % 24);

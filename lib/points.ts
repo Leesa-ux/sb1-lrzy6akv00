@@ -201,7 +201,7 @@ export const POINTS_CONFIG = {
  * Prelaunch cutoff date (Brussels time: March 1, 2026 at 00:00 = UTC Feb 28, 2026 at 23:00)
  * Brussels is UTC+1 at this date, so we use the UTC equivalent to avoid timezone issues.
  */
-export const PRELAUNCH_END_UTC = "2026-05-15T22:59:00.000Z";
+export const PRELAUNCH_END_UTC = "2026-06-01T21:59:59.000Z"; // 01/06/2026 23:59 CET = 21:59 UTC
 
 /**
  * Type definition for user roles

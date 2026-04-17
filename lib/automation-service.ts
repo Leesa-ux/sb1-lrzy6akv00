@@ -10,8 +10,8 @@ import {
 
 const BREVO_GLOW_LIST_ID = parseInt(process.env.BREVO_GLOW_LIST_ID || "5", 10);
 
-const LAUNCH_DATE = new Date("2026-05-15T22:59:00Z");
-const IS_POST_LAUNCH = Date.now() >= LAUNCH_DATE.getTime();
+import { CAMPAIGN_CONFIG } from "@/config/campaign";
+const IS_POST_LAUNCH = Date.now() >= CAMPAIGN_CONFIG.launchDate.getTime();
 
 /** Magic link that takes the user directly back to their personal Glow success page */
 function buildMyGlowLink(user: { firstName: string | null; referralCode: string }): string {

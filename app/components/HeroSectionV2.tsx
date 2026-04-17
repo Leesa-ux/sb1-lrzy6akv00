@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useFeature } from "@/lib/feature-flags";
 import Countdown from "./Countdown";
 import { POINTS_CONFIG } from "@/lib/points";
+import { CAMPAIGN_CONFIG } from "@/config/campaign";
 
 interface HeroSectionProps {
   onCTAClick?: () => void;
@@ -16,7 +17,7 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
   const showNewCopy = useFeature("hero-copy");
   const showCountdown = useFeature("countdown");
 
-  const LAUNCH_DATE = "2025-12-15T12:00:00+01:00";
+  const LAUNCH_DATE = CAMPAIGN_CONFIG.launchDate.toISOString();
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-black via-slate-950 to-black text-white pt-16 pb-20">

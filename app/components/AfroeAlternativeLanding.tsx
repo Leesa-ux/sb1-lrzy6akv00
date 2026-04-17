@@ -498,7 +498,8 @@ function Rewards({ userPoints }: { userPoints: number }): JSX.Element {
   );
 }
 
-const LAUNCH_TARGET = new Date("2025-12-15T12:00:00+01:00").toISOString();
+import { CAMPAIGN_CONFIG } from "@/config/campaign";
+const LAUNCH_TARGET = CAMPAIGN_CONFIG.launchDate.toISOString();
 
 interface CountdownProps {
   target?: string;
