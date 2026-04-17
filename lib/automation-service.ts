@@ -58,7 +58,7 @@ export async function syncUserToBrevo(userId: string, listIds?: number[]): Promi
     ...(listIds ? { listIds } : {}),
     attributes: {
       ROLE: mapRoleForBrevo(user.role),
-      REFERRAL_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
+      REF_LINK: `${process.env.NEXT_PUBLIC_APP_URL || "https://afroe.com"}/waitlist?ref=${user.referralCode}`,
       MY_GLOW_LINK: buildMyGlowLink(user),
       RANK: user.rank,
       REFERRAL_POINTS: currentPoints,
