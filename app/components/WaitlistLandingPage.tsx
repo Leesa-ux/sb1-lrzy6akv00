@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { CAMPAIGN_CONFIG } from "@/config/campaign";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -51,7 +52,7 @@ export default function WaitlistLandingPage() {
 
   // Countdown
   useEffect(() => {
-    const END = new Date("2025-12-31T23:59:59Z").getTime();
+    const END = CAMPAIGN_CONFIG.endDate.getTime();
     const t = setInterval(() => {
       const diff = Math.max(0, END - Date.now());
       const d = Math.floor(diff / 86400000);
