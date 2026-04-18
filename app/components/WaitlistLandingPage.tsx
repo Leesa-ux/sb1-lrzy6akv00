@@ -14,7 +14,7 @@ import RewardsTimeline from "./RewardsTimeline";
 
 // Logo
 const LOGO_IMAGE_SRC = "/images/bg-afroe.jpg";
-const HERO_IMAGE_SRC = "/images/hero-crew-v2.jpg";
+const HERO_IMAGE_SRC = "/images/hero-crew-v3.jpg";
 
 function ProgressBar({ points, breaks = [10, 25, 50, 100] }: { points: number; breaks?: number[] }) {
   const pct = Math.min(100, (points / breaks[3]) * 100);
