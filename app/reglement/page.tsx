@@ -198,7 +198,7 @@ export default function ReglementPage() {
                 <strong>Organisateur :</strong> Afroé (association de fait), groupement sans personnalité juridique, représenté par Lisa M, domiciliée en Belgique.
               </p>
               <p className="leading-relaxed mb-3">
-                <strong>Adresse postale :</strong> communiquée sur demande par email à contact@afroe.studio.
+                <strong>Adresse postale :</strong> Mme L. Moukendy, Boîte postale 123, 1020 BRUXELLES
               </p>
               <p className="leading-relaxed mb-3">
                 <strong>Email :</strong> <a href="mailto:contact@afroe.studio" className="text-fuchsia-400 hover:underline">contact@afroe.studio</a>
