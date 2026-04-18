@@ -84,8 +84,8 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           <div className="mt-10 max-w-3xl mx-auto px-4">
             <div className="relative rounded-xl overflow-hidden shadow-xl shadow-fuchsia-500/10 border border-white/5">
               <Image
-                src="/images/gemini-2.5-flash-image_change_the_color_of_the_female_model_into_8B004B-0_(1).jpg"
-                alt="Afroé — La beauté Afro autrement"
+                src="/images/hero-crew-v2.jpg"
+                alt="La communauté Afroé – style et beauté afro"
                 width={900}
                 height={900}
                 className="w-full h-auto max-h-[500px] object-contain object-center"
