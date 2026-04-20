@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useFeature } from "@/lib/feature-flags";
 import Countdown from "./Countdown";
 import { POINTS_CONFIG } from "@/lib/points";
@@ -23,11 +24,32 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
     <section className="relative overflow-hidden bg-gradient-to-b from-black via-slate-950 to-black text-white pt-16 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          {/* Badge marque avec effet glassy */}
-          <div className="inline-flex items-center justify-center mb-6">
+          {/* Badge marque */}
+          <div className="inline-flex items-center justify-center mb-4">
             <span className="px-4 py-1 rounded-full glassy text-xs font-medium tracking-wide uppercase">
               Afroé — Brussels · Liège · Anvers
             </span>
+          </div>
+
+          {/* CONCOURS GLOW LIST — annonce principale */}
+          <div className="mb-8 mx-auto max-w-2xl">
+            <div className="glassy neon-fuchsia rounded-2xl px-6 py-5 border border-fuchsia-500/30">
+              <p className="text-xs font-bold tracking-widest uppercase text-fuchsia-400 mb-2">🎉 Concours — Glow List Afroé</p>
+              <p className="text-white font-extrabold text-xl sm:text-2xl mb-3">
+                Gagne un <span className="text-amber-300">iPhone 17 Pro</span> ou <span className="text-fuchsia-300">2 000 €</span>
+              </p>
+              <div className="flex flex-wrap justify-center gap-3 text-sm text-slate-300 mb-3">
+                <span>📅 18 avril → 1er juin 2026</span>
+                <span>·</span>
+                <span>🏆 Rang #1 = iPhone 17 Pro</span>
+                <span>·</span>
+                <span>💰 Tirage ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} pts = 2 000 €</span>
+              </div>
+              <p className="text-xs text-slate-400 mb-3">Inscription gratuite · Aucun achat requis · Belgique uniquement</p>
+              <Link href="/reglement" className="text-xs text-fuchsia-400 hover:underline">
+                Voir le règlement complet →
+              </Link>
+            </div>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-tight">
@@ -44,13 +66,6 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
           <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-slate-400 mb-8">
             Cheveux&nbsp;&nbsp;·&nbsp;&nbsp;Grooming&nbsp;&nbsp;·&nbsp;&nbsp;Makeup
           </p>
-
-          {/* Bonus lancement - style glassy neon-gold */}
-          <div className="inline-flex flex-col items-center gap-2 mb-6 glassy neon-gold rounded-2xl px-6 py-4 max-w-2xl">
-            <p className="text-amber-300 font-bold text-base sm:text-lg">
-              🏆 iPhone 17 Pro pour le rang #1 + 2 000 € (tirage ≥ {POINTS_CONFIG.JACKPOT_THRESHOLD} pts)
-            </p>
-          </div>
 
           {showCountdown && (
             <Countdown targetDate={LAUNCH_DATE} className="max-w-md mx-auto mb-6" />
