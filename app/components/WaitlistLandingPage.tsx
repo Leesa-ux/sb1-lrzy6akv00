@@ -14,6 +14,7 @@ import RewardsTimeline from "./RewardsTimeline";
 
 // Logo
 const LOGO_IMAGE_SRC = "/images/bg-afroe.jpg";
+const HERO_IMAGE_SRC = "/images/hero-crew-v3.jpg";
 
 function ProgressBar({ points, breaks = [10, 25, 50, 100] }: { points: number; breaks?: number[] }) {
   const pct = Math.min(100, (points / breaks[3]) * 100);
@@ -106,24 +107,25 @@ export default function WaitlistLandingPage() {
 
       {/* HERO */}
       <section className="mx-auto w-full max-w-7xl px-6 pb-12">
-        {/* CENTERED LOGO */}
+        {/* HERO IMAGE + HEADLINE */}
         <div className="flex flex-col items-center justify-center mb-12 md:mb-16 text-center">
-          <div className="relative mb-8 md:mb-10">
-            <Image
-              src={LOGO_IMAGE_SRC}
-              alt="Logo Afroé – beauté et culture afro-européenne"
-              width={280}
-              height={280}
-              className="rounded-3xl logo-glow w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover"
-              priority
-            />
-          </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 leading-tight">
             Ton Style, Ton Impact, <span className="bg-gradient-to-r from-blue-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Ton Futur</span>.
           </h1>
           <p className="text-lg sm:text-xl text-zinc-300 leading-relaxed mb-8 max-w-3xl">
             Le futur de la beauté afro démarre maintenant. 🔥 Afroé, c'est l'étincelle qui allume le game.
           </p>
+          <div className="relative w-full max-w-2xl rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(217,70,239,0.25)] border border-white/10 mb-4">
+            <Image
+              src={HERO_IMAGE_SRC}
+              alt="La communauté Afroé – style et beauté afro"
+              width={900}
+              height={900}
+              className="w-full h-auto object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
