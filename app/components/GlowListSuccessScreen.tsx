@@ -42,19 +42,20 @@ export default function GlowListSuccessScreen({
     }
   }
 
+  const fullMessage = `✨ Rejoins la Glow List Afroé — beauté Afro premium 🌟\n\n👉 ${shareUrl}\n\nInscription gratuite. Aucun achat requis.`;
+
   async function copyForInsta() {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(fullMessage);
       setInstaCopied(true);
-      setTimeout(() => setInstaCopied(false), 2000);
+      setTimeout(() => setInstaCopied(false), 4000);
+      window.open("https://www.instagram.com/direct/inbox/", "_blank");
     } catch (err) {
       console.error("Erreur copie:", err);
     }
   }
 
-  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(
-    `Rejoins la Glow List Afroé 🌟 ${shareUrl}`
-  )}`;
+  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
 
   const smsHref = `sms:?body=${encodeURIComponent(
     `Rejoins la Glow List Afroé ${shareUrl}`
@@ -141,7 +142,7 @@ export default function GlowListSuccessScreen({
           </div>
           {instaCopied && (
             <p className="text-xs text-center text-emerald-400 font-medium">
-              ✓ Lien copié — colle-le dans ta bio !
+              ✓ Message copié — colle-le (Ctrl+V) dans ton DM Instagram !
             </p>
           )}
         </section>

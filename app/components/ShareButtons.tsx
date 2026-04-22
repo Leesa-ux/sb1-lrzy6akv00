@@ -48,9 +48,12 @@ export default function ShareButtons({
     window.open("https://www.linkedin.com/messaging/compose/", "_blank");
   }
 
-  function shareToInstagram() {
-    alert("Instagram ne supporte pas le partage direct de liens. Copie ton lien et partage-le dans ta story ou bio !");
-    copyToClipboard();
+  async function shareToInstagram() {
+    const fullMsg = `${message}\n\n👉 ${referralLink}`;
+    try { await navigator.clipboard.writeText(fullMsg); } catch {}
+    setLinkedinCopied(true);
+    setTimeout(() => setLinkedinCopied(false), 4000);
+    window.open("https://www.instagram.com/direct/inbox/", "_blank");
   }
 
   function shareToTikTok() {
