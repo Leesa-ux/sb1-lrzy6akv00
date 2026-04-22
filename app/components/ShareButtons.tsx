@@ -13,6 +13,7 @@ export default function ShareButtons({
   message = "Rejoins Afroé, la plateforme beauté afro qui change le game ! 🔥"
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
+  const [linkedinCopied, setLinkedinCopied] = useState(false);
 
   const encodedMessage = encodeURIComponent(message);
   const encodedLink = encodeURIComponent(referralLink);
@@ -21,7 +22,6 @@ export default function ShareButtons({
   const shareLinks = {
     whatsapp: `https://wa.me/?text=${fullMessage}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedLink}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedLink}`,
     twitter: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedLink}`,
     sms: `sms:?body=${fullMessage}`,
   };
@@ -31,9 +31,21 @@ export default function ShareButtons({
       await navigator.clipboard.writeText(referralLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       alert("Erreur lors de la copie");
     }
+  }
+
+  async function shareToLinkedIn() {
+    const linkedinMessage = `${message}\n\n👉 ${referralLink}`;
+    try {
+      await navigator.clipboard.writeText(linkedinMessage);
+    } catch {
+      // clipboard failed, open anyway
+    }
+    setLinkedinCopied(true);
+    setTimeout(() => setLinkedinCopied(false), 4000);
+    window.open("https://www.linkedin.com/messaging/compose/", "_blank");
   }
 
   function shareToInstagram() {
@@ -57,12 +69,19 @@ export default function ShareButtons({
     { name: "Instagram", icon: "📷", color: "from-purple-600 to-pink-500", action: shareToInstagram },
     { name: "Snapchat", icon: "👻", color: "from-yellow-400 to-yellow-300", action: shareToSnapchat },
     { name: "Facebook", icon: "👍", color: "from-blue-600 to-blue-500", action: () => window.open(shareLinks.facebook, "_blank") },
-    { name: "LinkedIn", icon: "💼", color: "from-blue-700 to-blue-600", action: () => window.open(shareLinks.linkedin, "_blank") },
+    { name: "LinkedIn", icon: "💼", color: "from-blue-700 to-blue-600", action: shareToLinkedIn },
     { name: "SMS", icon: "💬", color: "from-gray-600 to-gray-500", action: () => window.location.href = shareLinks.sms },
   ];
 
   return (
     <div className="space-y-4">
+      {linkedinCopied && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-blue-900/60 border border-blue-500/40 text-sm text-blue-200">
+          <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+          <span>Message copié ! Colle-le (Ctrl+V) dans ta conversation LinkedIn.</span>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-900/50">
         <div className="flex-1 overflow-hidden">
           <p className="text-xs text-zinc-400 mb-1">Ton lien de parrainage</p>
