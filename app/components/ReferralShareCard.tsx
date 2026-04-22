@@ -33,9 +33,10 @@ Rejoins le crew beauté Afro premium 🔥`;
 
   const whatsappHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
 
-  const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    shareUrl
-  )}`;
+  function openLinkedIn() {
+    copyAll();
+    window.open("https://www.linkedin.com/messaging/compose/", "_blank");
+  }
 
   const facebookHref = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
     shareUrl
@@ -45,7 +46,7 @@ Rejoins le crew beauté Afro premium 🔥`;
 
   function openInstagram() {
     copyAll();
-    window.open("https://www.instagram.com/", "_blank");
+    window.open("https://www.instagram.com/direct/inbox/", "_blank");
   }
 
   function openTikTok() {
@@ -83,14 +84,12 @@ Rejoins le crew beauté Afro premium 🔥`;
           🟢 WhatsApp
         </a>
 
-        <a
-          href={linkedinHref}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-xl py-3 bg-white/10 text-center font-semibold hover:bg-white/15 transition-colors"
+        <button
+          onClick={openLinkedIn}
+          className="rounded-xl py-3 bg-white/10 font-semibold hover:bg-white/15 transition-colors"
         >
           🔵 LinkedIn
-        </a>
+        </button>
 
         <a
           href={facebookHref}

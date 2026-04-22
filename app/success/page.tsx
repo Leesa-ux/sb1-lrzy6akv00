@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { CheckCircle, Copy, LinkedinLogo, InstagramLogo, ChatCircle, Trophy, ArrowRight } from '@phosphor-icons/react';
+import { CheckCircle, Copy, LinkedinLogo, InstagramLogo, ChatCircle, Trophy, ArrowRight, WhatsappLogo } from '@phosphor-icons/react';
 import Link from 'next/link';
 import GlowNav from '../components/GlowNav';
 
@@ -18,17 +18,34 @@ function SuccessContent() {
     sessionStorage.setItem('glowSuccessParams', params.toString());
   }
 
-  const [copied, setCopied]     = useState(false);
-  const [igCopied, setIgCopied] = useState(false);
+  const [copied, setCopied]           = useState(false);
+  const [igCopied, setIgCopied]       = useState(false);
+  const [liCopied, setLiCopied]       = useState(false);
 
-  const copy = async (msg?: string) => {
+  const fullMessage = `✨ Rejoins la Glow List Afroé — la plateforme beauté Afro-européenne !\n\n👉 ${shareUrl}\n\nInscription gratuite. Aucun achat requis.`;
+
+  const copy = async () => {
     await navigator.clipboard.writeText(shareUrl);
-    if (msg) { setIgCopied(true); setTimeout(() => setIgCopied(false), 2500); }
-    else      { setCopied(true);   setTimeout(() => setCopied(false), 2500); }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
-  const liText = encodeURIComponent(`Je viens de rejoindre la Glow List Afroé — la plateforme beauté Afro-européenne 🌟 Rejoins-moi : ${shareUrl}`);
-  const smsText = encodeURIComponent(`Rejoins la Glow List Afroé ${shareUrl}`);
+  const shareToInstagram = async () => {
+    await navigator.clipboard.writeText(fullMessage);
+    setIgCopied(true);
+    setTimeout(() => setIgCopied(false), 4000);
+    window.open('https://www.instagram.com/direct/inbox/', '_blank');
+  };
+
+  const shareToLinkedIn = async () => {
+    await navigator.clipboard.writeText(fullMessage);
+    setLiCopied(true);
+    setTimeout(() => setLiCopied(false), 4000);
+    window.open('https://www.linkedin.com/messaging/compose/', '_blank');
+  };
+
+  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
+  const smsText = encodeURIComponent(fullMessage);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-start px-4 py-12 pb-20 gap-8">
@@ -70,30 +87,44 @@ function SuccessContent() {
       </div>
 
       {/* SHARE BUTTONS */}
-      <div className="w-full max-w-lg flex gap-3">
-        <a
-          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${liText}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-700 hover:bg-blue-600 transition text-sm font-medium"
-        >
-          <LinkedinLogo weight="thin" size={20} />
-          LinkedIn
-        </a>
-        <button
-          onClick={() => copy('ig')}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-90 transition text-sm font-medium"
-        >
-          <InstagramLogo weight="thin" size={20} />
-          {igCopied ? 'Copié !' : 'Instagram'}
-        </button>
-        <a
-          href={`sms:?body=${smsText}`}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition text-sm font-medium"
-        >
-          <ChatCircle weight="thin" size={20} />
-          SMS
-        </a>
+      <div className="w-full max-w-lg flex flex-col gap-3">
+        {(igCopied || liCopied) && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-900/50 border border-emerald-500/30 text-sm text-emerald-200">
+            ✓ Message copié ! Colle-le (Ctrl+V) dans la conversation.
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#25D366] hover:bg-[#1fb856] transition text-sm font-medium text-white"
+          >
+            <WhatsappLogo weight="thin" size={20} />
+            WhatsApp
+          </a>
+          <button
+            onClick={shareToInstagram}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-90 transition text-sm font-medium"
+          >
+            <InstagramLogo weight="thin" size={20} />
+            {igCopied ? 'Copié !' : 'Instagram'}
+          </button>
+          <button
+            onClick={shareToLinkedIn}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-700 hover:bg-blue-600 transition text-sm font-medium"
+          >
+            <LinkedinLogo weight="thin" size={20} />
+            {liCopied ? 'Copié !' : 'LinkedIn'}
+          </button>
+          <a
+            href={`sms:?body=${smsText}`}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 transition text-sm font-medium"
+          >
+            <ChatCircle weight="thin" size={20} />
+            SMS
+          </a>
+        </div>
       </div>
 
       {/* POINTS PREVIEW */}
