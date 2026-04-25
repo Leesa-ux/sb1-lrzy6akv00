@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { sendBrevoSMS } from "@/lib/brevo-client";
-import crypto from "crypto";
 
 const BELGIAN_PHONE_REGEX = /^\+32\d{9}$/;
 
-function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-function hashPhone(phone: string): string {
-  return crypto.createHash("sha256").update(phone.trim()).digest("hex");
+function normalizePhone(phone: string): string | null {
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.startsWith('32') && cleaned.length === 11) return `+${cleaned}`;
+  if (cleaned.startsWith('04') && cleaned.length === 10) return `+32${cleaned.substring(1)}`;
+  if (cleaned.startsWith('4') && cleaned.length === 9) return `+32${cleaned}`;
+  return null;
 }
 
 export async function POST(req: NextRequest) {
@@ -19,65 +16,37 @@ export async function POST(req: NextRequest) {
     const { phone } = body;
 
     if (!phone || typeof phone !== "string") {
-      return NextResponse.json(
-        { ok: false, reason: "invalid" },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
     }
 
-    const normalizedPhone = phone.trim();
-
-    if (!BELGIAN_PHONE_REGEX.test(normalizedPhone)) {
-      return NextResponse.json(
-        { ok: false, reason: "invalid" },
-        { status: 400 }
-      );
+    const normalizedPhone = normalizePhone(phone.trim());
+    if (!normalizedPhone || !BELGIAN_PHONE_REGEX.test(normalizedPhone)) {
+      return NextResponse.json({ ok: false, reason: "invalid" }, { status: 400 });
     }
 
-    const existingUser = await db.user.findFirst({
-      where: { phone: normalizedPhone },
-      select: { id: true, email: true },
+    // Delegate to the Supabase edge function which stores the code in the DB
+    // so that /api/verify-code (which calls verify-sms-code edge fn) can find it.
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://yubmsrvzzcrubmshflpk.supabase.co";
+    const supabaseKey = process.env.SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+    const res = await fetch(`${supabaseUrl}/functions/v1/send-sms-code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({ phone: normalizedPhone }),
     });
 
-    if (existingUser) {
-      return NextResponse.json(
-        { ok: false, reason: "duplicate" },
-        { status: 200 }
-      );
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      return NextResponse.json({ ok: false, reason: data.error || "sms_failed" }, { status: 500 });
     }
 
-    const otp = generateOTP();
-    const expiresAt = Date.now() + 2 * 60 * 1000;
-    const requestId = crypto.randomBytes(16).toString("hex");
-
-    const smsMessage = `Afroé — Ton code de vérification : ${otp}. Valable 2 min.`;
-
-    try {
-      await sendBrevoSMS({
-        phone: normalizedPhone,
-        message: smsMessage,
-      });
-    } catch (smsError) {
-      console.error("SMS send error:", smsError);
-      return NextResponse.json(
-        { ok: false, reason: "sms_failed" },
-        { status: 500 }
-      );
-    }
-
-    const { putOTP } = await import("@/lib/otpStore");
-    putOTP(normalizedPhone, otp, 120);
-
-    return NextResponse.json({
-      ok: true,
-      requestId,
-      expiresAt,
-    });
+    return NextResponse.json({ ok: true, expiresAt: data.expiresAt });
   } catch (error) {
     console.error("verify-phone error:", error);
-    return NextResponse.json(
-      { ok: false, reason: "server_error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, reason: "server_error" }, { status: 500 });
   }
 }
