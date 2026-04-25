@@ -27,9 +27,14 @@ export async function POST(req: NextRequest) {
     // Delegate to the Supabase edge function which stores the code in the DB
     // so that /api/verify-code (which calls verify-sms-code edge fn) can find it.
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://yubmsrvzzcrubmshflpk.supabase.co";
+    const supabaseKey = process.env.SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
     const res = await fetch(`${supabaseUrl}/functions/v1/send-sms-code`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseKey}`,
+      },
       body: JSON.stringify({ phone: normalizedPhone }),
     });
 
