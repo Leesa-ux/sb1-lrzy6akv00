@@ -1,61 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendBrevoSMS } from "@/lib/brevo-client";
-import { generateOtp, putOTP } from "@/lib/otpStore";
 import { normalizePhone } from "@/lib/phone-utils";
 import { getClientIp } from "@/lib/get-client-ip";
 import { getSupabaseClient } from "@/lib/supabase";
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://yubmsrvzzcrubmshflpk.supabase.co";
+const SUPABASE_KEY = process.env.SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
 export async function POST(req: NextRequest) {
   try {
-    const supabase = getSupabaseClient();
-
     const body = await req.json();
     const { phone } = body;
 
     if (!phone) {
-      return NextResponse.json(
-        { error: "Phone number is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
     }
 
     const normalized = normalizePhone(phone);
     if (!normalized) {
-      return NextResponse.json(
-        { error: "Invalid phone number format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
     }
 
     const belgianPhoneRegex = /^\+32\d{9}$/;
     if (!belgianPhoneRegex.test(normalized)) {
-      return NextResponse.json(
-        { error: "Invalid Belgian phone number format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid Belgian phone number format" }, { status: 400 });
     }
 
-    const otpCode = generateOtp();
-    putOTP(normalized, otpCode, 600);
+    // Delegate to the edge function — stores code in sms_verification_codes table,
+    // stable across all serverless instances (no in-memory store).
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-sms-code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+      },
+      body: JSON.stringify({ phone: normalized }),
+    });
 
-    const message = `Afroé - Ton code de vérification est: ${otpCode}. Il expire dans 10 minutes.`;
+    const data = await res.json();
 
-    try {
-      await sendBrevoSMS({
-        phone: normalized,
-        message,
-      });
-    } catch (smsError) {
-      console.error("SMS send error:", smsError);
-      return NextResponse.json(
-        { error: "Failed to send SMS" },
-        { status: 500 }
-      );
+    if (!res.ok || !data.ok) {
+      console.error("send-sms-code edge fn error:", data);
+      return NextResponse.json({ error: data.error || "Failed to send SMS" }, { status: 500 });
     }
 
-    const ipAddress = getClientIp(req);
-
+    // Log IP activity (non-blocking)
     try {
+      const supabase = getSupabaseClient();
+      const ipAddress = getClientIp(req);
       await supabase.from("ip_activity").insert({
         ip_address: ipAddress,
         action_type: "sms_sent",
@@ -68,13 +59,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Code SMS envoyé",
-      expiresIn: 600,
+      expiresAt: data.expiresAt,
     });
   } catch (error) {
     console.error("Send OTP error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

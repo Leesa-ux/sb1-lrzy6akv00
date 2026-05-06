@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyOTP } from "@/lib/otpStore";
 import { normalizePhone } from "@/lib/phone-utils";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://yubmsrvzzcrubmshflpk.supabase.co";
+const SUPABASE_KEY = process.env.SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,38 +10,36 @@ export async function POST(req: NextRequest) {
     const { phone, code } = body;
 
     if (!phone || !code) {
-      return NextResponse.json(
-        { error: "Phone and code are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Phone and code are required" }, { status: 400 });
     }
 
     const normalized = normalizePhone(phone);
     if (!normalized) {
-      return NextResponse.json(
-        { error: "Invalid phone number format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
     }
 
-    const isValid = verifyOTP(normalized, code);
-
-    if (!isValid) {
-      return NextResponse.json(
-        { error: "Code incorrect ou expiré" },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      verified: true
+    // Verify against the DB-backed sms_verification_codes table via edge function.
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/verify-sms-code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+      },
+      body: JSON.stringify({ phone: normalized, code: String(code).trim() }),
     });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.verified) {
+      return NextResponse.json(
+        { error: data.error || "Code incorrect ou expiré", expired: data.expired ?? false },
+        { status: res.ok ? 400 : res.status }
+      );
+    }
+
+    return NextResponse.json({ success: true, verified: true });
   } catch (error) {
     console.error("Verify OTP error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
