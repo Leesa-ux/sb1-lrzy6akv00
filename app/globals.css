@@ -109,3 +109,33 @@
     background: radial-gradient(ellipse at center, rgba(11, 11, 11, 0.8) 0%, rgba(0, 0, 0, 1) 70%);
   }
 }
+
+/* ── Mobile readability fix for contest card (Samsung A5, older Android) ── */
+@media (max-width: 768px) {
+  .contest-card,
+  .contest-card * {
+    color: #ffffff !important;
+  }
+
+  .contest-card {
+    background: rgba(5, 8, 25, 0.92) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .contest-card::before,
+  .contest-card::after {
+    opacity: 0.15 !important;
+  }
+
+  /* Text-shadow on prize headings for low-brightness screens */
+  .contest-card p,
+  .contest-card span {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  }
+
+  /* Keep neon border visible */
+  .contest-card.neon-fuchsia {
+    box-shadow: 0 0 16px rgba(217, 70, 239, 0.5), inset 0 0 0 1px rgba(217, 70, 239, 0.4) !important;
+  }
+}
