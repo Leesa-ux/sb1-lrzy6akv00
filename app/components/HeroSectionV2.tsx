@@ -33,7 +33,7 @@ const HeroSectionV2: React.FC<HeroSectionProps> = ({
 
           {/* CONCOURS GLOW LIST — annonce principale */}
           <div className="mb-8 mx-auto max-w-2xl">
-            <div className="glassy neon-fuchsia rounded-2xl px-6 py-5 border border-fuchsia-500/30">
+            <div className="contest-card glassy neon-fuchsia rounded-2xl px-6 py-5 border border-fuchsia-500/30">
               <p className="text-xs font-bold tracking-widest uppercase text-fuchsia-400 mb-2">🎉 Concours — Glow List Afroé</p>
               <p className="text-white font-extrabold text-xl sm:text-2xl mb-3">
                 Gagne un <span className="text-amber-300">iPhone 17 Pro</span> ou <span className="text-fuchsia-300">2 000 €</span>
